@@ -1,0 +1,1224 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generado por Microsoft Visio, SVG Export modelo delegaciones.svg TRELEW -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+		xmlns:v="http://schemas.microsoft.com/visio/2003/SVGExtensions/" width="21.5385in" height="13.0769in"
+		viewBox="0 0 1550.77 941.538" xml:space="preserve" color-interpolation-filters="sRGB" class="st8">
+	<v:documentProperties v:langID="11274" v:metric="true" v:viewMarkup="false">
+		<v:userDefs>
+			<v:ud v:nameU="msvNoAutoConnect" v:val="VT0(1):26"/>
+		</v:userDefs>
+	</v:documentProperties>
+
+	<style type="text/css">
+	<![CDATA[
+		.st1 {stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:1}
+		.st2 {fill:#ffffff;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:1}
+		.st3 {fill:#000000;font-family:Roboto;font-size:0.833336em}
+		.st4 {font-size:1em}
+		.st5 {fill:#000000;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:1}
+		.st6 {fill:#ffffff;font-family:Roboto;font-size:0.833336em;font-weight:bold}
+		.st7 {fill:#c4d6a0;stroke:#000000;stroke-dasharray:7,5;stroke-linecap:round;stroke-linejoin:round;stroke-width:1}
+		.st8 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<g v:mID="13" v:index="9" v:groupContext="foregroundPage">
+		<v:userDefs>
+			<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+		</v:userDefs>
+		<title>TRELEW</title>
+		<v:pageProperties v:drawingScale="0.0393701" v:pageScale="0.0393701" v:drawingUnits="24" v:shadowOffsetX="8.50394"
+				v:shadowOffsetY="-8.50394"/>
+		<g id="shape1-1" v:mID="1" v:groupContext="shape" transform="translate(742.866,-689.704)">
+			<title>Conector dinámico.2098</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L0 952.17 L22.53 952.17 L22.53 1032.25" class="st1"/>
+		</g>
+		<g id="shape3-4" v:mID="3" v:groupContext="shape" transform="translate(742.866,-689.704)">
+			<title>Conector dinámico.2151</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L0 952.17 L481.88 952.17 L481.88 1270.36" class="st1"/>
+		</g>
+		<g id="shape4-7" v:mID="4" v:groupContext="shape" transform="translate(509.894,-623.251)">
+			<title>Conector dinámico.2152</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L-0 952.88 L153.45 952.88 L153.45 1203.91" class="st1"/>
+		</g>
+		<g id="shape6-10" v:mID="6" v:groupContext="shape" transform="translate(772.555,-553.641)">
+			<title>Conector dinámico.2156</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M-7.01 941.54 L-7.16 1020.91" class="st1"/>
+		</g>
+		<g id="shape7-13" v:mID="7" v:groupContext="shape" transform="translate(742.866,-689.704)">
+			<title>Conector dinámico.2159</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L0 952.17 L379.69 952.17 L379.69 1213.66" class="st1"/>
+		</g>
+		<g id="shape9-16" v:mID="9" v:groupContext="shape" transform="translate(963.969,-553.641)">
+			<title>Conector dinámico.2163</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L0 951.3 L56.54 951.3 L56.54 1077.6" class="st1"/>
+		</g>
+		<g id="shape10-19" v:mID="10" v:groupContext="shape" transform="translate(959.642,-553.641)">
+			<title>Conector dinámico.2164</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M4.33 941.54 L4.33 951.3 L9.85 951.3 L9.85 1134.29" class="st1"/>
+		</g>
+		<g id="shape11-22" v:mID="11" v:groupContext="shape" transform="translate(963.969,-553.641)">
+			<title>Conector dinámico.2165</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L0 951.3 L-45.5 951.3 L-45.5 1077.6" class="st1"/>
+		</g>
+		<g id="shape12-25" v:mID="12" v:groupContext="shape" transform="translate(202.335,-621.672)">
+			<title>Conector dinámico.2900</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L0 952.88 L-51.17 952.88 L-51.17 1202.33" class="st1"/>
+		</g>
+		<g id="shape13-28" v:mID="13" v:groupContext="shape" transform="translate(202.335,-621.672)">
+			<title>Conector dinámico.2901</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L0 952.88 L-102.2 952.88 L-102.2 1145.63" class="st1"/>
+		</g>
+		<g id="shape15-31" v:mID="15" v:groupContext="shape" transform="translate(209.347,-621.672)">
+			<title>Conector dinámico.2903</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M-7.01 941.54 L-7.16 1259.02" class="st1"/>
+		</g>
+		<g id="shape16-34" v:mID="16" v:groupContext="shape" transform="translate(202.335,-621.672)">
+			<title>Conector dinámico.2904</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L0 952.88 L50.87 952.88 L50.87 1145.63" class="st1"/>
+		</g>
+		<g id="shape17-37" v:mID="17" v:groupContext="shape" transform="translate(202.335,-621.672)">
+			<title>Conector dinámico.2905</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L0 952.88 L101.9 952.88 L101.9 1088.94" class="st1"/>
+		</g>
+		<g id="shape18-40" v:mID="18" v:groupContext="shape" transform="translate(509.894,-623.251)">
+			<title>Conector dinámico.2931</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L-0 952.88 L-154.64 952.88 L-154.64 1203.91" class="st1"/>
+		</g>
+		<g id="shape19-43" v:mID="19" v:groupContext="shape" transform="translate(509.894,-623.251)">
+			<title>Conector dinámico.2932</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L-0 952.88 L102.43 952.88 L102.43 1033.83" class="st1"/>
+		</g>
+		<g id="shape21-46" v:mID="21" v:groupContext="shape" transform="translate(502.998,-623.251)">
+			<title>Conector dinámico.2934</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M6.9 941.54 L6.9 952.88 L7.28 952.88 L7.28 1090.52" class="st1"/>
+		</g>
+		<g id="shape22-49" v:mID="22" v:groupContext="shape" transform="translate(765.543,-553.641)">
+			<title>Conector dinámico.2935</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L0 952.06 L-51.17 952.06 L-51.17 1077.6" class="st1"/>
+		</g>
+		<g id="shape23-52" v:mID="23" v:groupContext="shape" transform="translate(509.894,-623.251)">
+			<title>Conector dinámico.2936</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L0 952.88 L-103.61 952.88 L-103.61 1147.21" class="st1"/>
+		</g>
+		<g id="shape25-55" v:mID="25" v:groupContext="shape" transform="translate(765.543,-553.641)">
+			<title>Conector dinámico.2950</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L0 952.06 L50.87 952.06 L50.87 1077.6" class="st1"/>
+		</g>
+		<g id="shape26-58" v:mID="26" v:groupContext="shape" transform="translate(963.969,-553.641)">
+			<title>Conector dinámico.2961</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L0 951.3 L-96.53 951.3 L-96.53 1134.29" class="st1"/>
+		</g>
+		<g id="shape27-61" v:mID="27" v:groupContext="shape" transform="translate(963.969,-553.641)">
+			<title>Conector dinámico.2962</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L0 951.3 L107.57 951.3 L107.57 1190.99" class="st1"/>
+		</g>
+		<g id="shape28-64" v:mID="28" v:groupContext="shape" transform="translate(742.866,-689.704)">
+			<title>Conector dinámico.2966</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L0 952.17 L430.72 952.17 L430.72 1156.97" class="st1"/>
+		</g>
+		<g id="shape30-67" v:mID="30" v:groupContext="shape" transform="translate(742.866,-689.704)">
+			<title>Conector dinámico.2968</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L0 952.17 L220.95 952.17 L220.95 1032.25" class="st1"/>
+		</g>
+		<g id="shape31-70" v:mID="31" v:groupContext="shape" transform="translate(742.866,-689.704)">
+			<title>Conector dinámico.2969</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L0 952.88 L-233.12 952.88 L-233.12 962.64" class="st1"/>
+		</g>
+		<g id="shape32-73" v:mID="32" v:groupContext="shape" transform="translate(742.866,-689.704)">
+			<title>Conector dinámico.2970</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L0 952.88 L-540.68 952.88 L-540.68 964.22" class="st1"/>
+		</g>
+		<g id="shape33-76" v:mID="33" v:groupContext="shape" transform="translate(742.866,-689.704)">
+			<title>Conector dinámico.2975</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L0 952.17 L629.28 952.17 L629.28 1213.66" class="st1"/>
+		</g>
+		<g id="shape34-79" v:mID="34" v:groupContext="shape" transform="translate(816.567,-757.735)">
+			<title>Conector dinámico.3316</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L0 953.59 L-73.85 953.59 L-73.85 964.22" class="st1"/>
+		</g>
+		<g id="shape148-82" v:mID="148" v:groupContext="shape" transform="translate(742.866,-689.704)">
+			<title>Conector dinámico.148</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L0 952.17 L532.9 952.17 L532.9 1213.66" class="st1"/>
+		</g>
+		<g id="shape158-85" v:mID="158" v:groupContext="shape" transform="translate(816.567,-757.735)">
+			<title>Conector dinámico.158</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L0 953.59 L90.7 953.59 L90.7 964.22" class="st1"/>
+		</g>
+		<g id="shape174-88" v:mID="174" v:groupContext="shape" transform="translate(509.894,-623.251)">
+			<title>Conector dinámico.174</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L-0 952.88 L51.41 952.88 L51.41 1203.91" class="st1"/>
+		</g>
+		<g id="shape178-91" v:mID="178" v:groupContext="shape" transform="translate(509.894,-623.251)">
+			<title>Conector dinámico.178</title>
+			<v:userDefs>
+				<v:ud v:nameU="ShapeClass" v:val="VT4({D84F7AF5-C993-11d1-B2E7-006008BD347E})"/>
+				<v:ud v:nameU="OwnerUniqueID" v:val="VT0(-1):26"/>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="OrgChartStyle" v:prompt="" v:val="VT0(1):26"/>
+			</v:userDefs>
+			<path d="M0 941.54 L0 952.88 L-52.59 952.88 L-52.59 1203.91" class="st1"/>
+		</g>
+		<g id="group37-94" transform="translate(918.614,-553.641)" v:mID="37" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.37</title>
+			<g id="shape38-95" v:mID="38" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.38</title>
+				<desc>Sección Secretaría General</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="27.68" y="922.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Sección <tspan
+							x="4.46" dy="1em" class="st4">Secretaría General</tspan></text>			</g>
+			<g id="shape39-99" v:mID="39" v:groupContext="shape">
+				<title>Hoja.39</title>
+				<desc>J-VII</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="34.44" y="938.87" class="st6" v:langID="11274"><v:paragraph v:horizAlign="1"/><v:tabList/>J-<tspan
+							class="st4" v:langID="3082">VII</tspan></text>			</g>
+		</g>
+		<g id="group40-103" transform="translate(720.189,-553.641)" v:mID="40" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.40</title>
+			<g id="shape41-104" v:mID="41" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.41</title>
+				<desc>Sección Afiliaciones y Beneficios de Obra Social</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="27.68" y="912.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Sección<tspan
+							class="st4" v:langID="11274"> </tspan><tspan x="15.73" dy="1em" class="st4" v:langID="11274">Afiliaciones y </tspan><tspan
+							x="15.27" dy="1em" class="st4" v:langID="11274">Beneficios de </tspan><tspan x="19.88" dy="1em"
+							class="st4" v:langID="11274">Obra Social</tspan></text>			</g>
+			<g id="shape42-111" v:mID="42" v:groupContext="shape">
+				<title>Hoja.42</title>
+				<desc>J-VII</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="34.44" y="938.87" class="st6" v:langID="11274"><v:paragraph v:horizAlign="1"/><v:tabList/>J-<tspan
+							class="st4" v:langID="3082">VII</tspan></text>			</g>
+		</g>
+		<g id="group43-115" transform="translate(567.118,-485.609)" v:mID="43" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.43</title>
+			<g id="shape44-116" v:mID="44" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.44</title>
+				<desc>Responsable Secretaría Auditoría Médica</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="16.67" y="917.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Responsable<v:newlineChar/><tspan
+							x="22.78" dy="1em" class="st4">Secretaría </tspan><tspan x="7.55" dy="1em" class="st4">Auditoría Médica</tspan></text>			</g>
+			<g id="shape45-121" v:mID="45" v:groupContext="shape">
+				<title>Hoja.45</title>
+				<desc>C-V</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="36.88" y="938.87" class="st6" v:langID="11274"><v:paragraph v:horizAlign="1"/><v:tabList/>C-V</text>			</g>
+		</g>
+		<g id="group46-124" transform="translate(1128.38,-428.916)" v:mID="46" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.46</title>
+			<g id="shape47-125" v:mID="47" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.47</title>
+				<desc>Encargado Tesorería y Compras</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="21.53" y="917.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Encargado <tspan
+							x="20.7" dy="1em" class="st4">Tesorería y </tspan><tspan x="25.07" dy="1em" class="st4">Compras</tspan></text>			</g>
+			<g id="shape48-130" v:mID="48" v:groupContext="shape">
+				<title>Hoja.48</title>
+				<desc>C-IV</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="35.42" y="938.87" class="st6" v:langID="11274"><v:paragraph v:horizAlign="1"/><v:tabList/>C-<tspan
+							class="st4" v:langID="3082">IV</tspan></text>			</g>
+		</g>
+		<g id="group52-134" transform="translate(873.26,-372.223)" v:mID="52" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.52</title>
+			<g id="shape53-135" v:mID="53" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.53</title>
+				<desc>Administrativo Mesa de Entrada, Salida y Archivo</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="12.96" y="917.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Administrativo <tspan
+							x="6.93" dy="1em" class="st4">Mesa de Entrada, </tspan><tspan x="10.05" dy="1em" class="st4">Salida y Archivo</tspan></text>			</g>
+			<g id="shape54-140" v:mID="54" v:groupContext="shape">
+				<title>Hoja.54</title>
+				<desc>C-III</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="35.77" y="938.87" class="st6" v:langID="3082"><v:paragraph v:horizAlign="1"/><v:tabList/>C-I<tspan
+							class="st4" v:langID="11274">I</tspan>I</text>			</g>
+		</g>
+		<g id="group58-144" transform="translate(1077.35,-372.223)" v:mID="58" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.58</title>
+			<g id="shape59-145" v:mID="59" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.59</title>
+				<desc>Administrativo Previsión y Seguros</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="12.96" y="917.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Administrativo<v:newlineChar/><tspan
+							x="21.22" dy="1em" class="st4">Previsión y </tspan><tspan x="27.06" dy="1em" class="st4">Seguros</tspan></text>			</g>
+			<g id="shape60-150" v:mID="60" v:groupContext="shape">
+				<title>Hoja.60</title>
+				<desc>C-III</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="35.77" y="938.87" class="st6" v:langID="3082"><v:paragraph v:horizAlign="1"/><v:tabList/>C-I<tspan
+							class="st4" v:langID="11274">I</tspan>I</text>			</g>
+		</g>
+		<g id="group61-154" transform="translate(618.142,-315.53)" v:mID="61" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.61</title>
+			<g id="shape62-155" v:mID="62" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.62</title>
+				<desc>Personal Secretaría Auditoría Médica</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="25.74" y="917.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Personal <tspan
+							x="22.78" dy="1em" class="st4">Secretaría </tspan><tspan x="7.55" dy="1em" class="st4">Auditoría Médica</tspan></text>			</g>
+			<g id="shape63-160" v:mID="63" v:groupContext="shape">
+				<title>Hoja.63</title>
+				<desc>C-II</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="37.23" y="938.87" class="st6" v:langID="3082"><v:paragraph v:horizAlign="1"/><v:tabList/>C-I<tspan
+							class="st4" v:langID="11274">I</tspan></text>			</g>
+		</g>
+		<g id="group64-164" transform="translate(822.236,-315.53)" v:mID="64" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.64</title>
+			<g id="shape65-165" v:mID="65" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.65</title>
+				<desc>Personal Mesa de Informes</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="25.74" y="922.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Personal<v:newlineChar/><tspan
+							x="5.09" dy="1em" class="st4">Mesa de Informes</tspan></text>			</g>
+			<g id="shape66-169" v:mID="66" v:groupContext="shape">
+				<title>Hoja.66</title>
+				<desc>C-II</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="37.23" y="938.87" class="st6" v:langID="3082"><v:paragraph v:horizAlign="1"/><v:tabList/>C-I<tspan
+							class="st4" v:langID="11274">I</tspan></text>			</g>
+		</g>
+		<g id="group67-173" transform="translate(975.307,-372.223)" v:mID="67" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.67</title>
+			<g id="shape68-174" v:mID="68" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.68</title>
+				<desc>Personal Mantenimiento</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="25.74" y="922.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Personal <tspan
+							x="11.77" dy="1em" class="st4">Mantenimiento</tspan></text>			</g>
+			<g id="shape69-178" v:mID="69" v:groupContext="shape">
+				<title>Hoja.69</title>
+				<desc>C-III</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="35.77" y="938.87" class="st6" v:langID="3082"><v:paragraph v:horizAlign="1"/><v:tabList/>C-I<tspan
+							class="st4" v:langID="11274">I</tspan>I</text>			</g>
+		</g>
+		<g id="group70-182" transform="translate(54.933,-372.223)" v:mID="70" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.70</title>
+			<g id="shape71-183" v:mID="71" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.71</title>
+				<desc>Administrativo Gaiman</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="12.96" y="922.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Administrativo<v:lf/><tspan
+							x="28.15" dy="1em" class="st4" v:langID="11274">Gaiman</tspan></text>			</g>
+			<g id="shape72-187" v:mID="72" v:groupContext="shape">
+				<title>Hoja.72</title>
+				<desc>C-III</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="35.77" y="938.87" class="st6" v:langID="3082"><v:paragraph v:horizAlign="1"/><v:tabList/>C-I<tspan
+							class="st4" v:langID="11274">II</tspan></text>			</g>
+		</g>
+		<g id="group76-191" transform="translate(208.004,-372.223)" v:mID="76" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.76</title>
+			<g id="shape77-192" v:mID="77" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.77</title>
+				<desc>Administrativo Cajero</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="12.96" y="922.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Administrativo <tspan
+							x="30.99" dy="1em" class="st4">Cajero</tspan></text>			</g>
+			<g id="shape78-196" v:mID="78" v:groupContext="shape">
+				<title>Hoja.78</title>
+				<desc>C-III</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="35.77" y="938.87" class="st6" v:langID="3082"><v:paragraph v:horizAlign="1"/><v:tabList/>C-I<tspan
+							class="st4" v:langID="11274">II</tspan></text>			</g>
+		</g>
+		<g id="group79-200" transform="translate(105.957,-315.53)" v:mID="79" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.79</title>
+			<g id="shape80-201" v:mID="80" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.80</title>
+				<desc>Personal Dolavon</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="25.74" y="922.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Personal<v:newlineChar/><tspan
+							x="27.26" dy="1em" class="st4" v:langID="11274">Dolavon</tspan></text>			</g>
+			<g id="shape81-205" v:mID="81" v:groupContext="shape">
+				<title>Hoja.81</title>
+				<desc>C-II</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="37.23" y="938.87" class="st6" v:langID="3082"><v:paragraph v:horizAlign="1"/><v:tabList/>C-II</text>			</g>
+		</g>
+		<g id="group82-208" transform="translate(156.98,-258.838)" v:mID="82" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.82</title>
+			<g id="shape83-209" v:mID="83" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.83</title>
+				<desc>Auxiliar Camarones</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="28.81" y="922.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Auxiliar<v:newlineChar/><tspan
+							x="19.75" dy="1em" class="st4" v:langID="11274">Camarones</tspan></text>			</g>
+			<g id="shape84-213" v:mID="84" v:groupContext="shape">
+				<title>Hoja.84</title>
+				<desc>C-I</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="38.69" y="938.87" class="st6" v:langID="3082"><v:paragraph v:horizAlign="1"/><v:tabList/>C-I</text>			</g>
+		</g>
+		<g id="group85-216" transform="translate(259.027,-428.916)" v:mID="85" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.85</title>
+			<g id="shape86-217" v:mID="86" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.86</title>
+				<desc>Encargado Arancelamiento</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="21.53" y="922.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Encargado <tspan
+							x="10.23" dy="1em" class="st4">Arancelamiento</tspan></text>			</g>
+			<g id="shape87-221" v:mID="87" v:groupContext="shape">
+				<title>Hoja.87</title>
+				<desc>C-IV</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="35.42" y="938.87" class="st6" v:langID="11274"><v:paragraph v:horizAlign="1"/><v:tabList/>C-IV</text>			</g>
+		</g>
+		<g id="group88-224" transform="translate(156.98,-621.672)" v:mID="88" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.88</title>
+			<g id="shape89-225" v:mID="89" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.89</title>
+				<desc>División Boca de Expendio y Agencias</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="8.58" y="917.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>División Boca de <tspan
+							x="21.33" dy="1em" class="st4">Expendio y </tspan><tspan x="24.75" dy="1em" class="st4">Agencias</tspan></text>			</g>
+			<g id="shape90-230" v:mID="90" v:groupContext="shape">
+				<title>Hoja.90</title>
+				<desc>J-VI</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="35.9" y="938.87" class="st6" v:langID="11274"><v:paragraph v:horizAlign="1"/><v:tabList/>J-<tspan
+							class="st4" v:langID="3082">VI</tspan></text>			</g>
+		</g>
+		<g id="group91-234" transform="translate(464.539,-623.251)" v:mID="91" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.91</title>
+			<g id="shape92-235" v:mID="92" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.92</title>
+				<desc>División Administrativa de Obra Social</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="27.82" y="917.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>División <tspan
+							x="6.39" dy="1em" class="st4">Administrativa de </tspan><tspan x="19.88" dy="1em" class="st4">Obra Social</tspan></text>			</g>
+			<g id="shape93-240" v:mID="93" v:groupContext="shape">
+				<title>Hoja.93</title>
+				<desc>J-VI</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="35.9" y="938.87" class="st6" v:langID="11274"><v:paragraph v:horizAlign="1"/><v:tabList/>J-<tspan
+							class="st4" v:langID="3082">VI</tspan></text>			</g>
+		</g>
+		<g id="group97-244" transform="translate(669.165,-372.223)" v:mID="97" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.97</title>
+			<g id="shape98-245" v:mID="98" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.98</title>
+				<desc>Administrativo Afiliaciones y Convenios</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="12.96" y="917.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Administrativo <tspan
+							x="15.73" dy="1em" class="st4">Afiliaciones y </tspan><tspan x="22.02" dy="1em" class="st4">Convenios</tspan></text>			</g>
+			<g id="shape99-250" v:mID="99" v:groupContext="shape">
+				<title>Hoja.99</title>
+				<desc>C-III</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="35.77" y="938.87" class="st6" v:langID="3082"><v:paragraph v:horizAlign="1"/><v:tabList/>C-I<tspan
+							class="st4" v:langID="11274">II</tspan></text>			</g>
+		</g>
+		<g id="group100-254" transform="translate(516.094,-315.53)" v:mID="100" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.100</title>
+			<g id="shape101-255" v:mID="101" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.101</title>
+				<desc>Personal Farmacia</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="25.74" y="922.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Personal<v:newlineChar/><tspan
+							x="24.53" dy="1em" class="st4">Farmacia</tspan></text>			</g>
+			<g id="shape102-259" v:mID="102" v:groupContext="shape">
+				<title>Hoja.102</title>
+				<desc>C-II</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="37.23" y="938.87" class="st6" v:langID="3082"><v:paragraph v:horizAlign="1"/><v:tabList/>C-I<tspan
+							class="st4" v:langID="11274">I</tspan></text>			</g>
+		</g>
+		<g id="group106-263" transform="translate(361.075,-372.223)" v:mID="106" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.106</title>
+			<g id="shape107-264" v:mID="107" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.107</title>
+				<desc>Administrativo Derivaciones</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="12.96" y="922.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Administrativo <tspan
+							x="16.71" dy="1em" class="st4">Derivaciones</tspan></text>			</g>
+			<g id="shape108-268" v:mID="108" v:groupContext="shape">
+				<title>Hoja.108</title>
+				<desc>C-III</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="35.77" y="938.87" class="st6" v:langID="11274"><v:paragraph v:horizAlign="1"/><v:tabList/>C-I<tspan
+							class="st4" v:langID="3082">II</tspan></text>			</g>
+		</g>
+		<g id="group109-272" transform="translate(465.071,-428.916)" v:mID="109" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.109</title>
+			<g id="shape110-273" v:mID="110" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.110</title>
+				<desc>Encargado Farmacia</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="21.53" y="922.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Encargado <tspan
+							x="24.53" dy="1em" class="st4">Farmacia</tspan></text>			</g>
+			<g id="shape111-277" v:mID="111" v:groupContext="shape">
+				<title>Hoja.111</title>
+				<desc>C-IV</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="35.42" y="938.87" class="st6" v:langID="11274"><v:paragraph v:horizAlign="1"/><v:tabList/>C-IV</text>			</g>
+		</g>
+		<g id="group112-280" transform="translate(310.051,-315.53)" v:mID="112" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.112</title>
+			<g id="shape113-281" v:mID="113" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.113</title>
+				<desc>Personal Validación Online</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="25.74" y="922.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Personal <tspan
+							x="6.78" dy="1em" class="st4">Validación Online</tspan></text>			</g>
+			<g id="shape114-285" v:mID="114" v:groupContext="shape">
+				<title>Hoja.114</title>
+				<desc>C-II</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="37.23" y="938.87" class="st6" v:langID="3082"><v:paragraph v:horizAlign="1"/><v:tabList/>C-I<tspan
+							class="st4" v:langID="11274">I</tspan></text>			</g>
+		</g>
+		<g id="group115-289" transform="translate(720.189,-428.916)" v:mID="115" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.115</title>
+			<g id="shape116-290" v:mID="116" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.116</title>
+				<desc>Encargado Reintegros</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="21.53" y="922.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Encargado <tspan
+							x="21.45" dy="1em" class="st4">Reintegros</tspan></text>			</g>
+			<g id="shape117-294" v:mID="117" v:groupContext="shape">
+				<title>Hoja.117</title>
+				<desc>C-IV</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="35.42" y="938.87" class="st6" v:langID="11274"><v:paragraph v:horizAlign="1"/><v:tabList/>C-IV</text>			</g>
+		</g>
+		<g id="group121-297" transform="translate(771.213,-372.223)" v:mID="121" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.121</title>
+			<g id="shape122-298" v:mID="122" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.122</title>
+				<desc>Administrativo Prótesis y Órtesis</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="12.96" y="922.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Administrativo <tspan
+							x="6.38" dy="1em" class="st4">Prótesis y Órtesis</tspan></text>			</g>
+			<g id="shape123-302" v:mID="123" v:groupContext="shape">
+				<title>Hoja.123</title>
+				<desc>C-III</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="35.77" y="938.87" class="st6" v:langID="3082"><v:paragraph v:horizAlign="1"/><v:tabList/>C-I<tspan
+							class="st4" v:langID="11274">I</tspan>I</text>			</g>
+		</g>
+		<g id="group124-306" transform="translate(697.512,-689.704)" v:mID="124" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.124</title>
+			<g id="shape125-307" v:mID="125" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.125</title>
+				<desc>Subdelegado Trelew</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="16.3" y="922.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Subdelegado<v:newlineChar/><tspan
+							x="30.41" dy="1em" class="st4" v:langID="11274">Trelew</tspan></text>			</g>
+			<g id="shape126-311" v:mID="126" v:groupContext="shape">
+				<title>Hoja.126</title>
+				<desc>J-IV</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="35.9" y="938.87" class="st6" v:langID="11274"><v:paragraph v:horizAlign="1"/><v:tabList/>J-<tspan
+							class="st4" v:langID="3082">IV</tspan></text>			</g>
+		</g>
+		<g id="group127-315" transform="translate(924.283,-315.53)" v:mID="127" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.127</title>
+			<g id="shape128-316" v:mID="128" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.128</title>
+				<desc>Personal Chofer y Diligencias</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="5.96" y="922.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Personal Chofer y <tspan
+							x="21.09" dy="1em" class="st4">Diligencias</tspan></text>			</g>
+			<g id="shape129-320" v:mID="129" v:groupContext="shape">
+				<title>Hoja.129</title>
+				<desc>C-II</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="37.23" y="938.87" class="st6" v:langID="3082"><v:paragraph v:horizAlign="1"/><v:tabList/>C-I<tspan
+							class="st4" v:langID="11274">I</tspan></text>			</g>
+		</g>
+		<g id="group130-324" transform="translate(1026.33,-258.838)" v:mID="130" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.130</title>
+			<g id="shape131-325" v:mID="131" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.131</title>
+				<desc>Auxiliar Turismo</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="28.81" y="922.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Auxiliar<v:newlineChar/><tspan
+							x="26.9" dy="1em" class="st4">Turismo</tspan></text>			</g>
+			<g id="shape132-329" v:mID="132" v:groupContext="shape">
+				<title>Hoja.132</title>
+				<desc>C-I</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="38.69" y="938.87" class="st6" v:langID="3082"><v:paragraph v:horizAlign="1"/><v:tabList/>C-I</text>			</g>
+		</g>
+		<g id="group139-332" transform="translate(771.213,-757.735)" v:mID="139" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.139</title>
+			<g id="shape140-333" v:mID="140" v:groupContext="shape" transform="translate(2.91693,-11.3386)">
+				<title>Hoja.140</title>
+				<desc>Delegado Trelew</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="924.531" width="90.71" height="34.0157"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="24.37" y="921.53" class="st3" v:langID="3082"><v:paragraph v:horizAlign="1"/><v:tabList/>Delegado<v:newlineChar/><tspan
+							x="30.41" dy="1.2em" class="st4" v:langID="11274">Trelew</tspan></text>			</g>
+			<g id="shape141-337" v:mID="141" v:groupContext="shape" transform="translate(2.91693,0)">
+				<title>Hoja.141</title>
+				<desc>J-II</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="37.71" y="938.87" class="st6" v:langID="11274"><v:paragraph v:horizAlign="1"/><v:tabList/>J-I<tspan
+							class="st4" v:langID="3082">I</tspan></text>			</g>
+		</g>
+		<g id="group166-341" transform="translate(861.921,-689.704)" v:mID="166" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.166</title>
+			<g id="shape167-342" v:mID="167" v:groupContext="shape">
+				<title>Hoja.167</title>
+				<desc>Equipo de Auditoría Médica</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="919.617" width="90.71" height="46.8662"/>
+				<path d="M0 941.54 L90.71 941.54 L90.71 896.18 L0 896.18 L0 941.54 Z" class="st7"/>
+				<text x="23.34" y="916.87" class="st3" v:langID="3082"><v:paragraph v:spLine="-1.1" v:horizAlign="1"/><v:tabList/>Equipo de<v:newlineChar/><tspan
+							x="7.55" dy="1.1em" class="st4">Auditoría Médica</tspan></text>			</g>
+		</g>
+		<g id="group168-346" transform="translate(1179.4,-315.53)" v:mID="168" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.168</title>
+			<g id="shape169-347" v:mID="169" v:groupContext="shape">
+				<title>Hoja.169</title>
+				<desc>Equipo de Atención al Usuario</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="919.617" width="90.71" height="46.8662"/>
+				<path d="M0 941.54 L90.71 941.54 L90.71 896.18 L0 896.18 L0 941.54 Z" class="st7"/>
+				<text x="23.34" y="911.37" class="st3" v:langID="3082"><v:paragraph v:spLine="-1.1" v:horizAlign="1"/><v:tabList/>Equipo de<v:newlineChar/><tspan
+							x="20.44" dy="1.1em" class="st4">Atención al </tspan><tspan x="28.3" dy="1.1em" class="st4">Usuario</tspan></text>			</g>
+		</g>
+		<g id="group170-352" transform="translate(1230.43,-372.223)" v:mID="170" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.170</title>
+			<g id="shape171-353" v:mID="171" v:groupContext="shape">
+				<title>Hoja.171</title>
+				<desc>Equipo de Profesionales Vacunatorio</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="919.617" width="90.71" height="46.8662"/>
+				<path d="M0 941.54 L90.71 941.54 L90.71 896.18 L0 896.18 L0 941.54 Z" class="st7"/>
+				<text x="23.34" y="911.37" class="st3" v:langID="3082"><v:paragraph v:spLine="-1.1" v:horizAlign="1"/><v:tabList/>Equipo de<v:newlineChar/><tspan
+							x="14.71" dy="1.1em" class="st4">Profesionales </tspan><tspan x="18.36" dy="1.1em" class="st4">Vacunatorio</tspan></text>			</g>
+		</g>
+		<g id="group172-358" transform="translate(1326.8,-372.223)" v:mID="172" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.172</title>
+			<g id="shape173-359" v:mID="173" v:groupContext="shape">
+				<title>Hoja.173</title>
+				<desc>Equipo de Profesionales Trabajo Social</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="919.617" width="90.71" height="46.8662"/>
+				<path d="M0 941.54 L90.71 941.54 L90.71 896.18 L0 896.18 L0 941.54 Z" class="st7"/>
+				<text x="23.34" y="911.37" class="st3" v:langID="3082"><v:paragraph v:spLine="-1.1" v:horizAlign="1"/><v:tabList/>Equipo de<v:newlineChar/><tspan
+							x="14.71" dy="1.1em" class="st4">Profesionales </tspan><tspan x="13.57" dy="1.1em" class="st4"
+							v:langID="11274">Trabajo Social</tspan></text>			</g>
+		</g>
+		<g id="group175-364" transform="translate(412.098,-315.53)" v:mID="175" v:groupContext="group">
+			<v:custProps>
+				<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274" v:val="VT4(adasd)"/>
+				<v:cp v:nameU="Row_2" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274" v:val="VT4(dasda)"/>
+			</v:custProps>
+			<title>Hoja.175</title>
+			<g id="shape176-365" v:mID="176" v:groupContext="shape" transform="translate(-1.59872E-14,-11.3386)">
+				<title>Hoja.176</title>
+				<desc>Personal Farmacia</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Cargo" v:type="0" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="925.098" width="90.71" height="35.1496"/>
+				<rect x="0" y="907.523" width="90.7087" height="34.0157" class="st2"/>
+				<text x="25.74" y="922.6" class="st3" v:langID="3082"><v:paragraph v:spLine="-1" v:horizAlign="1"/><v:tabList/>Personal<v:newlineChar/><tspan
+							x="24.53" dy="1em" class="st4">Farmacia</tspan></text>			</g>
+			<g id="shape177-369" v:mID="177" v:groupContext="shape">
+				<title>Hoja.177</title>
+				<desc>C-II</desc>
+				<v:custProps>
+					<v:cp v:nameU="Row_1" v:lbl="Categoria" v:type="0" v:format="@+" v:langID="11274"/>
+				</v:custProps>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="935.869" width="90.71" height="11.3386"/>
+				<rect x="0" y="930.2" width="90.7087" height="11.3386" class="st5"/>
+				<text x="37.23" y="938.87" class="st6" v:langID="3082"><v:paragraph v:horizAlign="1"/><v:tabList/>C-I<tspan
+							class="st4" v:langID="11274">I</tspan></text>			</g>
+		</g>
+	</g>
+</svg>

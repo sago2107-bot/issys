@@ -1,0 +1,2320 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Organigrama — Delegación Comodoro Rivadavia · ISSyS</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#eef2f7;color:#1a2535;min-height:100vh}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,#0d2b4e,#1a5276);color:#fff;padding:14px 24px;display:flex;align-items:center;gap:14px;box-shadow:0 3px 10px rgba(0,0,0,.3)}
+.hdr-btns{margin-left:auto;display:flex;align-items:center;gap:8px}
+.deleg-select{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:8px;color:#fff;font-size:13px;font-weight:600;padding:7px 14px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;min-width:190px}
+.deleg-select:hover{background:rgba(255,255,255,.25)}
+.deleg-select option{background:#0d2b4e;color:#fff}
+.hdr-btn{display:flex;align-items:center;gap:7px;padding:8px 16px;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s}
+.hdr-btn:hover{background:rgba(255,255,255,.25)}
+
+/* MODAL DIAGRAMA */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{background:#fff;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,.35);width:92vw;height:88vh;display:flex;flex-direction:column;overflow:hidden}
+.modal-head{display:flex;align-items:center;padding:14px 18px;background:linear-gradient(135deg,#0d2b4e,#1a5276);color:#fff;gap:10px;flex-shrink:0}
+.modal-head-title{font-size:14px;font-weight:700}
+.modal-print{margin-left:auto;display:flex;align-items:center;gap:6px;padding:5px 12px;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:7px;color:#fff;font-size:12px;font-weight:600;cursor:pointer}
+.modal-print:hover{background:rgba(255,255,255,.25)}
+.modal-close{margin-left:8px;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:7px;color:#fff;font-size:18px;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.modal-close:hover{background:rgba(255,255,255,.3)}
+.modal-body{flex:1;overflow:hidden;background:#d8dde3;position:relative}
+#diagramaContainer{width:100%;height:100%;overflow:hidden;cursor:grab;display:flex;align-items:center;justify-content:center;position:relative}
+#diagramaContainer.dragging{cursor:grabbing}
+#diagramaImg{max-width:100%;max-height:100%;display:block;transform-origin:0 0;user-select:none;-webkit-user-drag:none}
+.hdr-ico{width:44px;height:44px;background:rgba(255,255,255,.15);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.hdr-title{font-size:16px;font-weight:700;letter-spacing:.2px}
+.hdr-sub{font-size:11px;opacity:.7;margin-top:2px}
+
+/* LAYOUT */
+.main{display:flex;height:calc(100vh - 72px);overflow:hidden}
+.tree-pnl{flex:1;overflow:auto;padding:20px 16px 40px;min-width:0}
+.detail-pnl{width:800px;flex-shrink:0;background:#fff;border-left:1px solid #d0dae4;overflow-y:auto;display:flex;flex-direction:column}
+
+/* TREE */
+.tl{padding-left:0}
+.tl .tl{padding-left:26px;border-left:2px solid #cdd8e3;margin-left:12px}
+.nw{margin:3px 0}
+
+/* NODE CARD */
+.nc{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border-radius:7px;border:1.5px solid;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.09);transition:transform .1s,box-shadow .1s;max-width:540px;user-select:none;outline:none}
+.nc:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.15)}
+.nc:focus-visible{box-shadow:0 0 0 3px rgba(41,128,185,.4)}
+.nc.active{box-shadow:0 0 0 3px rgba(41,128,185,.4),0 4px 14px rgba(0,0,0,.15);transform:translateY(-1px)}
+
+/* TOGGLE BUTTON */
+.tgl{width:18px;height:18px;border-radius:50%;border:1.5px solid currentColor;background:transparent;color:inherit;display:flex;align-items:center;justify-content:center;font-size:9px;cursor:pointer;flex-shrink:0;transition:transform .2s;padding:0;line-height:1}
+.tgl.open{transform:rotate(90deg)}
+.tgl.leaf{opacity:0;pointer-events:none;border:none}
+
+.nlbl{font-size:14px;font-weight:600;line-height:1.3}
+.nbadge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.nagrup{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:20px;white-space:nowrap;flex-shrink:0;background:#e8f0fe;color:#2c5fbd;border:1.5px solid #a8c0f0;letter-spacing:.2px}
+
+/* DRAG & DROP */
+.nw[data-nw-id]{position:relative;cursor:grab}
+.nw[data-nw-id]:active{cursor:grabbing}
+.nw.dragging>.nc{opacity:.4}
+.nw.drag-above::before{content:'';position:absolute;top:-2px;left:0;right:0;height:3px;background:#2980b9;border-radius:2px;z-index:10;pointer-events:none}
+.nw.drag-below::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:3px;background:#2980b9;border-radius:2px;z-index:10;pointer-events:none}
+
+/* CHILDREN */
+.ch{overflow:hidden;transition:max-height .25s ease,opacity .2s ease;max-height:4000px;opacity:1}
+.ch.collapsed{max-height:0!important;opacity:0}
+
+/* DETAIL PANEL */
+.d-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#8fa3b8;font-size:16.5px;text-align:center;padding:20px}
+.d-empty .ico{font-size:38px;opacity:.35}
+.d-header{padding:18px 18px 12px;border-bottom:1px solid #e4eaf0;position:relative}
+.btn-print{position:absolute;top:14px;right:14px;display:none;align-items:center;gap:5px;padding:5px 11px;background:#f0f4f8;border:1.5px solid #d0dae4;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;color:#1a2535}
+.btn-print:hover{background:#dce8f4;border-color:#b0c8e0}
+#printArea{display:none}
+#printAllArea{display:none}
+@page cargo-page{size:legal portrait;margin:1.5cm 1cm 1.5cm 2cm}
+@page diagram-page{size:legal landscape;margin:1cm}
+@media print{
+  @page{size:legal portrait;margin:1.5cm 1cm 1.5cm 2cm}
+  body>*{display:none!important}
+  body.printing-single #printArea{display:block!important;font-family:'Segoe UI',sans-serif;padding:0;color:#000;font-size:13px;line-height:1.6}
+  body.printing-all #printAllArea{display:block!important;font-family:'Segoe UI',sans-serif;color:#000}
+  body.printing-diagram #printDiagramArea{display:block!important;page:diagram-page;font-family:'Segoe UI',sans-serif}
+  #printDiagramArea .pa-title{font-size:16px;font-weight:700;text-transform:uppercase;text-align:center;letter-spacing:.5px;margin-bottom:10px}
+  #printDiagramArea img{width:100%;height:calc(100vh - 40px);object-fit:contain;display:block}
+  .pa-title{font-size:16px;font-weight:700;text-transform:uppercase;text-align:center;letter-spacing:.5px;margin-bottom:20px;white-space:nowrap}
+  .pa-hr{border:none;border-top:2px solid #0d2b4e;margin:18px 0}
+  .pa-field{margin-bottom:6px;font-size:15.5px;line-height:1.3}
+  .pa-key{font-weight:700;color:#0d2b4e}
+  .pa-sec{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#0d2b4e;margin:20px 0 10px}
+  #paMisiones,.pa-misiones-text{font-size:13.5px;line-height:1.75;margin-bottom:4px}
+  #paFunciones,.pa-funcs-list{padding-left:20px;margin:0}
+  #paFunciones li,.pa-funcs-list li{margin-bottom:6px;font-size:13.5px}
+  .pa-diagram-page{page:diagram-page;break-after:page;width:100%;height:100vh;display:flex;align-items:center;justify-content:center}
+  .pa-diagram-page img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+  .pa-cargo-page{page:cargo-page;font-size:13px;line-height:1.6;margin-bottom:24px}
+  .pa-cargo-header{break-inside:avoid;page-break-inside:avoid}
+  .pa-cargo-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
+  .pa-cargo-row .pa-field{margin-bottom:0;flex:1}
+  .pa-print-pills{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;flex-shrink:0}
+  .pa-print-pill{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;letter-spacing:.3px;border:2px solid #333;color:#000}
+  .ppill-has{background:#e0e0e0}
+  .ppill-no{background:transparent;opacity:.2;border-style:dashed}
+}
+.d-label{font-size:17.5px;font-weight:700;line-height:1.35;color:inherit;margin-bottom:8px}
+.d-deleg-pills{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;min-height:0}
+.d-deleg-pill{font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:20px;letter-spacing:.4px;border:1.5px solid currentColor;cursor:default}
+.d-deleg-pill.pill-active{background:rgba(0,0,0,.2);opacity:1}
+.d-deleg-pill.pill-has{background:transparent;opacity:.75}
+.d-deleg-pill.pill-no{background:transparent;opacity:.2;border-style:dashed}
+.d-badges-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.d-agrup{display:inline-flex;align-items:center;padding:4px 10px;border-radius:20px;font-size:14.5px;font-weight:700;background:#e8f0fe;color:#2c5fbd;border:1.5px solid #a8c0f0;letter-spacing:.2px}
+.d-badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:20px;font-size:14.5px;font-weight:700;border:1.5px solid}
+.d-body{padding:14px 18px;flex:1}
+.d-sec{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#0d2b4e;margin-bottom:8px}
+.mision-item{display:flex;align-items:flex-start;gap:8px;font-size:16px;line-height:1.7;color:#2c3e50;margin-bottom:6px;flex-wrap:wrap}
+.mision-item:last-of-type{margin-bottom:0}
+.mision-text{flex:1}
+.d-funcs{list-style:none;display:flex;flex-direction:column;gap:7px;padding:0;margin:0}
+.d-funcs li{font-size:16px;line-height:1.6;color:#2c3e50;padding-left:14px;position:relative}
+.d-funcs li::before{content:"▸";position:absolute;left:0;top:3px;color:#2980b9;font-size:13px}
+.d-funcs-numbered{counter-reset:func-counter;list-style:none;display:flex;flex-direction:column;gap:7px;padding:0;margin:0}
+.d-funcs-numbered li{counter-increment:func-counter;font-size:16px;line-height:1.6;color:#2c3e50;padding-left:26px;position:relative;display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap}
+.d-funcs-numbered li::before{content:counter(func-counter)".";position:absolute;left:0;top:1px;color:#1a5276;font-weight:700;font-size:15px;flex-shrink:0}
+.func-text{flex:1}
+.func-actions{display:flex;gap:4px;flex-shrink:0}
+.btn-label{display:inline-block;max-width:0;overflow:hidden;white-space:nowrap;vertical-align:middle;transition:max-width .2s,margin-left .2s;margin-left:0}
+.btn-func:hover .btn-label{max-width:70px;margin-left:3px}
+.btn-func{font-size:10.5px;padding:2px 8px;border-radius:5px;border:1.5px solid;cursor:pointer;font-weight:600;white-space:nowrap;line-height:1.6}
+.btn-edit{background:#e8f0fe;color:#2c5fbd;border-color:#a8c0f0}.btn-edit:hover{background:#d0e1fc}
+.btn-comment{background:#e8f4fb;color:#1a5276;border-color:#a8d0e8}.btn-comment:hover{background:#cce7f5}
+.btn-del{background:#fdecea;color:#c0392b;border-color:#f0a8a8}.btn-del:hover{background:#fcd0d0}
+.btn-save{background:#e8f9ee;color:#1a7a3c;border-color:#a8e0bc}.btn-save:hover{background:#d0f0dc}
+.btn-cancel{background:#f5f5f5;color:#666;border-color:#ccc}.btn-cancel:hover{background:#eee}
+.func-edit-input{flex:1;font-size:13.5px;line-height:1.5;color:#2c3e50;border:1.5px solid #a8c0f0;border-radius:6px;padding:5px 8px;font-family:inherit;resize:vertical;min-height:42px;outline:none}
+.func-edit-input:focus{border-color:#2980b9}
+.dep-func-ico{font-size:11px;opacity:.7;flex-shrink:0;margin-left:2px}
+
+/* CRUD CARGOS */
+.btn-nuevo-cargo{display:flex;align-items:center;justify-content:center;gap:6px;margin:10px 16px;padding:8px 14px;background:#e8f4fb;border:1.5px dashed #2980b9;border-radius:8px;color:#1a5276;font-size:12.5px;font-weight:600;cursor:pointer;width:calc(100% - 32px);box-sizing:border-box}
+.btn-nuevo-cargo:hover{background:#cce7f5}
+.cargo-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:2500;align-items:flex-start;justify-content:center;overflow-y:auto;padding:24px 16px}
+.cargo-modal-overlay.open{display:flex}
+.cargo-modal-box{background:#fff;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,.3);width:580px;max-width:96vw;margin:auto;display:flex;flex-direction:column}
+.cargo-modal-head{padding:18px 22px 14px;border-bottom:1px solid #e4eaf0;display:flex;align-items:center;gap:10px}
+.cargo-modal-title{font-size:15px;font-weight:700;color:#0d2b4e;flex:1}
+.cargo-modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:#8fa3b8;line-height:1;padding:0}
+.cargo-modal-close:hover{color:#0d2b4e}
+.cargo-modal-body{padding:18px 22px;display:flex;flex-direction:column;gap:14px;max-height:72vh;overflow-y:auto}
+.cargo-form-group{display:flex;flex-direction:column;gap:5px}
+.cargo-form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cargo-form-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#5a7fa8}
+.cargo-form-input,.cargo-form-select{font-size:13.5px;padding:9px 12px;border:1.5px solid #d0dae4;border-radius:8px;outline:none;font-family:inherit;color:#1a2535;width:100%;box-sizing:border-box}
+.cargo-form-input:focus,.cargo-form-select:focus{border-color:#2980b9}
+.cargo-deleg-checks{display:flex;gap:10px;flex-wrap:wrap}
+.cargo-deleg-label{display:flex;align-items:center;gap:4px;font-size:12.5px;cursor:pointer;font-weight:600}
+.cargo-deleg-label input{cursor:pointer;accent-color:#0d2b4e}
+.cargo-items-list{display:flex;flex-direction:column;gap:7px}
+.cargo-item-row{display:flex;gap:6px;align-items:flex-start}
+.cargo-item-num{font-size:12px;font-weight:700;color:#1a5276;min-width:20px;padding-top:10px;text-align:right}
+.cargo-item-ta{flex:1;font-size:13.5px;padding:8px 10px;border:1.5px solid #d0dae4;border-radius:7px;resize:none;font-family:inherit;min-height:54px;outline:none;line-height:1.5;box-sizing:border-box}
+.cargo-item-ta:focus{border-color:#2980b9}
+.cargo-item-del{padding:6px 9px;background:#fdecea;color:#c0392b;border:1.5px solid #f0a8a8;border-radius:6px;cursor:pointer;font-size:12px;flex-shrink:0;margin-top:2px}
+.cargo-item-del:hover{background:#fcd0d0}
+.cargo-add-btn{display:flex;align-items:center;gap:5px;background:none;border:1.5px dashed #2980b9;color:#2980b9;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;margin-top:2px}
+.cargo-add-btn:hover{background:#f0f7ff}
+.cargo-modal-foot{padding:14px 22px;border-top:1px solid #e4eaf0;display:flex;gap:10px;justify-content:flex-end}
+.cargo-btn-cancel{padding:9px 18px;background:#f5f5f5;color:#555;border:1.5px solid #ddd;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
+.cargo-btn-cancel:hover{background:#eee}
+.cargo-btn-save{padding:9px 20px;background:#0d2b4e;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
+.cargo-btn-save:hover{background:#1a5276}
+.nc-btn{display:inline-flex;align-items:center;gap:2px;max-width:0;overflow:hidden;padding:0;border-radius:4px;border:0px solid transparent;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;transition:max-width .2s,padding .2s,border-width .15s,opacity .15s;opacity:0;line-height:1.6;flex-shrink:0}
+.nc:hover .nc-btn{max-width:90px;opacity:1;padding:2px 6px;border-width:1.5px}
+.nc-btn-mod{background:#e8f0fe;color:#2c5fbd;border-color:#a8c0f0}.nc-btn-mod:hover{background:#d0e1fc!important}
+.nc-btn-del{background:#fdecea;color:#c0392b;border-color:#f0a8a8}.nc-btn-del:hover{background:#fcd0d0!important}
+.nc-btn-lbl{display:inline-block;max-width:0;overflow:hidden;white-space:nowrap;transition:max-width .2s,margin-left .2s;margin-left:0;font-size:10px}
+.nc-btn:hover .nc-btn-lbl{max-width:60px;margin-left:3px}
+.nc.dep-func{border-style:dashed!important}
+.d-dep-func-section{padding:14px 18px;flex:1}
+.d-dep-func-row{display:flex;gap:8px;align-items:baseline;font-size:15.5px;margin-bottom:10px;line-height:1.5}
+.d-dep-func-key{font-weight:700;color:#0d2b4e;white-space:nowrap;min-width:170px;font-size:14px;text-transform:uppercase;letter-spacing:.5px}
+.d-dep-func-val{color:#2c3e50}
+.d-dep-func-note{margin-top:18px;padding:12px 14px;background:#fff8e7;border:1.5px solid #e6a817;border-radius:8px;font-size:14.5px;color:#5a3d00;line-height:1.6}
+.voto-bar{display:inline-flex;align-items:stretch;border:1.5px solid #d0dae4;border-radius:20px;overflow:hidden;margin-top:6px}
+.voto-btn{display:flex;align-items:center;gap:5px;padding:4px 13px;border:none;background:transparent;cursor:pointer;color:#8fa3b8;transition:background .15s,color .15s;white-space:nowrap;line-height:1}
+.voto-btn svg{fill:none;stroke:currentColor;transition:fill .15s,stroke .15s}
+.voto-btn:hover{background:#f0f4f8;color:#4a6fa5}
+.voto-btn.active-up{color:#1e7e34;background:#e6f4ea}
+.voto-btn.active-up svg{fill:#1e7e34;stroke:#1e7e34}
+.voto-btn.active-down{color:#c0392b;background:#fce8ec}
+.voto-btn.active-down svg{fill:#c0392b;stroke:#c0392b}
+.voto-sep{width:1px;background:#d0dae4}
+.voto-count{font-size:12px;min-width:1ch;font-weight:600}
+.voto-tooltip{position:fixed;z-index:9999;background:#1a2535;color:#fff;font-size:12px;padding:7px 12px;border-radius:8px;pointer-events:none;max-width:260px;line-height:1.6;box-shadow:0 4px 16px rgba(0,0,0,.35);white-space:normal;display:none;animation:votoTipFadeIn .12s ease}
+@keyframes votoTipFadeIn{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:translateY(0)}}
+.voto-tooltip-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.6;margin-bottom:4px}
+.voto-tooltip-name{display:block;padding:1px 0}
+.btn-add-func{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;padding:8px 14px;background:#f0f7ff;border:1.5px dashed #2980b9;border-radius:7px;color:#2980b9;font-size:13px;font-weight:600;cursor:pointer;width:100%}
+.btn-add-func:hover{background:#e0efff}
+.d-path{padding:10px 18px;border-top:1px solid #e4eaf0;font-size:12.5px;color:#8fa3b8;line-height:1.5}
+#dMisionesSection{margin-bottom:16px}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:#c0cdd8;border-radius:2px}
+
+/* MODAL USUARIO */
+.user-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:3000;align-items:center;justify-content:center}
+.user-modal-overlay.open{display:flex}
+.user-modal-box{background:#fff;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,.3);padding:32px 28px;width:340px;display:flex;flex-direction:column;gap:14px}
+.user-modal-title{font-size:16px;font-weight:700;color:#0d2b4e}
+.user-modal-sub{font-size:13px;color:#5a7fa8;line-height:1.55}
+.user-modal-input{font-size:14px;padding:10px 14px;border:1.5px solid #d0dae4;border-radius:8px;outline:none;font-family:inherit;color:#1a2535}
+.user-modal-input:focus{border-color:#2980b9}
+.user-modal-btn{padding:10px;background:#0d2b4e;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
+.user-modal-btn:hover{background:#1a5276}
+.user-modal-error{font-size:12.5px;color:#c0392b;background:#fdecea;border:1px solid #f0a8a8;border-radius:7px;padding:8px 12px;text-align:center}
+.hdr-perfil-badge{font-size:9px;font-weight:700;padding:1px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px;flex-shrink:0}
+.hdr-perfil-badge.admin{background:#e6a817;color:#4a2800}
+.hdr-perfil-badge.delegado{background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.3)}
+
+/* CHIP USUARIO HEADER */
+.hdr-user{display:flex;align-items:center;gap:5px;font-size:12px;color:rgba(255,255,255,.75);border-right:1px solid rgba(255,255,255,.2);padding-right:12px;margin-right:4px}
+.hdr-user-name{font-weight:700;color:#fff}
+.hdr-change-user{background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;font-size:10.5px;text-decoration:underline;padding:0}
+.hdr-change-user:hover{color:#fff}
+
+/* ANOTACIONES */
+.d-anotaciones{border-top:1px solid #e4eaf0;padding:14px 18px 18px}
+.anot-user-row{display:flex;align-items:center;gap:5px;font-size:11.5px;color:#8fa3b8;margin-bottom:12px}
+.anot-change-user{background:none;border:none;color:#2980b9;cursor:pointer;font-size:11px;text-decoration:underline;padding:0}
+.anot-list{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;max-height:260px;overflow-y:auto}
+.anot-item{display:flex;gap:10px;align-items:flex-start}
+.anot-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:13px;flex-shrink:0;margin-top:1px}
+.anot-body{flex:1;min-width:0}
+.anot-meta{display:flex;align-items:center;gap:7px;margin-bottom:3px;flex-wrap:wrap}
+.anot-autor{font-size:12px;font-weight:700;color:#0d2b4e}
+.anot-fecha{font-size:10.5px;color:#8fa3b8}
+.anot-del{margin-left:auto;background:none;border:none;color:#c0392b;cursor:pointer;font-size:11px;padding:0;opacity:.55;line-height:1}
+.anot-del:hover{opacity:1}
+.anot-texto{font-size:14px;color:#2c3e50;line-height:1.6;word-break:break-word}
+.anot-input-area{display:flex;gap:8px;align-items:flex-end}
+.anot-textarea{flex:1;font-size:14px;padding:8px 12px;border:1.5px solid #d0dae4;border-radius:8px;resize:none;font-family:inherit;min-height:58px;outline:none;line-height:1.5;color:#1a2535}
+.anot-textarea:focus{border-color:#2980b9}
+.anot-btn{padding:9px 14px;background:#0d2b4e;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.anot-btn:hover{background:#1a5276}
+.anot-empty{font-size:12.5px;color:#8fa3b8;text-align:center;padding:10px 0;font-style:italic}
+.anot-loading{font-size:12px;color:#8fa3b8;text-align:center;padding:8px 0}
+.anot-contexto{font-size:11px;color:#5a7fa8;margin-bottom:4px;padding:3px 8px;background:#f0f7ff;border-left:2px solid #2980b9;border-radius:3px;line-height:1.4}
+.anot-ctx-label{font-weight:700;color:#2980b9}
+.inline-comment-form{flex-basis:100%;width:100%;margin-top:8px;padding:10px 12px;background:#f0f7ff;border-radius:8px;border:1.5px solid #a8c0f0;box-sizing:border-box}
+.inline-comment-ta{width:100%;font-size:12.5px;padding:7px 10px;border:1.5px solid #d0dae4;border-radius:6px;font-family:inherit;resize:none;min-height:52px;outline:none;box-sizing:border-box;line-height:1.5}
+.inline-comment-ta:focus{border-color:#2980b9}
+</style>
+</head>
+<body>
+
+<div id="votoTooltip" class="voto-tooltip"></div>
+
+<!-- Modal Nuevo / Editar Cargo -->
+<div id="cargoModal" class="cargo-modal-overlay">
+  <div class="cargo-modal-box">
+    <div class="cargo-modal-head">
+      <span id="cargoModalTitle" class="cargo-modal-title">Nuevo cargo</span>
+      <button class="cargo-modal-close" id="cargoModalClose">✕</button>
+    </div>
+    <div class="cargo-modal-body">
+      <div class="cargo-form-row">
+        <div class="cargo-form-group" style="grid-column:1/-1">
+          <label class="cargo-form-label">Nombre del cargo *</label>
+          <input type="text" id="nCargoNombre" class="cargo-form-input" placeholder="Ej: Encargado de Prestaciones">
+        </div>
+      </div>
+      <div class="cargo-form-row">
+        <div class="cargo-form-group">
+          <label class="cargo-form-label">Categoría *</label>
+          <select id="nCargoCat" class="cargo-form-select">
+            <optgroup label="Jefatura">
+              <option value="J-I">J-I</option><option value="J-II">J-II</option><option value="J-III">J-III</option>
+              <option value="J-IV">J-IV</option><option value="J-V">J-V</option><option value="J-VI">J-VI</option><option value="J-VII" selected>J-VII</option>
+            </optgroup>
+            <optgroup label="No Jerárquicos">
+              <option value="C-V">C-V</option><option value="C-IV">C-IV</option><option value="C-III">C-III</option>
+              <option value="C-II">C-II</option><option value="C-I">C-I</option>
+            </optgroup>
+            <optgroup label="Otro">
+              <option value="Equipo">Equipo</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="cargo-form-group">
+          <label class="cargo-form-label">Agrupamiento</label>
+          <select id="nCargoAgrup" class="cargo-form-select">
+            <option value="Administrativo">Administrativo</option>
+            <option value="Técnico/Profesional">Técnico/Profesional</option>
+            <option value="Servicio">Servicio</option>
+          </select>
+        </div>
+      </div>
+      <div class="cargo-form-group">
+        <label class="cargo-form-label">Dependencia (cargo superior) *</label>
+        <select id="nCargoDep" class="cargo-form-select"></select>
+      </div>
+      <div class="cargo-form-group">
+        <label class="cargo-form-label">Delegaciones</label>
+        <div class="cargo-deleg-checks" id="nDelegChecks"></div>
+      </div>
+      <div id="nCargoMisionesSection">
+        <div class="cargo-form-group">
+          <label class="cargo-form-label">Misiones</label>
+          <div class="cargo-items-list" id="nCargoMisionesWrap"></div>
+          <button class="cargo-add-btn" id="btnAddMision">＋ Agregar misión</button>
+        </div>
+      </div>
+      <div class="cargo-form-group">
+        <label class="cargo-form-label">Funciones</label>
+        <div class="cargo-items-list" id="nCargoFuncsWrap"></div>
+        <button class="cargo-add-btn" id="btnAddFunc">＋ Agregar función</button>
+      </div>
+    </div>
+    <div class="cargo-modal-foot">
+      <button class="cargo-btn-cancel" id="cargoModalCancel">Cancelar</button>
+      <button class="cargo-btn-save" id="cargoModalSave">Crear cargo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal usuario -->
+<div id="userModal" class="user-modal-overlay">
+  <div class="user-modal-box">
+    <div class="user-modal-title">🏛 ISSyS — Delegaciones</div>
+    <div class="user-modal-sub">Seleccioná tu usuario e ingresá tu contraseña para acceder.</div>
+    <select id="userSelect" class="user-modal-input">
+      <option value="">— Seleccioná tu usuario —</option>
+    </select>
+    <input type="password" id="userPassInput" class="user-modal-input" placeholder="Contraseña">
+    <div id="userLoginError" class="user-modal-error" style="display:none">Usuario o contraseña incorrectos.</div>
+    <button id="userNameSave" class="user-modal-btn">Ingresar</button>
+  </div>
+</div>
+
+<div class="hdr">
+  <div class="hdr-ico">🏛</div>
+  <div>
+    <div class="hdr-title">Delegación Comodoro Rivadavia</div>
+    <div class="hdr-sub">Instituto de Seguridad Social y Seguros de Chubut &nbsp;·&nbsp; Estructura Funcional</div>
+  </div>
+  <div class="hdr-btns">
+    <div class="hdr-user">
+      <span>👤</span>
+      <span id="hdrUserName">—</span>
+      <span id="hdrPerfilBadge" class="hdr-perfil-badge" style="display:none"></span>
+      <button id="btnChangeUser" class="hdr-change-user">cambiar</button>
+    </div>
+    <select class="deleg-select" id="delegSelect">
+      <option value="comodoro">Comodoro Rivadavia</option>
+      <option value="trelew">Trelew</option>
+      <option value="madryn">Puerto Madryn</option>
+      <option value="esquel">Esquel</option>
+      <option value="caba">CABA</option>
+      <option value="andina">Comarca Andina</option>
+    </select>
+    <button class="hdr-btn" id="btnPrintAll"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Imprimir</button>
+    <button class="hdr-btn" id="btnDiagrama"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Ver Diagrama</button>
+  </div>
+</div>
+
+<!-- Modal Diagrama -->
+<div class="modal-overlay" id="modalDiagrama">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span>📊</span>
+      <span class="modal-head-title">Diagrama — Delegación Comodoro Rivadavia</span>
+      <button class="modal-print" id="btnPrintDiagram"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Imprimir</button>
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="diagramaContainer">
+        <img id="diagramaImg" alt="Diagrama Comodoro Rivadavia">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="tree-pnl-wrap" style="display:flex;flex-direction:column;flex:1;overflow:hidden;min-width:0">
+  <button class="btn-nuevo-cargo" id="btnNuevoCargo">＋ Nuevo cargo</button>
+  <div class="tree-pnl" id="treePnl" style="flex:1;overflow:auto;padding:20px 16px 40px;min-width:0">
+    <div class="tl"><div class="nw">
+<div class="nc" id="nc-delegado" data-id="delegado" style="background:#1a3a5c;border-color:#1a3a5c;color:#fff" tabindex="0">
+<button class="tgl open" id="tgl-delegado" data-id="delegado" aria-label="expandir">▶</button>
+<span class="nlbl">Delegado Comodoro Rivadavia</span>
+<span class="nbadge" style="background:#0f2540;color:#90c8e8">J-II</span>
+</div>
+<div class="ch" id="ch-delegado"><div class="tl">
+<div class="nw">
+<div class="nc" id="nc-subdelegado" data-id="subdelegado" style="background:#1e5f8a;border-color:#1e5f8a;color:#fff" tabindex="0">
+<button class="tgl open" id="tgl-subdelegado" data-id="subdelegado" aria-label="expandir">▶</button>
+<span class="nlbl">Subdelegado Comodoro Rivadavia</span>
+<span class="nbadge" style="background:#144166;color:#8ec5e0">J-IV</span>
+</div>
+<div class="ch" id="ch-subdelegado"><div class="tl">
+<div class="nw">
+<div class="nc" id="nc-div_boca" data-id="div_boca" style="background:#e8f4fb;border-color:#2980b9;color:#1a3a5c" tabindex="0">
+<button class="tgl" id="tgl-div_boca" data-id="div_boca" aria-label="expandir">▶</button>
+<span class="nlbl">División Boca de Expendio y Agencias</span>
+<span class="nbadge" style="background:#2980b9;color:#fff">J-VI</span>
+</div>
+<div class="ch collapsed" id="ch-div_boca"><div class="tl">
+<div class="nw">
+<div class="nc" id="nc-enc_arancelamiento" data-id="enc_arancelamiento" style="background:#fdf4ff;border-color:#9b59b6;color:#4a1a6a" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Encargado Arancelamiento</span>
+<span class="nbadge" style="background:#9b59b6;color:#fff">C-IV</span>
+</div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-adm_rada_tilly" data-id="adm_rada_tilly" style="background:#f0f9f4;border-color:#27ae60;color:#1a4d2e" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Administrativo Rada Tilly</span>
+<span class="nbadge" style="background:#27ae60;color:#fff">C-III</span>
+</div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-adm_cajero" data-id="adm_cajero" style="background:#f0f9f4;border-color:#27ae60;color:#1a4d2e" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Administrativo Cajero</span>
+<span class="nbadge" style="background:#27ae60;color:#fff">C-III</span>
+</div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-personal_sarmiento" data-id="personal_sarmiento" style="background:#f7f8f9;border-color:#7f8c8d;color:#2c3e50" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Personal Sarmiento</span>
+<span class="nbadge" style="background:#7f8c8d;color:#fff">C-II</span>
+</div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-aux_rio_mayo" data-id="aux_rio_mayo" style="background:#fafafa;border-color:#bdc3c7;color:#34495e" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Auxiliar Río Mayo</span>
+<span class="nbadge" style="background:#bdc3c7;color:#555">C-I</span>
+</div>
+</div>
+</div></div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-div_adm_os" data-id="div_adm_os" style="background:#e8f4fb;border-color:#2980b9;color:#1a3a5c" tabindex="0">
+<button class="tgl" id="tgl-div_adm_os" data-id="div_adm_os" aria-label="expandir">▶</button>
+<span class="nlbl">División Administrativa de Obra Social</span>
+<span class="nbadge" style="background:#2980b9;color:#fff">J-VI</span>
+</div>
+<div class="ch collapsed" id="ch-div_adm_os"><div class="tl">
+<div class="nw">
+<div class="nc" id="nc-resp_auditoria" data-id="resp_auditoria" style="background:#fff8e7;border-color:#e6a817;color:#5a3d00" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Responsable Sec. Auditoría Médica</span>
+<span class="nbadge" style="background:#e6a817;color:#fff">C-V</span>
+</div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-enc_farmacia" data-id="enc_farmacia" style="background:#fdf4ff;border-color:#9b59b6;color:#4a1a6a" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Encargado Farmacia</span>
+<span class="nbadge" style="background:#9b59b6;color:#fff">C-IV</span>
+</div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-adm_derivaciones" data-id="adm_derivaciones" style="background:#f0f9f4;border-color:#27ae60;color:#1a4d2e" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Administrativo Derivaciones</span>
+<span class="nbadge" style="background:#27ae60;color:#fff">C-III</span>
+</div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-personal_farmacia" data-id="personal_farmacia" style="background:#f7f8f9;border-color:#7f8c8d;color:#2c3e50" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Personal Farmacia</span>
+<span class="nbadge" style="background:#7f8c8d;color:#fff">C-II</span>
+</div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-personal_validacion" data-id="personal_validacion" style="background:#f7f8f9;border-color:#7f8c8d;color:#2c3e50" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Personal Validación Online</span>
+<span class="nbadge" style="background:#7f8c8d;color:#fff">C-II</span>
+</div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-personal_auditoria" data-id="personal_auditoria" style="background:#f7f8f9;border-color:#7f8c8d;color:#2c3e50" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Personal Sec. Auditoría Médica</span>
+<span class="nbadge" style="background:#7f8c8d;color:#fff">C-II</span>
+</div>
+</div>
+</div></div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-sec_secretaria" data-id="sec_secretaria" style="background:#e8f4fb;border-color:#2980b9;color:#1a3a5c" tabindex="0">
+<button class="tgl" id="tgl-sec_secretaria" data-id="sec_secretaria" aria-label="expandir">▶</button>
+<span class="nlbl">Sección Secretaría General</span>
+<span class="nbadge" style="background:#2980b9;color:#fff">J-VII</span>
+</div>
+<div class="ch collapsed" id="ch-sec_secretaria"><div class="tl">
+<div class="nw">
+<div class="nc" id="nc-adm_mesa_entrada" data-id="adm_mesa_entrada" style="background:#f0f9f4;border-color:#27ae60;color:#1a4d2e" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Administrativo Mesa de Entrada, Salida y Archivo</span>
+<span class="nbadge" style="background:#27ae60;color:#fff">C-III</span>
+</div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-personal_mant" data-id="personal_mant" style="background:#f0f9f4;border-color:#27ae60;color:#1a4d2e" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Personal Mantenimiento</span>
+<span class="nbadge" style="background:#27ae60;color:#fff">C-III</span>
+</div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-personal_informes" data-id="personal_informes" style="background:#f7f8f9;border-color:#7f8c8d;color:#2c3e50" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Personal Mesa de Informes</span>
+<span class="nbadge" style="background:#7f8c8d;color:#fff">C-II</span>
+</div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-personal_chofer" data-id="personal_chofer" style="background:#f7f8f9;border-color:#7f8c8d;color:#2c3e50" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Personal Chofer y Diligencias</span>
+<span class="nbadge" style="background:#7f8c8d;color:#fff">C-II</span>
+</div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-aux_turismo" data-id="aux_turismo" style="background:#fafafa;border-color:#bdc3c7;color:#34495e" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Auxiliar Turismo</span>
+<span class="nbadge" style="background:#bdc3c7;color:#555">C-I</span>
+</div>
+</div>
+</div></div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-sec_afiliaciones" data-id="sec_afiliaciones" style="background:#e8f4fb;border-color:#2980b9;color:#1a3a5c" tabindex="0">
+<button class="tgl" id="tgl-sec_afiliaciones" data-id="sec_afiliaciones" aria-label="expandir">▶</button>
+<span class="nlbl">Sección Afiliaciones y Beneficios de Obra Social</span>
+<span class="nbadge" style="background:#2980b9;color:#fff">J-VII</span>
+</div>
+<div class="ch collapsed" id="ch-sec_afiliaciones"><div class="tl">
+<div class="nw">
+<div class="nc" id="nc-enc_reintegros" data-id="enc_reintegros" style="background:#fdf4ff;border-color:#9b59b6;color:#4a1a6a" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Encargado Reintegros</span>
+<span class="nbadge" style="background:#9b59b6;color:#fff">C-IV</span>
+</div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-adm_asuntos_legales" data-id="adm_asuntos_legales" style="background:#fdf4ff;border-color:#9b59b6;color:#4a1a6a" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Administrativo Asuntos Legales</span>
+<span class="nbadge" style="background:#9b59b6;color:#fff">C-IV</span>
+</div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-adm_afiliaciones" data-id="adm_afiliaciones" style="background:#f0f9f4;border-color:#27ae60;color:#1a4d2e" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Administrativo Afiliaciones y Convenios</span>
+<span class="nbadge" style="background:#27ae60;color:#fff">C-III</span>
+</div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-adm_protesis" data-id="adm_protesis" style="background:#f0f9f4;border-color:#27ae60;color:#1a4d2e" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Administrativo Prótesis y Órtesis</span>
+<span class="nbadge" style="background:#27ae60;color:#fff">C-III</span>
+</div>
+</div>
+</div></div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-sec_coord_ap" data-id="sec_coord_ap" style="background:#e8f4fb;border-color:#2980b9;color:#1a3a5c" tabindex="0">
+<button class="tgl" id="tgl-sec_coord_ap" data-id="sec_coord_ap" aria-label="expandir">▶</button>
+<span class="nlbl">Sección Coordinación de Atención Primaria</span>
+<span class="nbadge" style="background:#2980b9;color:#fff">J-VII</span>
+</div>
+<div class="ch collapsed" id="ch-sec_coord_ap"><div class="tl">
+<div class="nw">
+<div class="nc" id="nc-recepcionistas_ef" data-id="recepcionistas_ef" style="background:#eef2ff;border-color:#5c7cdb;color:#1e3a8a" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Recepcionistas Efectores Externos</span>
+<span class="nbadge" style="background:#5c7cdb;color:#fff">Equipo</span>
+</div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-equipo_vacunatorio" data-id="equipo_vacunatorio" style="background:#eef2ff;border-color:#5c7cdb;color:#1e3a8a" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Equipo Profesionales Vacunatorio</span>
+<span class="nbadge" style="background:#5c7cdb;color:#fff">Equipo</span>
+</div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-equipo_aud_medica" data-id="equipo_aud_medica" style="background:#eef2ff;border-color:#5c7cdb;color:#1e3a8a" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Equipo Auditoría Médica</span>
+<span class="nbadge" style="background:#5c7cdb;color:#fff">Equipo</span>
+</div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-equipo_atencion" data-id="equipo_atencion" style="background:#eef2ff;border-color:#5c7cdb;color:#1e3a8a" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Equipo Atención al Usuario</span>
+<span class="nbadge" style="background:#5c7cdb;color:#fff">Equipo</span>
+</div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-equipo_trabajo_social" data-id="equipo_trabajo_social" style="background:#eef2ff;border-color:#5c7cdb;color:#1e3a8a" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Equipo Trabajo Social</span>
+<span class="nbadge" style="background:#5c7cdb;color:#fff">Equipo</span>
+</div>
+</div>
+</div></div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-enc_tesoreria" data-id="enc_tesoreria" style="background:#fdf4ff;border-color:#9b59b6;color:#4a1a6a" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Encargado Tesorería y Compras</span>
+<span class="nbadge" style="background:#9b59b6;color:#fff">C-IV</span>
+</div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-adm_prevision" data-id="adm_prevision" style="background:#f0f9f4;border-color:#27ae60;color:#1a4d2e" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Administrativo Previsión y Seguros</span>
+<span class="nbadge" style="background:#27ae60;color:#fff">C-III</span>
+</div>
+</div>
+</div></div>
+</div>
+<div class="nw">
+<div class="nc" id="nc-equipo_aud_delegado" data-id="equipo_aud_delegado" style="background:#eef2ff;border-color:#5c7cdb;color:#1e3a8a" tabindex="0">
+<span class="tgl leaf" aria-hidden="true"></span>
+<span class="nlbl">Equipo Auditoría Médica</span>
+<span class="nbadge" style="background:#5c7cdb;color:#fff">Equipo</span>
+</div>
+</div>
+</div></div>
+</div></div>
+  </div>
+  </div><!-- /tree-pnl-wrap -->
+
+  <div class="detail-pnl" id="detailPnl">
+    <div class="d-empty" id="dEmpty">
+      <div class="ico">📋</div>
+      <div>Hacé clic en un cargo<br>para ver sus misiones y funciones</div>
+    </div>
+    <div id="dContent" style="display:none;flex-direction:column;flex:1">
+      <div class="d-header">
+        <div class="d-label" id="dLabel"></div>
+        <div class="d-deleg-pills" id="dDelegPills"></div>
+        <div class="d-badges-row">
+          <div class="d-agrup" id="dAgrup"></div>
+          <div class="d-badge" id="dBadge"></div>
+        </div>
+        <button class="btn-print" id="btnPrint">🖨 Imprimir</button>
+      </div>
+      <div id="dDepFuncSection" style="display:none" class="d-dep-func-section">
+        <div class="d-dep-func-row"><span class="d-dep-func-key">Dep. Administrativa</span><span class="d-dep-func-val" id="dDepAdmin"></span></div>
+        <div class="d-dep-func-row"><span class="d-dep-func-key">Dep. Funcional</span><span class="d-dep-func-val" id="dDepFunc"></span></div>
+        <div class="d-dep-func-note">Este cargo no tiene misiones ni funciones propias. Sus tareas están definidas y supervisadas funcionalmente por la <strong id="dDepFuncRef"></strong>.</div>
+      </div>
+      <div class="d-body" id="dBodyNormal">
+        <div id="dMisionesSection">
+          <div class="d-sec">Misiones</div>
+          <div id="dMisionesWrap"></div>
+        </div>
+        <div class="d-sec" id="dFuncionesLabel">Funciones</div>
+        <div id="dFuncsWrap"></div>
+      </div>
+      <div class="d-path" id="dPath"></div>
+      <div id="dAnotaciones" class="d-anotaciones">
+        <div class="d-sec">Anotaciones</div>
+        <div class="anot-user-row">
+          Anotando como <strong id="anotUserDisplay" style="color:#0d2b4e;margin:0 3px">—</strong>
+          <button id="anotChangeUser" class="anot-change-user">cambiar nombre</button>
+        </div>
+        <div id="anotList" class="anot-list"></div>
+        <div class="anot-input-area">
+          <textarea id="anotTexto" class="anot-textarea" placeholder="Escribir anotación… (Ctrl+Enter para enviar)" rows="2"></textarea>
+          <button id="anotAgregar" class="anot-btn">Agregar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let DATA = {"delegado": {"label": "Delegado", "delegaciones":["comodoro","trelew","madryn","esquel","caba","andina"], "cat": "J-II", "tipo": "J", "misiones": ["Ejercer la representación directiva, política e institucional del Instituto dentro de su Jurisdicción.", "Liderar la planificación estratégica de la Delegación y sus dependencias (si las tuviese), asegurando el cumplimiento de las políticas determinadas por el Directorio y las directivas estratégicas emanadas por la Gerencia General.", "Fomentar una cultura de mejora continua y articulación eficiente con las distintas coordinaciones y gerencias para garantizar la calidad en la prestación de servicios y la satisfacción del afiliado."], "funciones": ["Ejercer la representación institucional, política y administrativa del ISSyS dentro de su jurisdicción (la Delegación y sus dependencias, si las tuviese).", "Establecer un entorno propicio para la innovación, la capacitación continua y la implementación de tecnologías que mejoren la eficacia y seguridad en todas las operaciones de la Delegación y sus dependencias (si las tuviese).", "Intervenir, representar a la institución y brindar atención en la resolución de conflictos, reclamos de alta complejidad o necesidades críticas de los afiliados (incluyendo derivados) y prestadores, únicamente cuando estos hayan superado la capacidad de resolución de la primera línea de atención y de la Subdelegación, solicitando la mediación de la Sección Enlace Delegaciones cuando se presenten conflictos administrativos directos con Casa Central.", "Supervisar y articular estratégicamente con la Coordinación de Auditoría Médica (J-IV+), evaluando el cumplimiento de las políticas sanitarias y de cobertura dictadas por la Dirección Médica de Obra Social, sin tener injerencia en el criterio médico profesional exclusivo de dicha coordinación.", "Aprobar y elevar a la Gerencia General, a través de las áreas correspondientes, los requerimientos de personal, insumos, infraestructura y planes de mantenimiento propuestos por la Subdelegación para garantizar la operatividad de la sede.", "Establecer las directivas y controlar, a través de la Subdelegación, la presencia institucional y el correcto funcionamiento de las agencias y bocas de expendio dependientes de su jurisdicción.", "Evaluar e informar sobre el desempeño del Subdelegado y de los responsables de área bajo su dependencia directa.", "Aprobar y promover estrategias de intervención y mejora continua elaboradas por las distintas áreas, elevándolas al Directorio y coordinando su implementación con la asistencia técnica de la Sección Enlace Delegaciones.", "Administrar y rendir cuentas sobre los fondos estratégicos asignados para el funcionamiento normal de la Delegación.", "Tener un conocimiento acabado de la realidad prestacional y la política sanitaria local, así como de la población destinataria de los beneficios prestacionales.", "Requerir informes de diagnóstico situacional y estadísticas a la Subdelegación para la toma estratégica de decisiones bajo su competencia.", "Garantizar una comunicación fluida y efectiva con las autoridades provinciales, municipales, prestadores y proveedores.", "Ordenar y adoptar medidas de excepción en caso de urgencias institucionales o edilicias, informando inmediatamente a la superioridad de Casa Central.", "Articular de manera permanente con la Sección Enlace Delegaciones, facilitando la información necesaria para sus informes de gestión, recibiendo sus visitas periódicas de evaluación y canalizando a través de ella las necesidades operativas y desafíos particulares de la Delegación."], "agrupamiento": "Administrativo", "path": []}, "subdelegado": {"label": "Subdelegado", "delegaciones":["comodoro","trelew","madryn","esquel","caba","andina"], "cat": "J-IV", "tipo": "J", "misiones": ["Liderar y gestionar operativamente la representación administrativa y funcional del Instituto en la jurisdicción de la Delegación.", "Actuar como nexo coordinador entre la Dirección (Delegado) y las áreas operativas (Divisiones y Secciones), garantizando un despliegue eficiente, el control de los recursos y el cumplimiento normativo de las tareas que beneficien a los afiliados."], "funciones": ["Articular, junto al Delegado, la planificación y ejecución de las tareas operativas que permitan ejercer la representación administrativa y funcional del Instituto.", "Supervisar y dirigir el recurso humano de la Delegación, manteniéndose informado acerca del trabajo realizado por las Divisiones y Secciones bajo su responsabilidad.", "Cumplir las misiones y funciones asignadas al Delegado en caso de su ausencia u otro motivo que impida el ejercicio de su función.", "Supervisar y conformar los arqueos diarios de caja, así como las liquidaciones de viáticos, subsidios y reintegros, ejecutados operativamente por las áreas de Tesorería, Finanzas y/o Boca de Expendio.", "Autorizar y supervisar las solicitudes de anticipos y la gestión de compras de insumos, garantizando las rendiciones en tiempo y forma por parte de las áreas técnico-administrativas correspondientes.", "Intervenir, asesorar y resolver de manera directa los reclamos, quejas o consultas de afiliados y prestadores que, por su complejidad o nivel de conflictividad, superen la capacidad de resolución de las Jefaturas de División o Sección.", "Supervisar, en coordinación con el Departamento Técnico, la ejecución de las reparaciones menores, el mantenimiento general del edificio y la optimización de los consumos de servicios de agua, energía eléctrica y gas.", "Garantizar el cumplimiento de las normas de seguridad e higiene dispuestas por la Aseguradora de Riesgos de Trabajo (ART) y verificar la vigilancia del edificio.", "Relevar las necesidades de capacitación del personal a su cargo y proponer al Delegado los planes de formación correspondientes para optimizar las funciones de la Delegación.", "Monitorear el clima laboral e informar al Delegado para la aplicación de acciones preventivas o correctivas tendientes a fomentar un buen ambiente de trabajo.", "Realizar evaluaciones periódicas y elaborar informes sobre el desempeño del personal a su cargo (Jefaturas de División y Sección), para ser presentados ante la superioridad.", "Registrar y controlar la asistencia diaria del personal, garantizando la cobertura de funciones operativas en caso de licencias o ausencias.", "Mantener reuniones de trabajo periódicas con los jefes de división y responsables de área a su cargo para alinear objetivos y mejorar el desempeño de la Delegación.", "Supervisar el Archivo General de la Delegación y asegurar el correcto resguardo de la documentación.", "Tener un conocimiento acabado de la realidad prestacional y política sanitaria local.", "Realizar toda función y/o tarea operativa o de supervisión que sea encomendada por el Delegado."], "agrupamiento": "Administrativo", "path": ["Delegado"]}, "sec_secretaria": {"label": "Sección Secretaría General", "cat": "J-VII", "tipo": "J", "misiones": ["Gestionar, coordinar y supervisar los procesos administrativos internos, logísticos, de mantenimiento edilicio y del parque automotor de la Delegación.", "Administrar de manera directa e integral los recursos humanos locales, garantizando el cumplimiento de la normativa laboral, el control de presentismo y el desarrollo del personal, así como asegurar el correcto flujo de la documentación institucional y el resguardo del archivo general."], "funciones": ["Coordinar y supervisar las tareas operativas de las áreas a su cargo: Mesa de Entradas, Salidas y Archivo, Mantenimiento, Choferes, Mesa de Informes y Turismo.", "Asesorar al personal de las diferentes plantas sobre la aplicación de lo establecido en el Estatuto Escalafón Reglamentario y las normativas laborales vigentes.", "Registrar, controlar e informar la asistencia y puntualidad de los agentes pertenecientes a la Delegación y sus dependencias, confeccionando y controlando el parte diario.", "Solicitar y remitir la documentación necesaria para mantener actualizados los legajos de cada agente de la Delegación, trabajando de manera articulada con el Departamento de Desarrollo de RRHH y Personal de Casa Central.", "Gestionar y tramitar las comisiones de servicios del personal de la Delegación y sus dependencias.", "Relevar las necesidades de capacitación del personal local y articular con Casa Central lo referido a concursos, formación y motivación.", "Supervisar el uso, cuidado y mantenimiento de los bienes muebles e inmuebles de la Delegación y sus dependencias.", "Articular con la Gerencia General (División Mantenimiento Edilicio y Departamento de Desarrollo y Planificación) los requerimientos de reformas y trabajos de mantenimientos edilicios necesarios para el mejor desempeño y atención.", "Realizar el control y seguimiento del mantenimiento, estado general, seguros y documentación legal de los vehículos oficiales utilizados por la Delegación.", "Informar y controlar el cumplimiento de los servicios prestados por terceros (proveedores de limpieza, seguridad, u otros).", "Supervisar el correcto ingreso, clasificación, registro, distribución y guarda (archivo) de toda la documentación oficial y los actos administrativos de la Delegación.", "Emitir listados, reportes e informes a pedido del Subdelegado o Delegado.", "Evaluar e informar periódicamente sobre el desempeño del personal a su cargo (Mesa de Entradas, Mantenimiento, Choferes, Informes).", "Elaborar, colaborar y proponer en el proceso de confección de los manuales de procedimientos correspondientes a su área.", "Fomentar un buen ambiente de trabajo mediante acciones preventivas o correctivas, según corresponda.", "Realizar toda función y/o tarea que sea encomendada por el jefe inmediato superior."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia"]}, "adm_mesa_entrada": {"label": "Administrativo Mesa de Entrada, Salida y Archivo", "cat": "C-III", "tipo": "C", "funciones": ["Recepcionar, registrar y distribuir la documentación entrante.", "Controlar la salida y remisión de correspondencia.", "Mantener el archivo físico y digital de la Delegación.", "Llevar el registro de expedientes internos.", "Informar sobre el estado de trámites a afiliados y personal."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia", "Sección Secretaría General"]}, "adm_prevision": {"label": "Administrativo Previsión y Seguros", "cat": "C-III", "tipo": "C", "funciones": ["Gestionar las prestaciones de previsión social de los afiliados.", "Tramitar solicitudes vinculadas a seguros de vida y accidentes.", "Asesorar a los afiliados sobre sus derechos en materia previsional.", "Mantener actualizado el registro de beneficiarios de previsión.", "Articular con Casa Central para la resolución de casos complejos."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia"]}, "personal_informes": {"label": "Personal Mesa de Informes", "cat": "C-II", "tipo": "C", "funciones": ["Atender y orientar al público afiliado en consultas generales.", "Brindar información sobre prestaciones, turnos y requisitos.", "Derivar consultas a las secciones correspondientes.", "Registrar y canalizar reclamos y sugerencias de los afiliados."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia", "Sección Secretaría General"]}, "personal_mant": {"label": "Personal Mantenimiento", "cat": "C-III", "tipo": "C", "funciones": ["Realizar tareas de mantenimiento general del edificio de la Delegación.", "Controlar el estado de las instalaciones y equipamiento.", "Coordinar con División Mantenimiento Edilicio de Casa Central las reparaciones de mayor envergadura.", "Gestionar insumos básicos de limpieza y mantenimiento."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia", "Sección Secretaría General"]}, "adm_cajero": {"label": "Administrativo Cajero", "cat": "C-III", "tipo": "C", "funciones": ["Realizar la recaudación y registro de cobros en la Delegación.", "Efectuar pagos autorizados a proveedores y beneficiarios.", "Rendir diariamente los movimientos de caja.", "Custodiar los valores en efectivo asignados a la caja.", "Mantener actualizado el libro de caja y los comprobantes respaldatorios."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia", "División Boca de Expendio y Agencias"]}, "personal_chofer": {"label": "Personal Chofer y Diligencias", "cat": "C-II", "tipo": "C", "funciones": ["Conducir los vehículos institucionales asignados a la Delegación.", "Realizar diligencias y trámites externos en nombre de la Delegación.", "Mantener el vehículo en condiciones operativas e informar desperfectos.", "Registrar los viajes y consumo de combustible."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia", "Sección Secretaría General"]}, "aux_turismo": {"label": "Auxiliar Turismo", "cat": "C-I", "tipo": "C", "funciones": ["Asistir en la gestión de trámites de turismo social para afiliados.", "Informar sobre destinos, fechas y requisitos de los programas turísticos.", "Mantener el registro de solicitudes y asignaciones de turismo.", "Articular con Casa Central para la tramitación de los beneficios."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia", "Sección Secretaría General"]}, "adm_rada_tilly": {"label": "Administrativo Rada Tilly", "cat": "C-III", "tipo": "C", "funciones": ["Atender a los afiliados de la boca de expendio de Rada Tilly.", "Gestionar la entrega de medicamentos y prestaciones en dicha localidad.", "Mantener el registro de beneficios otorgados.", "Reportar novedades al Jefe de Sección Secretaría General."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia", "División Boca de Expendio y Agencias"]}, "personal_sarmiento": {"label": "Personal Sarmiento", "cat": "C-II", "tipo": "C", "funciones": ["Atender a los afiliados en la boca de expendio de Sarmiento.", "Tramitar la entrega de prestaciones y medicamentos en esa localidad.", "Mantener el registro de operaciones realizadas.", "Reportar al Jefe de Sección Secretaría General."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia", "División Boca de Expendio y Agencias"]}, "aux_rio_mayo": {"label": "Auxiliar Río Mayo", "cat": "C-I", "tipo": "C", "funciones": ["Asistir en la atención a afiliados en Río Mayo.", "Colaborar en la tramitación de prestaciones básicas.", "Mantener actualizado el registro de afiliados de la localidad.", "Reportar novedades operativas al Jefe de Sección Secretaría General."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia", "División Boca de Expendio y Agencias"]}, "div_boca": {"label": "División Boca de Expendio y Agencias", "delegaciones":["comodoro","trelew","esquel","andina"], "cat": "J-VI", "tipo": "J", "misiones": ["Coordinar, supervisar y asegurar el correcto funcionamiento operativo y administrativo de la Boca de Expendio de la Delegación y de las Agencias bajo su dependencia.", "Garantizar una atención de excelencia al afiliado, el control riguroso de la recaudación y valores, y la correcta aplicación de las normativas vigentes por parte de todo el personal a su cargo."], "funciones": ["Coordinar y supervisar todas las tareas del área, cumpliendo y haciendo cumplir las normas y procedimientos institucionales vigentes.", "Supervisar, en coordinación con el Subdelegado, el funcionamiento integral de las Agencias y/o bocas de expendio que dependan jurisdiccionalmente de la Delegación.", "Supervisar y controlar las operaciones de atención al público, garantizando el correcto asesoramiento al afiliado y la correcta emisión de bonos de internación, órdenes GOA y prácticas médicas en general.", "Intervenir en la atención directa al afiliado (expendio de órdenes, asesoramiento) únicamente en casos de contingencia, alta demanda o resolución de conflictos que superen a los administrativos de ventanilla.", "Supervisar los arqueos diarios de caja y controlar las rendiciones tanto de la Delegación cabecera como de las distintas Bocas de Expendio dependientes.", "Coordinar y fiscalizar la gestión de cobros en concepto de: coseguros de prestaciones, cuotas de Seros Vital, utilización de complejos turísticos y cancelaciones de préstamos.", "Controlar que la documentación correspondiente al cierre de caja mensual sea enviada en tiempo y forma a Casa Central.", "Supervisar la correcta gestión, recepción y control de los lotes de reintegros presentados en el área.", "Contar con información actualizada sobre cambios en aranceles, incrementos, suspensiones, bajas de servicios, resoluciones y prácticas moduladas, asegurando la inmediata instrucción y actualización del personal a su cargo.", "Tener un conocimiento acabado de la realidad prestacional y política sanitaria local, del Nomenclador Nacional, y de los convenios de reciprocidad vigentes.", "Mantener contacto permanente con los prestadores de su zona, garantizando interacciones positivas que favorezcan y simplifiquen los procesos administrativos cotidianos.", "Verificar que las prescripciones médicas cumplan estrictamente con las normas institucionales antes de autorizar la emisión de órdenes o bonos, articulando con Auditoría Médica cuando la normativa lo requiera.", "Evaluar e informar periódicamente sobre el desempeño del personal a su cargo (Encargados, Cajeros y Administrativos) presentándolo ante la superioridad.", "Colaborar en la mejora continua de los procesos del sector, proponiendo planes de capacitación técnica y de atención al público para optimizar el desempeño de los empleados bajo su órbita.", "Colaborar con el Jefe superior en la elaboración de competencias, temarios y entrega de material pertinente para las convocatorias de Concursos Internos que afecten a su área.", "Fomentar un buen ambiente de trabajo mediante acciones preventivas o correctivas, según corresponda."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia"]}, "enc_arancelamiento": {"label": "Encargado Arancelamiento", "cat": "C-IV", "tipo": "C", "funciones": ["Gestionar el proceso de arancelamiento de prestaciones en la Delegación.", "Controlar la correcta aplicación del nomenclador de prestaciones.", "Tramitar las liquidaciones de prestaciones con prestadores de la jurisdicción.", "Resolver consultas sobre coseguros y valores de prestaciones.", "Mantener actualizado el registro de aranceles y convenios."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia", "División Boca de Expendio y Agencias"]}, "div_adm_os": {"label": "División Administrativa de Obra Social", "cat": "J-VI", "tipo": "J", "misiones": ["Gestionar, coordinar y supervisar integralmente los procesos administrativos vinculados a las prestaciones médicas, derivaciones, farmacia y validación online.", "Articular de manera estrecha y eficiente con la Coordinación de Auditoría Médica para garantizar una atención de excelencia, asegurando la celeridad en la resolución de los trámites de salud y la estricta aplicación del marco normativo institucional vigente."], "funciones": ["Coordinar y supervisar todas las tareas operativas del área (derivaciones, farmacia, validación online y secretaría de auditoría médica), garantizando que el circuito administrativo de las prestaciones de salud se ejecute en tiempo y forma según la normativa vigente.", "Articular administrativamente con la Coordinación de Auditoría Médica los criterios de aplicación de las normas inherentes al sector, derivando a dicho equipo exclusivamente las decisiones que requieran evaluación de criterio médico profesional.", "Identificar de manera ágil aquellos casos o trámites que revistan carácter de urgencia y darles intervención inmediata ante el médico auditor para su priorización.", "Tener un conocimiento exhaustivo y actualizado del proceso de carga y autorización de medicamentos, prestaciones médicas en la provincia, y derivaciones a centros de mayor complejidad en CABA.", "Intervenir y realizar la atención personalizada de afiliados con trámites prestacionales complejos, disconformes o que requieran contención por temas estrictamente de salud, respaldando y guiando al personal a su cargo en la resolución de conflictos.", "Mantener contacto permanente con las áreas técnicas de Casa Central para unificar criterios, informar situaciones relevantes y solucionar inconvenientes relacionados con autorizaciones, medicamentos de alto costo o afiliados derivados.", "Elaborar y presentar informes estadísticos, diagnósticos y reportes de solicitudes de excepción requeridos por la Subdelegación o Delegación para la toma de decisiones.", "Evaluar e informar periódicamente sobre el desempeño del personal a su cargo (Encargados de Farmacia, Derivaciones, Administrativos de Validación Online y Secretaría de Auditoría Médica).", "Garantizar la correcta atención al público en todos los puestos vinculados a la provisión de salud, monitoreando los tiempos de espera y la calidad de la información brindada al afiliado.", "Mantener reuniones periódicas con su equipo de trabajo para alinear objetivos, actualizar normativas médicas y mejorar el flujo de los procesos internos.", "Estudiar y proponer modificaciones de los procesos que se realizan en el sector, tendientes a mejorar la eficiencia administrativa, elevándolas a la superioridad.", "Colaborar con el Jefe superior en la elaboración de competencias, temarios y entrega de material pertinente para las convocatorias de Concursos Internos que afecten a su área.", "Proponer planes de capacitación técnica, normativa y de calidad de atención para optimizar el desempeño de los empleados bajo su órbita.", "Garantizar el cumplimiento de las funciones del personal a su cargo en caso de ausencias y/o licencias.", "Fomentar un buen ambiente de trabajo mediante acciones preventivas o correctivas, según corresponda."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia"]}, "enc_farmacia": {"label": "Encargado Farmacia", "cat": "C-IV", "tipo": "C", "funciones": ["Supervisar la dispensación de medicamentos en la farmacia de la Delegación.", "Controlar el stock de medicamentos y gestionar su reposición.", "Verificar el cumplimiento de la normativa farmacéutica.", "Articular con los prescriptores médicos para la validación de recetas.", "Rendir el movimiento de farmacia al Jefe de División."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia", "División Administrativa de Obra Social"]}, "personal_farmacia": {"label": "Personal Farmacia", "cat": "C-II", "tipo": "C", "funciones": ["Dispensar medicamentos a los afiliados conforme a las recetas autorizadas.", "Asistir en el control de stock y vencimientos.", "Atender consultas básicas sobre medicamentos.", "Registrar las dispensaciones realizadas."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia", "División Administrativa de Obra Social"]}, "adm_derivaciones": {"label": "Administrativo Derivaciones", "cat": "C-III", "tipo": "C", "funciones": ["Gestionar las autorizaciones de derivaciones a prestadores de la red.", "Tramitar pedidos de internación, cirugías y estudios de alta complejidad.", "Mantener el registro de derivaciones y su seguimiento.", "Informar al afiliado sobre el estado de su derivación.", "Articular con Casa Central para derivaciones que requieran autorización superior."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia", "División Administrativa de Obra Social"]}, "personal_validacion": {"label": "Personal Validación Online", "cat": "C-II", "tipo": "C", "funciones": ["Realizar la validación online de prestaciones en los sistemas institucionales.", "Controlar la identidad y vigencia de la afiliación al momento de la prestación.", "Registrar las validaciones efectuadas.", "Reportar inconsistencias al responsable de la División."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia", "División Administrativa de Obra Social"]}, "resp_auditoria": {"label": "Responsable Sec. Auditoría Médica", "cat": "C-V", "tipo": "C", "funciones": ["Coordinar los procesos de auditoría médica en la jurisdicción.", "Controlar la pertinencia y codificación de las prestaciones auditadas.", "Articular con médicos auditores y prestadores.", "Elevar informes de auditoría a la Dirección Médica de Casa Central.", "Gestionar los reclamos de prestadores vinculados a auditoría."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia", "División Administrativa de Obra Social"]}, "personal_auditoria": {"label": "Personal Sec. Auditoría Médica", "cat": "C-II", "tipo": "C", "funciones": ["Asistir en las tareas administrativas de la Secretaría de Auditoría Médica.", "Procesar la documentación de auditoría.", "Mantener el registro de prestaciones auditadas.", "Gestionar el archivo de expedientes de auditoría."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia", "División Administrativa de Obra Social"]}, "sec_afiliaciones": {"label": "Sección Afiliaciones y Beneficios de Obra Social", "cat": "J-VII", "tipo": "J", "misiones": ["Coordinar, supervisar y asegurar la gestión eficiente de los trámites administrativos vinculados a reintegros, subsidios, afiliaciones y la provisión de materiales ortésicos.", "Garantizar una atención de calidad y la estricta aplicación del marco normativo vigente, asegurando que los afiliados accedan a sus beneficios y coberturas en tiempo y forma."], "funciones": ["Recibir y dar continuidad a la totalidad de trámites de reintegros y amparos de conformidad a la normativa vigente y las directivas establecidas por la superioridad.", "Realizar el control y cierre de los lotes de reintegros y subsidios para su correspondiente pago.", "Supervisar el proceso de recepción de los pedidos médicos autorizados de solicitudes de prótesis, órtesis e implantes conforme a los procedimientos y normas vigentes.", "Realizar el seguimiento interno de los procesos de autorización y auditoría previa de los materiales ortésicos solicitados.", "Controlar la entrega y recupero de los elementos ortésicos que fueran propiedad de la institución entregados en comodato al afiliado.", "Articular la logística, entrega y devolución del material disponible en la Institución.", "Supervisar el procesamiento de la documentación requerida para altas y bajas de afiliados, así como la actualización constante de sus datos en el sistema.", "Controlar el seguimiento, solicitud y entrega de credenciales, además de la emisión de cartas de presentación y boletas para el cobro de Seros Vital.", "Supervisar la correcta aplicación de los convenios de reciprocidad vigentes para la atención y afiliación.", "Articular con el área de Servicio Social en los casos de afiliados con discapacidad, menores a cargo o que requieran juntas médicas.", "Realizar estadísticas y/o informes que posibiliten cuantificar la realidad y disponer de información para la toma de decisiones bajo su competencia.", "Evaluar e informar el desempeño del personal a su cargo (Encargado de Reintegros, Administrativos de Afiliaciones y de Prótesis y Órtesis).", "Garantizar el cumplimiento de las funciones del personal a su cargo en caso de ausencias y/o licencias.", "Elaborar, colaborar y proponer en el proceso de confección de los manuales de procedimientos correspondientes a las funciones del cargo.", "Colaborar con la mejora de procesos del sector, a efectos de cumplir con eficiencia las misiones asignadas a la jefatura.", "Proponer planes de capacitación para el mejor desempeño en las funciones y/o actividades que se llevan a cabo en el sector.", "Mantener la confidencialidad de la documentación que se maneja en el área.", "Asistir y cumplir con las capacitaciones propuestas por el Instituto con intención de adquirir conocimientos, herramientas, habilidades y aptitudes para interactuar en el entorno laboral.", "Fomentar un buen ambiente de trabajo mediante acciones preventivas o correctivas, según corresponda.", "Realizar toda función y/o tarea que sea encomendada por el jefe inmediato superior."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia"]}, "enc_reintegros": {"label": "Encargado Reintegros", "cat": "C-IV", "tipo": "C", "funciones": ["Gestionar las solicitudes de reintegro de prestaciones de los afiliados.", "Verificar la documentación respaldatoria de cada solicitud.", "Tramitar las liquidaciones de reintegros con Casa Central.", "Informar a los afiliados sobre el estado de sus solicitudes.", "Mantener el registro de reintegros otorgados."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia", "Sección Afiliaciones y Beneficios de Obra Social"]}, "adm_afiliaciones": {"label": "Administrativo Afiliaciones y Convenios", "cat": "C-III", "tipo": "C", "funciones": ["Tramitar altas, bajas y modificaciones en el padrón de afiliados.", "Gestionar los convenios con prestadores médicos y paramédicos.", "Mantener actualizado el registro de beneficiarios.", "Atender consultas sobre cobertura y carnet de afiliado.", "Articular con Casa Central las novedades de afiliación."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia", "Sección Afiliaciones y Beneficios de Obra Social"]}, "adm_protesis": {"label": "Administrativo Prótesis y Órtesis", "cat": "C-III", "tipo": "C", "funciones": ["Gestionar solicitudes de prótesis y órtesis de los afiliados.", "Verificar la documentación médica y técnica requerida.", "Tramitar las autorizaciones ante Casa Central.", "Realizar el seguimiento de cada solicitud hasta su resolución.", "Mantener el registro de prótesis y órtesis entregadas."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia", "Sección Afiliaciones y Beneficios de Obra Social"]}, "adm_asuntos_legales": {"label": "Administrativo Asuntos Legales", "cat": "C-IV", "tipo": "C", "funciones": ["Gestionar los aspectos administrativos de los asuntos legales de la Delegación.", "Tramitar notificaciones, cédulas y documentación judicial.", "Mantener el registro de expedientes con intervención legal.", "Articular con el área legal de Casa Central.", "Asistir en la elaboración de informes para actuaciones jurídicas."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia", "Sección Afiliaciones y Beneficios de Obra Social"]}, "sec_coord_ap": {"label": "Sección Coordinación de Atención Primaria", "cat": "J-VII", "tipo": "J", "misiones": ["Administrar, coordinar y controlar el funcionamiento integral de los efectores de salud propios de la Delegación (consultorios y vacunatorio).", "Garantizar la excelencia en la atención médica primaria al afiliado mediante la óptima administración de los recursos humanos, incluyendo la conducción del equipo de recepcionistas de efectores externos, la aplicación de herramientas de gestión sanitaria eficientes y el estricto cumplimiento de las políticas establecidas por la Obra Social."], "funciones": ["Administrar, coordinar y controlar el funcionamiento diario de los efectores de salud propios pertenecientes al Instituto en el área de su competencia, asegurando la correcta aplicación de las políticas sanitarias vigentes.", "Supervisar, organizar y dirigir al equipo de recepcionistas de los efectores externos, asegurando una atención de calidad al afiliado, la correcta asignación de turnos y la fluidez administrativa en el ingreso de los pacientes.", "Garantizar que el equipo de recepcionistas brinde información clara y precisa sobre las especialidades disponibles, horarios y normativas de atención, resolviendo conflictos o dudas operativas que superen a la primera línea de atención.", "Implementar herramientas específicas de gestión de consultorios y de calidad, que garanticen un nivel óptimo y seguro en el servicio médico-asistencial brindado al afiliado.", "Supervisar, organizar y evaluar el desempeño de todos los recursos humanos a su cargo (médicos, enfermeros y recepcionistas), asegurando la eficiencia del personal y la cobertura continua de la atención al afiliado.", "Tener un conocimiento acabado del contexto sanitario y la problemática médica local, aplicando fundamentos de administración y economía de la salud para optimizar los recursos disponibles.", "Relevar de manera constante e informar a la superioridad sobre las especialidades médicas más demandadas por los afiliados, a los efectos de planificar la cobertura y satisfacer dichos requerimientos.", "Diseñar y proponer modificaciones o estrategias tendientes a mejorar la atención y los procesos tanto en la recepción, como en los consultorios médicos y en el vacunatorio.", "Elaborar informes de gestión y realizar análisis estadísticos que posibiliten cuantificar la realidad prestacional de los consultorios, disponiendo de información precisa para la toma de decisiones.", "Realizar toda función y/o tarea de coordinación sanitaria que sea encomendada por el jefe inmediato superior."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia"]}, "recepcionistas_ef": {"label": "Recepcionistas Efectores Externos", "cat": "Equipo", "tipo": "equipo", "funciones": ["Atender y orientar a los afiliados en los efectores externos de la Delegación.", "Gestionar turnos y derivaciones hacia prestadores de la red.", "Registrar la atención brindada en los efectores.", "Coordinar con el Jefe de Sección las novedades de los efectores."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia", "Sección Coordinación de Atención Primaria"]}, "equipo_vacunatorio": {"label": "Equipo Profesionales Vacunatorio", "cat": "Equipo", "tipo": "equipo", "funciones": ["Administrar las vacunas del calendario oficial e institucional.", "Mantener la cadena de frío y el stock de vacunas.", "Registrar las dosis aplicadas en los sistemas institucionales.", "Informar a los afiliados sobre los esquemas de vacunación.", "Articular con la Coordinación de Vacunatorios de Casa Central."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia", "Sección Coordinación de Atención Primaria"]}, "equipo_atencion": {"label": "Equipo Atención al Usuario", "cat": "Equipo", "tipo": "equipo", "funciones": ["Brindar atención personalizada a los afiliados.", "Gestionar consultas, reclamos y orientación en prestaciones.", "Registrar y dar seguimiento a los reclamos de los afiliados.", "Elevar reportes de atención al Jefe de Sección."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia", "Sección Coordinación de Atención Primaria"]}, "equipo_trabajo_social": {"label": "Equipo Trabajo Social", "cat": "Equipo", "tipo": "equipo", "funciones": ["Realizar evaluaciones e intervenciones de trabajo social para afiliados.", "Gestionar situaciones de vulnerabilidad social de los beneficiarios.", "Articular con redes de apoyo comunitarias e institucionales.", "Elaborar informes sociales para tramitación de prestaciones especiales.", "Coordinar con la Dirección Médica y programas sociales de Casa Central."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia", "Sección Coordinación de Atención Primaria"]}, "enc_tesoreria": {"label": "Encargado Tesorería y Compras", "cat": "C-IV", "tipo": "C", "funciones": ["Administrar los fondos asignados a la Delegación.", "Gestionar el proceso de compras y contrataciones locales.", "Rendir cuentas periódicamente a Casa Central.", "Controlar los gastos operativos de la Delegación.", "Mantener actualizado el registro contable de la Delegación.", "Tramitar pagos a proveedores y reintegros autorizados."], "agrupamiento": "Administrativo", "path": ["Delegado Comodoro Rivadavia", "Subdelegado Comodoro Rivadavia"]}, "equipo_aud_delegado": {"label": "Equipo Auditoría Médica", "delegaciones":["comodoro","trelew","madryn","esquel","caba","andina"], "cat": "Equipo", "tipo": "equipo", "depFuncional": "Jefatura de Auditoría Médica", "funciones": [], "agrupamiento": "Técnico/Profesional", "path": ["Delegado Comodoro Rivadavia"]}};
+
+const USUARIOS = [
+  {nombre:"Sebastián Galdame",  pass:"27582505", perfil:"admin"},
+  {nombre:"Vanesa Anchordoqui", pass:"26857419", perfil:"delegado"},
+  {nombre:"Marcelo Castro",     pass:"20238758", perfil:"delegado"},
+  {nombre:"Maria Otero",        pass:"28702662", perfil:"delegado"},
+  {nombre:"Omar Beatove",       pass:"23514985", perfil:"delegado"},
+  {nombre:"Emilio Roca",        pass:"33362781", perfil:"delegado"},
+  {nombre:"Cecilia Seguel",     pass:"29419871", perfil:"delegado"},
+];
+
+function isAdmin() {
+  return localStorage.getItem('issys_user_perfil') === 'admin';
+}
+function getCargo(id) {
+  return (DELEGACIONES[currentDeleg] && DELEGACIONES[currentDeleg].cargos[id]) || DATA[id];
+}
+function updateAdminUI() {
+  const admin = isAdmin();
+  const btn = document.getElementById('btnNuevoCargo');
+  if (btn) btn.style.display = admin ? '' : 'none';
+  if (typeof currentDeleg !== 'undefined' && typeof DELEGACIONES !== 'undefined') {
+    renderTree(DELEGACIONES[currentDeleg]);
+  }
+}
+
+const JEF_DIV_ADM_OS = {
+  label:"Jefe División Administrativa de Obra Social", delegaciones:["esquel","andina","madryn"],
+  cat:"J-VI", tipo:"J", agrupamiento:"Administrativo",
+  misiones:["Gestionar, coordinar y supervisar integralmente los procesos administrativos vinculados a las prestaciones médicas, farmacia, derivaciones y afiliaciones.", "Articular de manera estrecha y eficiente con el Equipo de Auditoría Médica para garantizar una atención de excelencia, asegurando la celeridad en la resolución de los trámites y la estricta aplicación del marco normativo institucional vigente."],
+  funciones:["Coordinar y supervisar todas las tareas operativas del área (derivaciones, farmacia, prótesis, autorizaciones, afiliaciones), garantizando que el circuito administrativo se ejecute en tiempo y forma según la normativa vigente.", "Articular administrativamente con la Coordinación de Auditoría Médica los criterios de aplicación de las normas inherentes al sector, derivando a dicho equipo exclusivamente las decisiones que requieran evaluación de criterio médico profesional.", "Identificar de manera ágil aquellos casos o trámites que revistan carácter de urgencia y darles intervención inmediata ante el médico auditor para su priorización.", "Tener un conocimiento exhaustivo y actualizado de las resoluciones, disposiciones, coberturas de medicamentos, y de todas las prestaciones médicas que se brindan tanto en la provincia como en los centros de mayor complejidad en CABA.", "Intervenir y realizar la atención personalizada de afiliados con trámites complejos, disconformes o que requieran contención por parte de la jefatura, respaldando y guiando al personal a su cargo en la resolución de conflictos.", "Mantener contacto permanente con las áreas técnicas de Casa Central para unificar criterios, informar situaciones relevantes y solucionar inconvenientes relacionados con autorizaciones, medicamentos de alto costo o afiliados derivados.", "Elaborar y presentar informes estadísticos, diagnósticos y reportes de solicitudes de excepción requeridos por la Subdelegación o Delegación para la toma de decisiones.", "Evaluar e informar periódicamente sobre el desempeño del personal a su cargo (Encargados y Administrativos de las distintas áreas prestacionales).", "Garantizar la correcta atención al público en todos los puestos vinculados a la Obra Social, monitoreando los tiempos de espera y la calidad de la información brindada al afiliado.", "Mantener reuniones periódicas con su equipo de trabajo para alinear objetivos, actualizar normativas y mejorar el flujo de los procesos internos.", "Estudiar y proponer modificaciones de los procesos que se realizan en el sector, tendientes a mejorar la eficiencia administrativa, elevándolas a la superioridad.", "Colaborar con el Jefe superior en la elaboración de competencias, temarios y entrega de material pertinente para las convocatorias de Concursos Internos que afecten a su área.", "Proponer planes de capacitación técnica, normativa y de calidad de atención para optimizar el desempeño de los empleados bajo su órbita.", "Fomentar un buen ambiente de trabajo mediante acciones preventivas o correctivas, según corresponda."],
+  path:["Delegado","Subdelegado"]
+};
+
+const DIV_ADM_OS_CABA = {
+  label:"División Administrativa de Obra Social", delegaciones:["caba"],
+  cat:"J-VI", tipo:"J", agrupamiento:"Administrativo",
+  misiones:["Coordinar, supervisar y optimizar los procesos administrativos vinculados a la gestión de prestaciones de salud, farmacia, afiliaciones, previsión, turnos, autorizaciones, pasajes, viáticos, mesa de entradas, atención virtual e informes, articulando con Auditoría Médica y áreas técnicas de CABA y Casa Central para garantizar una atención ordenada, oportuna y conforme a la normativa institucional vigente."],
+  funciones:[
+    "Coordinar y supervisar las tareas operativas vinculadas a turnos, farmacia, afiliaciones, previsión, autorizaciones, pasajes, viáticos, mesa de entradas, atención virtual e informes.",
+    "Garantizar que los circuitos administrativos vinculados a prestaciones de salud se ejecuten en tiempo y forma, conforme la normativa vigente.",
+    "Articular administrativamente con Auditoría Médica la aplicación de criterios normativos, derivando a dicho equipo las solicitudes que requieran evaluación médica profesional.",
+    "Identificar trámites o situaciones que revistan carácter urgente, disponiendo su inmediata intervención ante Auditoría Médica o el área competente.",
+    "Mantener conocimiento actualizado sobre los procesos de carga, autorización y seguimiento de medicamentos, prestaciones médicas, derivaciones y solicitudes especiales en CABA.",
+    "Intervenir en la atención personalizada de afiliados, tanto presencial, como virtual y telefónicamente, con trámites complejos, disconformidades o situaciones que requieran orientación institucional, acompañando al personal a su cargo en la resolución de conflictos.",
+    "Mantener contacto permanente con las áreas técnicas de Casa Central para unificar criterios, informar situaciones relevantes y resolver inconvenientes vinculados a autorizaciones, prótesis, medicamentos de alto costo, afiliados derivados y demás prestaciones de salud.",
+    "Supervisar la gestión de solicitudes de excepción, coberturas especiales, medicamentos, prótesis, órtesis, materiales médicos e insumos, conforme normativa vigente y con intervención de las áreas competentes.",
+    "Supervisar la carga de medicación y prestaciones en los sistemas correspondientes, garantizando que cuenten con la autorización previa de Auditoría Médica cuando corresponda.",
+    "Coordinar la solicitud de presupuestos a proveedores para la adquisición de prótesis, órtesis, materiales médicos, insumos u otros elementos necesarios para la atención de afiliados.",
+    "Supervisar la confección y entrega de órdenes de servicio, órdenes de bienes y servicios, solicitudes de anticipo con cargo a rendir y demás documentación administrativa vinculada a prestaciones de salud.",
+    "Coordinar con Tesorería las gestiones vinculadas a compra de insumos, anticipos, rendiciones y pagos relacionados con prestaciones a afiliados.",
+    "Supervisar la recepción, tramitación y liquidación de reintegros, procurando el cumplimiento de los plazos establecidos por los procedimientos vigentes.",
+    "Garantizar el registro, control y seguimiento de préstamos de elementos médicos, tales como sillas de ruedas, bastones, muletas u otros, así como del stock disponible.",
+    "Gestionar la línea de Atención Virtual, asegurando la correcta distribución de consultas, la detección de posibles urgencias y la respuesta adecuada conforme los circuitos internos.",
+    "Garantizar la correcta atención al público en los puestos vinculados a prestaciones de salud, monitoreando tiempos de espera, calidad de la información brindada y adecuada derivación de trámites.",
+    "Elaborar y presentar informes estadísticos, diagnósticos, reportes de gestión y solicitudes de excepción requeridos por la Subdelegación o Delegación.",
+    "Evaluar e informar periódicamente sobre el desempeño del personal a su cargo.",
+    "Mantener reuniones periódicas con el equipo de trabajo para alinear criterios, actualizar normativa, revisar circuitos y mejorar el flujo de los procesos internos.",
+    "Proponer modificaciones de procesos tendientes a mejorar la eficiencia administrativa, la trazabilidad de los trámites y la calidad de atención.",
+    "Colaborar con la autoridad superior en la elaboración de competencias, temarios y material pertinente para convocatorias de concursos internos que afecten a su área.",
+    "Proponer planes de capacitación técnica, normativa y de calidad de atención para optimizar el desempeño del personal bajo su órbita.",
+    "Garantizar la continuidad operativa de las funciones del área ante ausencias, licencias o situaciones excepcionales del personal a su cargo.",
+    "Promover pautas de trabajo ordenadas, colaborativas y respetuosas, interviniendo ante situaciones que afecten el normal funcionamiento del sector.",
+    "Realizar toda otra función o tarea vinculada al área que sea encomendada por la autoridad superior."
+  ],
+  path:["Delegado","Subdelegado"]
+};
+
+const SEC_FACTURACION_CABA = {
+  label:"Sección Facturación", delegaciones:["caba"],
+  cat:"J-VII", tipo:"J", agrupamiento:"Administrativo",
+  misiones:["Coordinar, supervisar y controlar el proceso de recepción, análisis, liquidación y rendición de la facturación correspondiente a prestaciones brindadas a afiliados derivados en la Ciudad Autónoma de Buenos Aires, garantizando el cumplimiento de los plazos establecidos por la Delegación y Subdelegación, la correcta aplicación de los valores convenidos con prestadores y la remisión oportuna de las liquidaciones a Casa Central."],
+  funciones:[
+    "Coordinar y supervisar la liquidación de las prestaciones brindadas a afiliados a través de prestadores y entidades prestadoras de la Ciudad Autónoma de Buenos Aires.",
+    "Controlar, revisar y firmar las liquidaciones confeccionadas por el sector, disponiendo su remisión al área correspondiente para su pago.",
+    "Verificar la correcta aplicación de los valores convenidos con los prestadores, manteniendo actualizadas las grillas arancelarias conforme las modificaciones aprobadas, como así también los módulos convenidos.",
+    "Supervisar la distribución interna de prestadores y tareas dentro del equipo de Facturación, procurando una adecuada organización del trabajo.",
+    "Controlar la liquidación de coseguros y demás conceptos vinculados a las prestaciones facturadas.",
+    "Recibir, canalizar y responder consultas de prestadores, proveedores, afiliados o áreas internas vinculadas a trámites de facturación, conforme la normativa vigente y las competencias del sector.",
+    "Organizar mecanismos administrativos y logísticos que permitan agilizar los circuitos de recepción de documentación, auditoría médica, liquidación, rendición y envío a Casa Central.",
+    "Gestionar los plazos del sector, procurando que las liquidaciones sean remitidas dentro del mes de recepción.",
+    "Elaborar informes relacionados con el área cuando sean requeridos por la Delegación o Subdelegación.",
+    "Registrar y sistematizar información estadística sobre facturación, liquidaciones, pagos realizados, débitos, créditos y prestaciones liquidadas durante el año.",
+    "Evaluar el funcionamiento del sistema informático utilizado para las liquidaciones mensuales, informando a la superioridad las irregularidades detectadas y proponiendo las medidas correctivas pertinentes.",
+    "Garantizar la continuidad operativa de las funciones del área ante ausencias, licencias o situaciones excepcionales del personal a su cargo.",
+    "Promover pautas de trabajo ordenadas, colaborativas y respetuosas, interviniendo ante situaciones que afecten el normal funcionamiento del sector.",
+    "Asistir y cumplir con las capacitaciones propuestas por el Instituto, orientadas a fortalecer los conocimientos, herramientas y habilidades necesarias para el desempeño eficiente del cargo.",
+    "Realizar toda otra función o tarea vinculada al área que sea encomendada por la autoridad superior."
+  ],
+  path:["Delegado","Subdelegado"]
+};
+
+const DELEGACIONES = {
+  comodoro: { nombre:"Comodoro Rivadavia", abrev:"CR", diagrama:"comodoro.svg", cargos:DATA,
+    tree:{id:"delegado",children:[{id:"subdelegado",children:[
+      {id:"div_boca",children:[{id:"enc_arancelamiento"},{id:"adm_rada_tilly"},{id:"adm_cajero"},{id:"personal_sarmiento"},{id:"aux_rio_mayo"}]},
+      {id:"div_adm_os",children:[{id:"resp_auditoria"},{id:"enc_farmacia"},{id:"adm_derivaciones"},{id:"personal_farmacia"},{id:"personal_validacion"},{id:"personal_auditoria"}]},
+      {id:"sec_secretaria",children:[{id:"adm_mesa_entrada"},{id:"personal_mant"},{id:"personal_informes"},{id:"personal_chofer"},{id:"aux_turismo"}]},
+      {id:"sec_afiliaciones",children:[{id:"enc_reintegros"},{id:"adm_asuntos_legales"},{id:"adm_afiliaciones"},{id:"adm_protesis"}]},
+      {id:"sec_coord_ap",children:[{id:"recepcionistas_ef"},{id:"equipo_vacunatorio"},{id:"equipo_atencion"},{id:"equipo_trabajo_social"}]},
+      {id:"enc_tesoreria"},{id:"adm_prevision"}
+    ]},{id:"equipo_aud_delegado"}]}
+  },
+  trelew: { nombre:"Trelew",         abrev:"TR", diagrama:"trelew.svg",  tree:{id:"delegado",children:[{id:"subdelegado",children:[{id:"div_boca",children:[]}]},{id:"equipo_aud_delegado"}]}, cargos:{ delegado: DATA.delegado, subdelegado: DATA.subdelegado, div_boca: DATA.div_boca, equipo_aud_delegado: DATA.equipo_aud_delegado } },
+  madryn: { nombre:"Puerto Madryn",  abrev:"PM", diagrama:"madryn.svg",
+    tree:{id:"delegado",children:[{id:"subdelegado",children:[{id:"jef_sec_boca",children:[]},{id:"jef_div_adm_os",children:[]}]},{id:"equipo_aud_delegado"}]},
+    cargos:{ delegado: DATA.delegado, subdelegado: DATA.subdelegado, equipo_aud_delegado: DATA.equipo_aud_delegado, jef_div_adm_os: JEF_DIV_ADM_OS,
+      jef_sec_boca:{label:"Jefe Sección Boca de Expendio", delegaciones:["madryn"], cat:"J-VII", tipo:"J", agrupamiento:"Administrativo",
+        misiones:["Coordinar, supervisar y asegurar el correcto funcionamiento operativo y administrativo de la Boca de Expendio de la Delegación.", "Garantizar una atención de excelencia al afiliado, el control riguroso de la recaudación y valores, y la correcta aplicación de las normativas vigentes por parte de todo el personal a su cargo."],
+        funciones:["Coordinar y supervisar todas las tareas del área, cumpliendo y haciendo cumplir las normas y procedimientos institucionales vigentes.", "Supervisar y controlar las operaciones de atención al público, garantizando el correcto asesoramiento al afiliado y la correcta emisión de bonos de internación, órdenes GOA y prácticas médicas en general.", "Intervenir y colaborar en la atención directa al afiliado (expendio de órdenes, asesoramiento) en casos de contingencia, alta demanda o para la resolución de conflictos que superen a los administrativos de ventanilla.", "Supervisar los arqueos diarios de caja y controlar las rendiciones efectuadas exclusivamente en la Boca de Expendio de la sede.", "Coordinar y fiscalizar la gestión de cobros en concepto de: coseguros de prestaciones, cuotas de Seros Vital, utilización de complejos turísticos y cancelaciones de préstamos.", "Controlar que la documentación correspondiente al cierre de caja mensual sea enviada en tiempo y forma a Casa Central.", "Supervisar la correcta gestión, recepción y control de los lotes de reintegros presentados en el área.", "Contar con información actualizada sobre cambios en aranceles, incrementos, suspensiones, bajas de servicios, resoluciones y prácticas moduladas, asegurando la inmediata instrucción y actualización del personal a su cargo.", "Tener un conocimiento acabado de la realidad prestacional y política sanitaria local, del Nomenclador Nacional, y de los convenios de reciprocidad vigentes.", "Mantener contacto permanente con los prestadores locales, garantizando interacciones positivas que favorezcan y simplifiquen los procesos administrativos cotidianos.", "Verificar que las prescripciones médicas cumplan estrictamente con las normas institucionales antes de autorizar la emisión de órdenes o bonos.", "Evaluar e informar periódicamente sobre el desempeño del personal a su cargo (Administrativos y Cajeros) presentándolo ante la superioridad.", "Colaborar en la mejora continua de los procesos del sector, proponiendo planes de capacitación técnica y de atención al público para optimizar el desempeño de los empleados.", "Colaborar con el Jefe superior en la elaboración de competencias, temarios y entrega de material pertinente para las convocatorias de Concursos Internos que afecten a su área.", "Fomentar un buen ambiente de trabajo mediante acciones preventivas o correctivas, según corresponda."],
+        path:["Delegado","Subdelegado"]}
+    }
+  },
+  esquel: { nombre:"Esquel",         abrev:"EQ", diagrama:"esquel.svg",  tree:{id:"delegado",children:[{id:"subdelegado",children:[{id:"div_boca",children:[]},{id:"jef_div_adm_os",children:[]}]},{id:"equipo_aud_delegado"}]}, cargos:{ delegado: DATA.delegado, subdelegado: DATA.subdelegado, div_boca: DATA.div_boca, equipo_aud_delegado: DATA.equipo_aud_delegado, jef_div_adm_os: JEF_DIV_ADM_OS } },
+  caba:   { nombre:"CABA",           abrev:"CB", diagrama:"caba.svg",    tree:{id:"delegado",children:[{id:"subdelegado",children:[{id:"div_adm_os_caba",children:[]},{id:"sec_facturacion",children:[]}]},{id:"equipo_aud_delegado"}]}, cargos:{ delegado: DATA.delegado, subdelegado: DATA.subdelegado, equipo_aud_delegado: DATA.equipo_aud_delegado, div_adm_os_caba: DIV_ADM_OS_CABA, sec_facturacion: SEC_FACTURACION_CABA } },
+  andina: { nombre:"Comarca Andina", abrev:"CA", diagrama:"andina.svg",  tree:{id:"delegado",children:[{id:"subdelegado",children:[{id:"div_boca",children:[]},{id:"jef_div_adm_os",children:[]}]},{id:"equipo_aud_delegado"}]}, cargos:{ delegado: DATA.delegado, subdelegado: DATA.subdelegado, div_boca: DATA.div_boca, equipo_aud_delegado: DATA.equipo_aud_delegado, jef_div_adm_os: JEF_DIV_ADM_OS } }
+};
+
+// Capturar árboles iniciales hardcodeados antes de que Firestore los sobreescriba
+const INITIAL_TREES = {};
+Object.entries(DELEGACIONES).forEach(([id, d]) => {
+  INITIAL_TREES[id] = JSON.parse(JSON.stringify(d.tree));
+});
+
+let activeCard = null;
+let activeId = null;
+let currentDeleg = 'comodoro';
+let currentVotos = {};
+
+// ── Toggle children ──────────────────────────────────────
+function toggleNode(id) {
+  const ch  = document.getElementById('ch-'  + id);
+  const btn = document.getElementById('tgl-' + id);
+  if (!ch) return;
+  const opening = ch.classList.contains('collapsed');
+  ch.classList.toggle('collapsed', !opening);
+  btn.classList.toggle('open', opening);
+}
+
+// ── Select node → show detail ────────────────────────────
+function selectNode(id) {
+  const d = getCargo(id);
+  if (!d) return;
+
+  // activate card
+  if (activeCard) activeCard.classList.remove('active');
+  const card = document.getElementById('nc-' + id);
+  card.classList.add('active');
+  activeCard = card;
+  activeId = id;
+
+  // swap panels
+  document.getElementById('dEmpty').style.display = 'none';
+  const content = document.getElementById('dContent');
+  content.style.display = 'flex';
+
+  document.getElementById('dLabel').textContent = d.label;
+  document.getElementById('dAgrup').textContent = d.agrupamiento || '';
+  document.getElementById('btnPrint').style.display = 'flex';
+
+  // color encabezado según categoría
+  const hc = headerColors(d.cat, d.tipo);
+  const dHeader = document.querySelector('.d-header');
+  dHeader.style.background = hc.bg;
+  dHeader.style.color = hc.txt;
+  dHeader.style.borderBottomColor = hc.bdr;
+  const btnP = document.getElementById('btnPrint');
+  if (hc.txt === '#fff') {
+    btnP.style.background = 'rgba(255,255,255,0.15)';
+    btnP.style.borderColor = 'rgba(255,255,255,0.3)';
+    btnP.style.color = '#fff';
+  } else {
+    btnP.style.background = '';
+    btnP.style.borderColor = '';
+    btnP.style.color = '';
+  }
+
+  // pastillas de delegaciones — siempre las 6
+  const pillsEl = document.getElementById('dDelegPills');
+  pillsEl.innerHTML = '';
+  Object.keys(DELEGACIONES).forEach(delId => {
+    const deleg = DELEGACIONES[delId];
+    const hasCargo  = d.delegaciones ? d.delegaciones.includes(delId) : !!deleg.cargos[id];
+    const isCurrent = delId === currentDeleg;
+    const pill = document.createElement('span');
+    pill.className = 'd-deleg-pill ' + (isCurrent && hasCargo ? 'pill-active' : hasCargo ? 'pill-has' : 'pill-no');
+    pill.textContent = deleg.abrev;
+    pill.title = `${deleg.nombre}${hasCargo ? '' : ' (no tiene este cargo)'}`;
+    pillsEl.appendChild(pill);
+  });
+
+  // badge
+  const badge = document.getElementById('dBadge');
+  const colors = badgeColors(d.cat, d.tipo);
+  badge.textContent = d.cat;
+  badge.style.cssText = `background:${colors.bg};color:${colors.txt};border-color:${colors.bdr}`;
+
+  // dependencia funcional vs misiones/funciones normales
+  const depFuncSection = document.getElementById('dDepFuncSection');
+  const bodyNormal     = document.getElementById('dBodyNormal');
+  if (d.depFuncional) {
+    depFuncSection.style.display = 'block';
+    bodyNormal.style.display     = 'none';
+    document.getElementById('dDepAdmin').textContent   = DELEGACIONES[currentDeleg].nombre;
+    document.getElementById('dDepFunc').textContent    = d.depFuncional;
+    document.getElementById('dDepFuncRef').textContent = d.depFuncional;
+  } else {
+    depFuncSection.style.display = 'none';
+    bodyNormal.style.display     = 'block';
+    const misionesSection = document.getElementById('dMisionesSection');
+    if (d.tipo === 'J' && d.misiones) {
+      misionesSection.style.display = 'block';
+      renderMisiones(id);
+    } else {
+      misionesSection.style.display = 'none';
+    }
+    renderFuncs(id);
+  }
+
+  // path
+  const pathEl = document.getElementById('dPath');
+  pathEl.innerHTML = d.path.length
+    ? '📍 ' + d.path.map(p => `<span>${p}</span>`).join(' › ')
+    : '';
+
+  // anotaciones
+  const anotUserDisplay = document.getElementById('anotUserDisplay');
+  if (anotUserDisplay) anotUserDisplay.textContent = getCurrentUser() || '(sin nombre)';
+  if (typeof loadAnotacionesUI === 'function') loadAnotacionesUI(id);
+
+  // votos
+  currentVotos = {};
+  loadVotosUI(id);
+}
+
+function buildVotoBar(tipo, idx) {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'flex-basis:100%';
+  const bar = document.createElement('div');
+  bar.className = 'voto-bar';
+  bar.dataset.tipo = tipo;
+  bar.dataset.idx = String(idx);
+  const upBtn = document.createElement('button');
+  upBtn.className = 'voto-btn voto-up';
+  upBtn.title = '';
+  upBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg><span class="voto-count"></span>';
+  upBtn.onclick = () => toggleVoto(tipo, idx, 1);
+  const sep = document.createElement('div');
+  sep.className = 'voto-sep';
+  const downBtn = document.createElement('button');
+  downBtn.className = 'voto-btn voto-down';
+  downBtn.title = '';
+  downBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg><span class="voto-count"></span>';
+  downBtn.onclick = () => toggleVoto(tipo, idx, -1);
+  bar.appendChild(upBtn); bar.appendChild(sep); bar.appendChild(downBtn);
+  wrap.appendChild(bar);
+  return wrap;
+}
+
+function renderVotos() {
+  const user = getCurrentUser();
+  ['mision','func'].forEach(tipo => {
+    const tipoKey = tipo === 'mision' ? 'misiones' : 'funciones';
+    const tipoVotos = currentVotos[tipoKey] || {};
+    document.querySelectorAll(`.voto-bar[data-tipo="${tipo}"]`).forEach(bar => {
+      const idx = bar.dataset.idx;
+      const itemVotos = tipoVotos[idx] || {};
+      const ups   = Object.values(itemVotos).filter(v => v ===  1).length;
+      const downs = Object.values(itemVotos).filter(v => v === -1).length;
+      const userVoto = user ? (itemVotos[user] || 0) : 0;
+      bar.querySelector('.voto-up .voto-count').textContent   = ups   > 0 ? ups   : '';
+      bar.querySelector('.voto-down .voto-count').textContent = downs > 0 ? downs : '';
+      bar.querySelector('.voto-up').classList.toggle('active-up',     userVoto ===  1);
+      bar.querySelector('.voto-down').classList.toggle('active-down', userVoto === -1);
+      const upUsers   = Object.entries(itemVotos).filter(([,v]) => v ===  1).map(([u]) => u);
+      const downUsers = Object.entries(itemVotos).filter(([,v]) => v === -1).map(([u]) => u);
+      bar.querySelector('.voto-up').dataset.voters   = JSON.stringify(upUsers);
+      bar.querySelector('.voto-down').dataset.voters = JSON.stringify(downUsers);
+    });
+  });
+}
+
+async function loadVotosUI(cargoId) {
+  try {
+    const snap = await db.collection('votos').doc(cargoId).get();
+    currentVotos = snap.exists ? snap.data() : {};
+  } catch(e) { currentVotos = {}; }
+  renderVotos();
+}
+
+async function toggleVoto(tipo, idx, valor) {
+  const user = getCurrentUser();
+  if (!user) { openUserModal(); return; }
+  const cargoId = activeId;
+  if (!cargoId) return;
+  const tipoKey = tipo === 'mision' ? 'misiones' : 'funciones';
+  if (!currentVotos[tipoKey]) currentVotos[tipoKey] = {};
+  if (!currentVotos[tipoKey][String(idx)]) currentVotos[tipoKey][String(idx)] = {};
+  const prev = currentVotos[tipoKey][String(idx)][user] || 0;
+  const nuevo = (prev === valor) ? 0 : valor;
+  if (nuevo === 0) delete currentVotos[tipoKey][String(idx)][user];
+  else currentVotos[tipoKey][String(idx)][user] = nuevo;
+  renderVotos();
+  try {
+    if (nuevo === 0) {
+      await db.collection('votos').doc(cargoId).update({
+        [`${tipoKey}.${String(idx)}.${user}`]: firebase.firestore.FieldValue.delete()
+      });
+    } else {
+      await db.collection('votos').doc(cargoId).set(
+        { [tipoKey]: { [String(idx)]: { [user]: nuevo } } },
+        { merge: true }
+      );
+    }
+  } catch(e) { console.warn('Error al guardar voto:', e); }
+}
+
+function renderMisiones(id) {
+  const d = getCargo(id);
+  const wrap = document.getElementById('dMisionesWrap');
+  wrap.innerHTML = '';
+
+  d.misiones.forEach((m, idx) => {
+    const div = document.createElement('div');
+    div.className = 'mision-item';
+
+    const span = document.createElement('span');
+    span.className = 'mision-text';
+    span.textContent = m;
+
+    const acts = document.createElement('div');
+    acts.className = 'func-actions';
+
+    const btnE = document.createElement('button');
+    btnE.className = 'btn-func btn-edit';
+    btnE.innerHTML = '<span>✏</span><span class="btn-label">Modificar</span>';
+    btnE.onclick = () => {
+      const ta = document.createElement('textarea');
+      ta.className = 'func-edit-input';
+      ta.value = span.textContent;
+      const bS = document.createElement('button');
+      bS.className = 'btn-func btn-save';
+      bS.textContent = '✓ Guardar';
+      bS.onclick = () => { const t = ta.value.trim(); if (t) getCargo(id).misiones[idx] = t; renderMisiones(id); };
+      const bC = document.createElement('button');
+      bC.className = 'btn-func btn-cancel';
+      bC.textContent = '✕ Cancelar';
+      bC.onclick = () => renderMisiones(id);
+      acts.innerHTML = ''; acts.appendChild(bS); acts.appendChild(bC); acts.style.opacity = '1';
+      span.replaceWith(ta); ta.focus();
+    };
+
+    const btnD = document.createElement('button');
+    btnD.className = 'btn-func btn-del';
+    btnD.innerHTML = '<span>✕</span><span class="btn-label">Eliminar</span>';
+    btnD.onclick = () => { getCargo(id).misiones.splice(idx, 1); renderMisiones(id); };
+
+    const btnCM = document.createElement('button');
+    btnCM.className = 'btn-func btn-comment';
+    btnCM.innerHTML = '<span>💬</span><span class="btn-label">Comentar</span>';
+    btnCM.onclick = () => openInlineComment(div, id, {tipo:'mision', idx, resumen: m.slice(0,60)+(m.length>60?'…':'')});
+    if (isAdmin()) { acts.appendChild(btnE); acts.appendChild(btnD); }
+    acts.appendChild(btnCM);
+    div.appendChild(span); div.appendChild(acts); div.appendChild(buildVotoBar('mision', idx));
+    wrap.appendChild(div);
+  });
+  renderVotos();
+
+  if (!isAdmin()) return;
+  const btnAdd = document.createElement('button');
+  btnAdd.className = 'btn-add-func';
+  btnAdd.textContent = '+ Agregar misión';
+  btnAdd.onclick = () => {
+    btnAdd.remove();
+    const divNew = document.createElement('div');
+    divNew.className = 'mision-item';
+    const ta = document.createElement('textarea');
+    ta.className = 'func-edit-input';
+    ta.placeholder = 'Escribir nueva misión...';
+    const acts = document.createElement('div');
+    acts.className = 'func-actions';
+    acts.style.opacity = '1';
+    const bS = document.createElement('button');
+    bS.className = 'btn-func btn-save';
+    bS.textContent = '✓ Guardar';
+    bS.onclick = () => { const t = ta.value.trim(); if (t) getCargo(id).misiones.push(t); renderMisiones(id); };
+    const bC = document.createElement('button');
+    bC.className = 'btn-func btn-cancel';
+    bC.textContent = '✕ Cancelar';
+    bC.onclick = () => renderMisiones(id);
+    acts.appendChild(bS); acts.appendChild(bC);
+    divNew.appendChild(ta); divNew.appendChild(acts);
+    wrap.appendChild(divNew); ta.focus();
+  };
+  wrap.appendChild(btnAdd);
+}
+
+function renderFuncs(id) {
+  const d = getCargo(id);
+  const wrap = document.getElementById('dFuncsWrap');
+  wrap.innerHTML = '';
+
+  const ol = document.createElement('ol');
+  ol.className = 'd-funcs-numbered';
+
+  d.funciones.forEach((f, idx) => {
+    const li = document.createElement('li');
+
+    const span = document.createElement('span');
+    span.className = 'func-text';
+    span.textContent = f;
+
+    const acts = document.createElement('div');
+    acts.className = 'func-actions';
+
+    const btnE = document.createElement('button');
+    btnE.className = 'btn-func btn-edit';
+    btnE.innerHTML = '<span>✏</span><span class="btn-label">Modificar</span>';
+    btnE.onclick = () => {
+      const ta = document.createElement('textarea');
+      ta.className = 'func-edit-input';
+      ta.value = span.textContent;
+      const bS = document.createElement('button');
+      bS.className = 'btn-func btn-save';
+      bS.textContent = '✓ Guardar';
+      bS.onclick = () => { const t = ta.value.trim(); if (t) getCargo(id).funciones[idx] = t; renderFuncs(id); };
+      const bC = document.createElement('button');
+      bC.className = 'btn-func btn-cancel';
+      bC.textContent = '✕ Cancelar';
+      bC.onclick = () => renderFuncs(id);
+      acts.innerHTML = ''; acts.appendChild(bS); acts.appendChild(bC); acts.style.opacity = '1';
+      span.replaceWith(ta); ta.focus();
+    };
+
+    const btnD = document.createElement('button');
+    btnD.className = 'btn-func btn-del';
+    btnD.innerHTML = '<span>✕</span><span class="btn-label">Eliminar</span>';
+    btnD.onclick = () => { getCargo(id).funciones.splice(idx, 1); renderFuncs(id); };
+
+    const btnCF = document.createElement('button');
+    btnCF.className = 'btn-func btn-comment';
+    btnCF.innerHTML = '<span>💬</span><span class="btn-label">Comentar</span>';
+    btnCF.onclick = () => openInlineComment(li, id, {tipo:'funcion', idx, resumen: f.slice(0,60)+(f.length>60?'…':'')});
+    if (isAdmin()) { acts.appendChild(btnE); acts.appendChild(btnD); }
+    acts.appendChild(btnCF);
+    li.appendChild(span); li.appendChild(acts); li.appendChild(buildVotoBar('func', idx));
+    ol.appendChild(li);
+  });
+  renderVotos();
+
+  wrap.appendChild(ol);
+
+  if (!isAdmin()) return;
+  const btnAdd = document.createElement('button');
+  btnAdd.className = 'btn-add-func';
+  btnAdd.textContent = '+ Agregar función';
+  btnAdd.onclick = () => {
+    btnAdd.remove();
+    const liNew = document.createElement('li');
+    const ta = document.createElement('textarea');
+    ta.className = 'func-edit-input';
+    ta.placeholder = 'Escribir nueva función...';
+    const acts = document.createElement('div');
+    acts.className = 'func-actions';
+    acts.style.opacity = '1';
+    const bS = document.createElement('button');
+    bS.className = 'btn-func btn-save';
+    bS.textContent = '✓ Guardar';
+    bS.onclick = () => { const t = ta.value.trim(); if (t) getCargo(id).funciones.push(t); renderFuncs(id); };
+    const bC = document.createElement('button');
+    bC.className = 'btn-func btn-cancel';
+    bC.textContent = '✕ Cancelar';
+    bC.onclick = () => renderFuncs(id);
+    acts.appendChild(bS); acts.appendChild(bC);
+    liNew.appendChild(ta); liNew.appendChild(acts);
+    ol.appendChild(liNew); ta.focus();
+  };
+  wrap.appendChild(btnAdd);
+}
+
+// ── Estilos inline para nodos del árbol ──────────────────
+function getCardStyle(cat, tipo) {
+  if (tipo==='equipo') return 'background:#eef2ff;border-color:#5c7cdb;color:#1e3a8a';
+  const s={'J-II':'background:#1a3a5c;border-color:#1a3a5c;color:#fff','J-IV':'background:#1e5f8a;border-color:#1e5f8a;color:#fff','J-VI':'background:#e8f4fb;border-color:#2980b9;color:#1a3a5c','J-VII':'background:#e8f4fb;border-color:#2980b9;color:#1a3a5c','C-V':'background:#fff8e7;border-color:#e6a817;color:#5a3d00','C-IV':'background:#fdf4ff;border-color:#9b59b6;color:#4a1a6a','C-III':'background:#f0f9f4;border-color:#27ae60;color:#1a4d2e','C-II':'background:#f7f8f9;border-color:#7f8c8d;color:#2c3e50','C-I':'background:#fafafa;border-color:#bdc3c7;color:#34495e'};
+  return s[cat]||'background:#f5f5f5;border-color:#999;color:#333';
+}
+function getBadgeStyle(cat, tipo) {
+  if (tipo==='equipo') return 'background:#5c7cdb;color:#fff';
+  const s={'J-II':'background:#0f2540;color:#90c8e8','J-IV':'background:#144166;color:#8ec5e0','J-VI':'background:#2980b9;color:#fff','J-VII':'background:#2980b9;color:#fff','C-V':'background:#e6a817;color:#fff','C-IV':'background:#9b59b6;color:#fff','C-III':'background:#27ae60;color:#fff','C-II':'background:#7f8c8d;color:#fff','C-I':'background:#bdc3c7;color:#555'};
+  return s[cat]||'background:#999;color:#fff';
+}
+
+// ── Renderizado dinámico del árbol ────────────────────────
+function renderNode(node, cargos, depth) {
+  const d = cargos[node.id];
+  if (!d) return '';
+  const hasKids = node.children && node.children.length > 0;
+  const open = depth < 2;
+  const extraStyle = d.depFuncional ? ';border-style:dashed' : '';
+  const _admin = isAdmin();
+  let h = `<div class="nw" ${_admin?`draggable="true" data-nw-id="${node.id}"`:''}><div class="nc${d.depFuncional?' dep-func':''}" id="nc-${node.id}" data-id="${node.id}" style="${getCardStyle(d.cat,d.tipo)}${extraStyle}" tabindex="0">`;
+  h += hasKids
+    ? `<button class="tgl${open?' open':''}" id="tgl-${node.id}" data-id="${node.id}" aria-label="expandir">▶</button>`
+    : `<span class="tgl leaf" aria-hidden="true"></span>`;
+  h += `<span class="nlbl">${d.label}</span>`;
+  if (d.depFuncional) h += `<span class="dep-func-ico" title="Dep. funcional: ${d.depFuncional}">⇢</span>`;
+  if (d.agrupamiento) h += `<span class="nagrup">${d.agrupamiento}</span>`;
+  h += `<span class="nbadge" style="${getBadgeStyle(d.cat,d.tipo)}">${d.cat}</span>`;
+  if (_admin) {
+    h += `<button class="nc-btn nc-btn-mod" draggable="false" onclick="event.stopPropagation();openCargoModal('${node.id}')" title="Modificar cargo">✏<span class="nc-btn-lbl">Modificar</span></button>`;
+    h += `<button class="nc-btn nc-btn-del" draggable="false" onclick="event.stopPropagation();eliminarCargo('${node.id}')" title="Eliminar cargo">✕<span class="nc-btn-lbl">Eliminar</span></button>`;
+  }
+  h += `</div>`;
+  if (hasKids) {
+    h += `<div class="ch${open?'':' collapsed'}" id="ch-${node.id}"><div class="tl">`;
+    node.children.forEach(c => { h += renderNode(c, cargos, depth+1); });
+    h += `</div></div>`;
+  }
+  return h + `</div>`;
+}
+
+let appLoaded = false;
+
+function renderTree(deleg) {
+  const pnl = document.getElementById('treePnl');
+  if (!appLoaded) {
+    pnl.innerHTML = '<div style="padding:60px 24px;color:#8fa3b8;text-align:center;font-size:13px;line-height:1.8">Cargando estructura…</div>';
+    return;
+  }
+  if (!deleg.tree || !Object.keys(deleg.cargos).length) {
+    pnl.innerHTML = '<div style="padding:60px 24px;color:#8fa3b8;text-align:center;font-size:13px;line-height:1.8">Estructura de esta Delegación<br>pendiente de configuración.</div>';
+    return;
+  }
+  pnl.innerHTML = `<div class="tl">${renderNode(deleg.tree, deleg.cargos, 0)}</div>`;
+}
+
+// ── Cambio de delegación ──────────────────────────────────
+function switchDelegacion(id) {
+  currentDeleg = id;
+  const deleg = DELEGACIONES[id];
+  DATA = deleg.cargos;
+  document.querySelector('.hdr-title').textContent = `Delegación ${deleg.nombre}`;
+  dImg.src = ''; delete dImg.dataset.locked; dReset();
+  renderTree(deleg);
+  if (activeCard) activeCard.classList.remove('active');
+  activeCard = null; activeId = null;
+  document.getElementById('dEmpty').style.display = '';
+  document.getElementById('dContent').style.display = 'none';
+  document.getElementById('btnPrint').style.display = 'none';
+}
+
+function headerColors(cat, tipo) {
+  if (tipo === 'equipo') return {bg:'#eef2ff', txt:'#1e3a8a', bdr:'#5c7cdb'};
+  const m = {
+    'J-II':  {bg:'#1a3a5c', txt:'#fff',    bdr:'#0f2540'},
+    'J-IV':  {bg:'#1e5f8a', txt:'#fff',    bdr:'#144166'},
+    'J-VI':  {bg:'#e8f4fb', txt:'#1a3a5c', bdr:'#2980b9'},
+    'J-VII': {bg:'#e8f4fb', txt:'#1a3a5c', bdr:'#2980b9'},
+    'C-V':   {bg:'#fff8e7', txt:'#5a3d00', bdr:'#e6a817'},
+    'C-IV':  {bg:'#fdf4ff', txt:'#4a1a6a', bdr:'#9b59b6'},
+    'C-III': {bg:'#f0f9f4', txt:'#1a4d2e', bdr:'#27ae60'},
+    'C-II':  {bg:'#f7f8f9', txt:'#2c3e50', bdr:'#7f8c8d'},
+    'C-I':   {bg:'#fafafa', txt:'#34495e', bdr:'#bdc3c7'},
+  };
+  return m[cat] || {bg:'#f5f5f5', txt:'#1a2535', bdr:'#d0dae4'};
+}
+
+// ── CRUD Cargos ───────────────────────────────────────────
+
+let _cargoEditId = null; // null = alta, string = edición
+
+function generateCargoId(name) {
+  let base = name.toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/[^a-z0-9\s]/g,'').trim().replace(/\s+/g,'_');
+  let id = base, n = 2;
+  while (DATA[id]) { id = base + '_' + n++; }
+  return id;
+}
+
+function buildPath(parentId) {
+  const p = DATA[parentId];
+  return p ? [...(p.path||[]), p.label] : [];
+}
+
+function findSiblings(tree, id) {
+  if (!tree || !tree.children) return null;
+  if (tree.children.some(c => c.id === id)) return tree.children;
+  for (const child of tree.children) {
+    const found = findSiblings(child, id);
+    if (found) return found;
+  }
+  return null;
+}
+
+function findParentId(node, targetId, parentId = null) {
+  if (!node) return null;
+  if (node.id === targetId) return parentId;
+  for (const child of (node.children || [])) {
+    const found = findParentId(child, targetId, node.id);
+    if (found !== null) return found;
+  }
+  return null;
+}
+
+function insertInTree(node, parentId, newId) {
+  if (!node) return false;
+  if (node.id === parentId) {
+    if (!node.children) node.children = [];
+    node.children.push({ id: newId, children: [] });
+    return true;
+  }
+  return (node.children||[]).some(c => insertInTree(c, parentId, newId));
+}
+
+function removeFromTree(node, id) {
+  if (!node || !node.children) return;
+  node.children = node.children.filter(c => c.id !== id);
+  node.children.forEach(c => removeFromTree(c, id));
+}
+
+function extractFromTree(node, id) {
+  if (!node || !node.children) return null;
+  const idx = node.children.findIndex(c => c.id === id);
+  if (idx !== -1) return node.children.splice(idx, 1)[0];
+  for (const child of node.children) {
+    const found = extractFromTree(child, id);
+    if (found) return found;
+  }
+  return null;
+}
+
+function insertNodeInTree(node, parentId, nodeToInsert) {
+  if (!node) return false;
+  if (node.id === parentId) {
+    if (!node.children) node.children = [];
+    node.children.push(nodeToInsert);
+    return true;
+  }
+  return (node.children||[]).some(c => insertNodeInTree(c, parentId, nodeToInsert));
+}
+
+function populateDependenciaSelect(selectedId) {
+  const sel = document.getElementById('nCargoDep');
+  sel.innerHTML = '';
+  Object.entries(DATA)
+    .filter(([, d]) => d.tipo === 'J')
+    .forEach(([id, d]) => {
+      const opt = document.createElement('option');
+      opt.value = id;
+      opt.textContent = d.label + ' (' + d.cat + ')';
+      if (id === selectedId) opt.selected = true;
+      sel.appendChild(opt);
+    });
+}
+
+function populateDelegChecks(selectedDeleg) {
+  const wrap = document.getElementById('nDelegChecks');
+  wrap.innerHTML = '';
+  Object.entries(DELEGACIONES).forEach(([id, deleg]) => {
+    const lbl = document.createElement('label');
+    lbl.className = 'cargo-deleg-label';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.value = id;
+    cb.checked = selectedDeleg ? selectedDeleg.includes(id) : id === currentDeleg;
+    lbl.appendChild(cb);
+    lbl.appendChild(document.createTextNode(' ' + deleg.abrev));
+    wrap.appendChild(lbl);
+  });
+}
+
+function toggleMisionesSection() {
+  const cat = document.getElementById('nCargoCat').value;
+  document.getElementById('nCargoMisionesSection').style.display =
+    cat.startsWith('J') ? 'block' : 'none';
+}
+
+function addItemRow(wrapId, text='') {
+  const wrap = document.getElementById(wrapId);
+  const idx = wrap.children.length + 1;
+  const row = document.createElement('div');
+  row.className = 'cargo-item-row';
+  const num = document.createElement('span');
+  num.className = 'cargo-item-num';
+  num.textContent = idx + '.';
+  const ta = document.createElement('textarea');
+  ta.className = 'cargo-item-ta'; ta.rows = 2;
+  ta.placeholder = wrapId.includes('Misiones') ? 'Describir la misión...' : 'Describir la función...';
+  ta.value = text;
+  const del = document.createElement('button');
+  del.className = 'cargo-item-del'; del.innerHTML = '✕';
+  del.onclick = () => {
+    row.remove();
+    // Renumerar
+    Array.from(wrap.children).forEach((r,i) => {
+      const n = r.querySelector('.cargo-item-num');
+      if(n) n.textContent = (i+1) + '.';
+    });
+  };
+  row.appendChild(num); row.appendChild(ta); row.appendChild(del);
+  wrap.appendChild(row); ta.focus();
+}
+
+function openCargoModal(editId=null) {
+  _cargoEditId = editId;
+  const isEdit = !!editId;
+  document.getElementById('cargoModalTitle').textContent = isEdit ? 'Editar cargo' : 'Nuevo cargo';
+  document.getElementById('cargoModalSave').textContent  = isEdit ? 'Guardar cambios' : 'Crear cargo';
+
+  const d = isEdit ? DATA[editId] : null;
+
+  document.getElementById('nCargoNombre').value = d ? d.label : '';
+  document.getElementById('nCargoCat').value    = d ? d.cat   : 'C-III';
+  document.getElementById('nCargoAgrup').value  = d ? (d.agrupamiento||'Administrativo') : 'Administrativo';
+
+  // Dependencia: buscar parent del cargo en el árbol actual
+  let parentId = '';
+  if (isEdit) {
+    parentId = findParentId(DELEGACIONES[currentDeleg].tree, editId) || '';
+  }
+  populateDependenciaSelect(parentId);
+  populateDelegChecks(d ? d.delegaciones : null);
+
+  // Misiones
+  document.getElementById('nCargoMisionesWrap').innerHTML = '';
+  if (d && d.misiones) d.misiones.forEach(m => addItemRow('nCargoMisionesWrap', m));
+
+  // Funciones
+  document.getElementById('nCargoFuncsWrap').innerHTML = '';
+  if (d && d.funciones) d.funciones.forEach(f => addItemRow('nCargoFuncsWrap', f));
+
+  toggleMisionesSection();
+  document.getElementById('cargoModal').classList.add('open');
+}
+
+function saveCargoModal() {
+  const nombre = document.getElementById('nCargoNombre').value.trim();
+  if (!nombre) { document.getElementById('nCargoNombre').focus(); return; }
+
+  const cat   = document.getElementById('nCargoCat').value;
+  const agrup = document.getElementById('nCargoAgrup').value;
+  const depId = document.getElementById('nCargoDep').value;
+  const tipo  = cat.startsWith('J') ? 'J' : (cat === 'Equipo' ? 'equipo' : 'C');
+
+  const delegaciones = Array.from(document.querySelectorAll('#nDelegChecks input:checked')).map(cb => cb.value);
+  if (!delegaciones.length) { alert('Seleccioná al menos una delegación.'); return; }
+
+  // Validar que el cargo padre existe en cada delegación seleccionada
+  const sinPadre = delegaciones.filter(delId => !DELEGACIONES[delId].cargos[depId]);
+  if (sinPadre.length) {
+    const parentLabel = DATA[depId]?.label || depId;
+    const nombres = sinPadre.map(id => DELEGACIONES[id].nombre).join(', ');
+    alert(`No se puede asignar este cargo a:\n• ${sinPadre.map(id => DELEGACIONES[id].nombre).join('\n• ')}\n\nMotivo: el cargo padre "${parentLabel}" no existe en esas delegaciones.\n\nPrimero agregá "${parentLabel}" a esas delegaciones.`);
+    return;
+  }
+
+  const misiones = tipo === 'J'
+    ? Array.from(document.querySelectorAll('#nCargoMisionesWrap .cargo-item-ta')).map(t=>t.value.trim()).filter(Boolean)
+    : undefined;
+  const funciones = Array.from(document.querySelectorAll('#nCargoFuncsWrap .cargo-item-ta')).map(t=>t.value.trim()).filter(Boolean);
+
+  if (_cargoEditId) {
+    // EDICIÓN — actualizar cargo existente
+    const d = DATA[_cargoEditId];
+    d.label = nombre; d.cat = cat; d.agrupamiento = agrup; d.tipo = tipo;
+    d.delegaciones = delegaciones; d.funciones = funciones;
+    if (misiones !== undefined) d.misiones = misiones; else delete d.misiones;
+    d.path = buildPath(depId);
+    // Actualizar árbol solo si cambia el padre o las delegaciones
+    Object.entries(DELEGACIONES).forEach(([delId, deleg]) => {
+      const teniaCargo = !!deleg.cargos[_cargoEditId];
+      const tieneAhora = delegaciones.includes(delId);
+      if (teniaCargo) {
+        if (tieneAhora) {
+          const padreActual = findParentId(deleg.tree, _cargoEditId);
+          if (padreActual !== depId) {
+            const nodo = extractFromTree(deleg.tree, _cargoEditId) || { id: _cargoEditId, children: [] };
+            insertNodeInTree(deleg.tree, depId, nodo);
+          }
+          deleg.cargos[_cargoEditId] = d;
+        } else {
+          extractFromTree(deleg.tree, _cargoEditId);
+          delete deleg.cargos[_cargoEditId];
+        }
+      } else if (tieneAhora) {
+        deleg.cargos[_cargoEditId] = d;
+        insertInTree(deleg.tree, depId, _cargoEditId);
+      }
+    });
+    if (typeof saveTreeState === 'function') saveTreeState();
+    if (typeof saveCargoChanges === 'function') saveCargoChanges();
+    renderTree(DELEGACIONES[currentDeleg]);
+    document.getElementById('cargoModal').classList.remove('open');
+    setTimeout(() => { expandToNode(_cargoEditId); selectNode(_cargoEditId); }, 100);
+
+  } else {
+    // ALTA — crear nuevo cargo
+    const id = generateCargoId(nombre);
+    const cargo = { label:nombre, delegaciones, cat, tipo, agrupamiento:agrup,
+                    funciones, path: buildPath(depId) };
+    if (misiones) cargo.misiones = misiones;
+    DATA[id] = cargo;
+    delegaciones.forEach(delId => {
+      DELEGACIONES[delId].cargos[id] = cargo;
+      insertInTree(DELEGACIONES[delId].tree, depId, id);
+    });
+    if (typeof saveTreeState === 'function') saveTreeState();
+    if (typeof saveCargoChanges === 'function') saveCargoChanges();
+    renderTree(DELEGACIONES[currentDeleg]);
+    document.getElementById('cargoModal').classList.remove('open');
+    setTimeout(() => { expandToNode(id); selectNode(id);
+      const el = document.getElementById('nc-'+id);
+      if(el) el.scrollIntoView({behavior:'smooth',block:'center'}); }, 150);
+  }
+}
+
+function eliminarCargo(id) {
+  if (!confirm(`¿Eliminar el cargo "${DATA[id]?.label}"? Esta acción no se puede deshacer.`)) return;
+  // Quitar de DATA y de todas las delegaciones
+  Object.values(DELEGACIONES).forEach(deleg => {
+    delete deleg.cargos[id];
+    removeFromTree(deleg.tree, id);
+  });
+  delete DATA[id];
+  renderTree(DELEGACIONES[currentDeleg]);
+  if (typeof saveTreeState === 'function') saveTreeState();
+  if (typeof saveCargoChanges === 'function') saveCargoChanges();
+  // Limpiar panel derecho
+  activeCard = null; activeId = null;
+  document.getElementById('dEmpty').style.display = '';
+  document.getElementById('dContent').style.display = 'none';
+  document.getElementById('btnPrint').style.display = 'none';
+}
+
+// Eventos del modal
+document.getElementById('btnNuevoCargo').addEventListener('click', () => openCargoModal(null));
+document.getElementById('cargoModalClose').addEventListener('click', () => document.getElementById('cargoModal').classList.remove('open'));
+document.getElementById('cargoModalCancel').addEventListener('click', () => document.getElementById('cargoModal').classList.remove('open'));
+document.getElementById('cargoModalSave').addEventListener('click', saveCargoModal);
+document.getElementById('nCargoCat').addEventListener('change', toggleMisionesSection);
+document.getElementById('btnAddMision').addEventListener('click', () => addItemRow('nCargoMisionesWrap'));
+document.getElementById('btnAddFunc').addEventListener('click',   () => addItemRow('nCargoFuncsWrap'));
+// Editar/Eliminar se disparan desde botones en el árbol (renderNode)
+document.getElementById('cargoModal').addEventListener('click', e => { if(e.target===document.getElementById('cargoModal')) document.getElementById('cargoModal').classList.remove('open'); });
+
+function badgeColors(cat, tipo) {
+  if (tipo === 'equipo') return {bg:'#5c7cdb',txt:'#fff',bdr:'#5c7cdb'};
+  const m = {
+    'J-II': {bg:'#1a3a5c',txt:'#fff',bdr:'#1a3a5c'},
+    'J-IV': {bg:'#1e5f8a',txt:'#fff',bdr:'#1e5f8a'},
+    'J-VI': {bg:'#2980b9',txt:'#fff',bdr:'#2980b9'},
+    'J-VII':{bg:'#2980b9',txt:'#fff',bdr:'#2980b9'},
+    'C-V':  {bg:'#e6a817',txt:'#fff',bdr:'#e6a817'},
+    'C-IV': {bg:'#9b59b6',txt:'#fff',bdr:'#9b59b6'},
+    'C-III':{bg:'#27ae60',txt:'#fff',bdr:'#27ae60'},
+    'C-II': {bg:'#7f8c8d',txt:'#fff',bdr:'#7f8c8d'},
+    'C-I':  {bg:'#bdc3c7',txt:'#555',bdr:'#bdc3c7'},
+  };
+  return m[cat] || {bg:'#999',txt:'#fff',bdr:'#999'};
+}
+
+// ── Wire events via delegation ────────────────────────────
+document.getElementById('treePnl').addEventListener('click', function(e) {
+  // Toggle button
+  const btn = e.target.closest('button.tgl');
+  if (btn) {
+    e.stopPropagation();
+    toggleNode(btn.dataset.id);
+    return;
+  }
+  // Node card
+  const card = e.target.closest('.nc');
+  if (card) {
+    const id = card.dataset.id;
+    // toggle children if has them
+    const ch = document.getElementById('ch-' + id);
+    if (ch) toggleNode(id);
+    // show detail
+    selectNode(id);
+  }
+});
+
+// keyboard: Enter/Space on focused card
+document.getElementById('treePnl').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    const card = e.target.closest('.nc');
+    if (card) {
+      e.preventDefault();
+      const id = card.dataset.id;
+      const ch = document.getElementById('ch-' + id);
+      if (ch) toggleNode(id);
+      selectNode(id);
+    }
+  }
+});
+
+// Modal diagrama
+// ── Modal diagrama con zoom + pan ────────────────────────
+const modalOverlay = document.getElementById('modalDiagrama');
+const dContainer  = document.getElementById('diagramaContainer');
+const dImg        = document.getElementById('diagramaImg');
+let ds = 1, dx = 0, dy = 0;
+let dragging = false, dmx = 0, dmy = 0;
+
+function dApply() {
+  dImg.style.transform = `translate(${dx}px,${dy}px) scale(${ds})`;
+}
+
+function dInitLock() {
+  if (dImg.dataset.locked) return;
+  const cr = dContainer.getBoundingClientRect();
+  const ir = dImg.getBoundingClientRect();
+  dx = ir.left - cr.left;
+  dy = ir.top  - cr.top;
+  ds = 1;
+  dImg.style.width    = ir.width  + 'px';
+  dImg.style.height   = ir.height + 'px';
+  dImg.style.maxWidth = 'none';
+  dImg.style.maxHeight= 'none';
+  dImg.dataset.locked = '1';
+  dApply();
+}
+
+function dReset() {
+  ds = 1; dx = 0; dy = 0;
+  delete dImg.dataset.locked;
+  dImg.style.transform  = '';
+  dImg.style.width      = '';
+  dImg.style.height     = '';
+  dImg.style.maxWidth   = '100%';
+  dImg.style.maxHeight  = '100%';
+}
+
+dContainer.addEventListener('wheel', e => {
+  e.preventDefault();
+  dInitLock();
+  const cr  = dContainer.getBoundingClientRect();
+  const px  = e.clientX - cr.left;
+  const py  = e.clientY - cr.top;
+  const f   = e.deltaY < 0 ? 1.15 : 0.87;
+  const ns  = Math.min(Math.max(ds * f, 0.05), 20);
+  dx = px - (px - dx) * ns / ds;
+  dy = py - (py - dy) * ns / ds;
+  ds = ns;
+  dApply();
+}, { passive: false });
+
+dContainer.addEventListener('mousedown', e => {
+  dragging = true;
+  dInitLock();
+  dmx = e.clientX - dx;
+  dmy = e.clientY - dy;
+  dContainer.classList.add('dragging');
+});
+window.addEventListener('mousemove', e => {
+  if (!dragging) return;
+  dx = e.clientX - dmx;
+  dy = e.clientY - dmy;
+  dApply();
+});
+window.addEventListener('mouseup', () => {
+  dragging = false;
+  dContainer.classList.remove('dragging');
+});
+
+function expandToNode(cargoId) {
+  let el = document.getElementById('nc-' + cargoId);
+  if (!el) return;
+  let node = el.parentElement;
+  while (node && node.id !== 'treePnl') {
+    if (node.classList && node.classList.contains('ch') && node.classList.contains('collapsed')) {
+      toggleNode(node.id.replace('ch-', ''));
+    }
+    node = node.parentElement;
+  }
+}
+
+document.getElementById('btnDiagrama').addEventListener('click', () => {
+  const diagrama = DELEGACIONES[currentDeleg].diagrama;
+  if (!dImg.src || !dImg.src.endsWith(diagrama)) dImg.src = diagrama;
+  dReset();
+  modalOverlay.classList.add('open');
+});
+document.getElementById('modalClose').addEventListener('click', () => modalOverlay.classList.remove('open'));
+modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) modalOverlay.classList.remove('open'); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') modalOverlay.classList.remove('open'); });
+
+// ── Drag & drop para reordenar cargos ────────────────────
+let dragNwId = null;
+const treePnlEl = document.getElementById('treePnl');
+
+treePnlEl.addEventListener('dragstart', e => {
+  if (!isAdmin()) { e.preventDefault(); return; }
+  const nw = e.target.closest('[data-nw-id]');
+  if (!nw) { e.preventDefault(); return; }
+  dragNwId = nw.dataset.nwId;
+  nw.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', dragNwId);
+  // Imagen de arrastre: solo la tarjeta, sin los hijos
+  const nc = nw.querySelector('.nc');
+  if (nc) {
+    const ghost = nc.cloneNode(true);
+    ghost.style.cssText = `position:fixed;top:-1000px;left:-1000px;width:${nc.offsetWidth}px;pointer-events:none`;
+    document.body.appendChild(ghost);
+    e.dataTransfer.setDragImage(ghost, e.offsetX, e.offsetY);
+    setTimeout(() => ghost.remove(), 0);
+  }
+}, true);
+
+treePnlEl.addEventListener('dragend', () => {
+  treePnlEl.querySelectorAll('.dragging,.drag-above,.drag-below')
+    .forEach(el => el.classList.remove('dragging','drag-above','drag-below'));
+  dragNwId = null;
+});
+
+treePnlEl.addEventListener('dragover', e => {
+  e.preventDefault();
+  if (!dragNwId) return;
+  const nw = e.target.closest('[data-nw-id]');
+  if (!nw || nw.dataset.nwId === dragNwId) return;
+  const siblings = findSiblings(DELEGACIONES[currentDeleg].tree, dragNwId);
+  if (!siblings || !siblings.some(s => s.id === nw.dataset.nwId)) return;
+  e.dataTransfer.dropEffect = 'move';
+  treePnlEl.querySelectorAll('.drag-above,.drag-below')
+    .forEach(el => el.classList.remove('drag-above','drag-below'));
+  const mid = nw.getBoundingClientRect().top + nw.getBoundingClientRect().height / 2;
+  nw.classList.add(e.clientY < mid ? 'drag-above' : 'drag-below');
+});
+
+treePnlEl.addEventListener('dragleave', e => {
+  const nw = e.target.closest('[data-nw-id]');
+  if (nw) nw.classList.remove('drag-above','drag-below');
+});
+
+treePnlEl.addEventListener('drop', e => {
+  e.preventDefault();
+  const nw = e.target.closest('[data-nw-id]');
+  if (!nw || !dragNwId) return;
+  const targetId = nw.dataset.nwId;
+  if (targetId === dragNwId) return;
+  const siblings = findSiblings(DELEGACIONES[currentDeleg].tree, dragNwId);
+  if (!siblings || !siblings.some(s => s.id === targetId)) return;
+  const fromIdx = siblings.findIndex(s => s.id === dragNwId);
+  const [moved] = siblings.splice(fromIdx, 1);
+  let toIdx = siblings.findIndex(s => s.id === targetId);
+  const mid = nw.getBoundingClientRect().top + nw.getBoundingClientRect().height / 2;
+  if (e.clientY >= mid) toIdx++;
+  siblings.splice(toIdx, 0, moved);
+  renderTree(DELEGACIONES[currentDeleg]);
+  if (typeof saveTreeState === 'function') saveTreeState();
+});
+
+// ── Selector de delegación ────────────────────────────────
+document.getElementById('delegSelect').addEventListener('change', e => {
+  switchDelegacion(e.target.value);
+});
+
+// ── Inicialización ────────────────────────────────────────
+switchDelegacion('comodoro');
+// ── Helper pastillas de impresión ────────────────────────
+function buildPillsEl(d) {
+  const wrap = document.createElement('div');
+  wrap.className = 'pa-print-pills';
+  Object.keys(DELEGACIONES).forEach(delId => {
+    const has = d.delegaciones && d.delegaciones.includes(delId);
+    const pill = document.createElement('span');
+    pill.className = 'pa-print-pill ' + (has ? 'ppill-has' : 'ppill-no');
+    pill.textContent = DELEGACIONES[delId].abrev;
+    wrap.appendChild(pill);
+  });
+  return wrap;
+}
+
+// ── Imprimir cargo individual ─────────────────────────────
+document.getElementById('btnPrint').addEventListener('click', () => {
+  const d = DATA[activeId];
+  if (!d) return;
+  document.getElementById('paCargo').textContent = d.label;
+  document.getElementById('paAgrup').textContent  = d.agrupamiento || '';
+  document.getElementById('paCat').textContent    = d.cat;
+  // pastillas
+  const paPills = document.getElementById('paPills');
+  paPills.innerHTML = '';
+  paPills.appendChild(buildPillsEl(d));
+  const paMisiones = document.getElementById('paMisionesSection');
+  if (d.misiones && d.misiones.length) {
+    paMisiones.style.display = 'block';
+    document.getElementById('paMisiones').textContent = d.misiones.join(' ');
+  } else {
+    paMisiones.style.display = 'none';
+  }
+  const ol = document.getElementById('paFunciones');
+  ol.innerHTML = '';
+  d.funciones.forEach(f => { const li = document.createElement('li'); li.textContent = f; ol.appendChild(li); });
+  document.body.classList.add('printing-single');
+  window.print();
+});
+
+// ── Imprimir completo ─────────────────────────────────────
+function buildCargoPage(id, isFirst) {
+  const d = getCargo(id);
+  const page = document.createElement('div');
+  page.className = 'pa-cargo-page';
+  const header = document.createElement('div');
+  header.className = 'pa-cargo-header';
+  if (isFirst) {
+    const title = document.createElement('div');
+    title.className = 'pa-title';
+    title.textContent = 'DELEGACIÓN COMODORO RIVADAVIA - ISSyS';
+    header.appendChild(title);
+  }
+  const hr1 = document.createElement('hr'); hr1.className = 'pa-hr'; header.appendChild(hr1);
+  // Cargo + pastillas en la misma fila
+  const cargoRow = document.createElement('div');
+  cargoRow.className = 'pa-cargo-row';
+  const cargoField = document.createElement('div');
+  cargoField.className = 'pa-field';
+  cargoField.innerHTML = `<span class="pa-key">Cargo: </span>${d.label}`;
+  cargoRow.appendChild(cargoField);
+  cargoRow.appendChild(buildPillsEl(d));
+  header.appendChild(cargoRow);
+  const addField = (k, v) => {
+    const div = document.createElement('div'); div.className = 'pa-field';
+    div.innerHTML = `<span class="pa-key">${k} </span>${v}`; header.appendChild(div);
+  };
+  addField('Agrupamiento:', d.agrupamiento || '');
+  addField('Categoría:', d.cat);
+  const hr2 = document.createElement('hr'); hr2.className = 'pa-hr'; header.appendChild(hr2);
+  page.appendChild(header);
+  if (d.misiones && d.misiones.length) {
+    const sm = document.createElement('div'); sm.className = 'pa-sec'; sm.textContent = 'Misiones'; page.appendChild(sm);
+    const p = document.createElement('p'); p.className = 'pa-misiones-text'; p.textContent = d.misiones.join(' '); page.appendChild(p);
+  }
+  const sf = document.createElement('div'); sf.className = 'pa-sec'; sf.textContent = 'Funciones'; page.appendChild(sf);
+  const ol = document.createElement('ol'); ol.className = 'pa-funcs-list';
+  d.funciones.forEach(f => { const li = document.createElement('li'); li.textContent = f; ol.appendChild(li); });
+  page.appendChild(ol);
+  return page;
+}
+
+document.getElementById('btnPrintAll').addEventListener('click', () => {
+  const wrap = document.getElementById('printAllArea');
+  wrap.innerHTML = '';
+  Object.keys(DATA).forEach((id, idx) => wrap.appendChild(buildCargoPage(id, idx === 0)));
+  document.body.classList.add('printing-all');
+  window.print();
+});
+
+window.addEventListener('afterprint', () => {
+  document.body.classList.remove('printing-single', 'printing-all', 'printing-diagram');
+});
+
+// ── Imprimir diagrama ─────────────────────────────────────
+document.getElementById('btnPrintDiagram').addEventListener('click', () => {
+  document.body.classList.add('printing-diagram');
+  window.print();
+});
+</script>
+
+<!-- Área impresión diagrama -->
+<div id="printDiagramArea" style="display:none">
+  <div class="pa-title">Delegación Comodoro Rivadavia - ISSyS</div>
+  <img src="comodoro.svg" alt="Diagrama Comodoro Rivadavia">
+</div>
+
+<!-- Área impresión completa -->
+<div id="printAllArea"></div>
+
+<!-- Área de impresión -->
+<div id="printArea">
+  <div class="pa-title">Delegación Comodoro Rivadavia - ISSyS</div>
+  <hr class="pa-hr">
+  <div class="pa-cargo-row">
+    <div class="pa-field"><span class="pa-key">Cargo: </span><span id="paCargo"></span></div>
+    <div id="paPills" class="pa-print-pills"></div>
+  </div>
+  <div class="pa-field"><span class="pa-key">Agrupamiento: </span><span id="paAgrup"></span></div>
+  <div class="pa-field"><span class="pa-key">Categoría: </span><span id="paCat"></span></div>
+  <hr class="pa-hr">
+  <div id="paMisionesSection">
+    <div class="pa-sec">Misiones</div>
+    <p id="paMisiones"></p>
+  </div>
+  <div class="pa-sec">Funciones</div>
+  <ol id="paFunciones"></ol>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+
+<script>
+// ── Firebase init ─────────────────────────────────────────
+firebase.initializeApp({
+  apiKey: "AIzaSyAHc1apJp1UH6zIeOII3ZWwtEQwkdBnr9M",
+  authDomain: "issys-delegaciones.firebaseapp.com",
+  projectId: "issys-delegaciones",
+  storageBucket: "issys-delegaciones.firebasestorage.app",
+  messagingSenderId: "224770312299",
+  appId: "1:224770312299:web:324fe291f1c1584268492e"
+});
+const db = firebase.firestore();
+
+// ── Usuario ───────────────────────────────────────────────
+function getCurrentUser()  { return localStorage.getItem('issys_username') || ''; }
+function getCurrentPerfil(){ return localStorage.getItem('issys_user_perfil') || 'delegado'; }
+
+function setCurrentUser(nombre, perfil) {
+  localStorage.setItem('issys_username', nombre);
+  localStorage.setItem('issys_user_perfil', perfil);
+  document.getElementById('hdrUserName').textContent = nombre;
+  const badge = document.getElementById('hdrPerfilBadge');
+  badge.textContent = perfil === 'admin' ? 'Admin' : 'Delegado';
+  badge.className = 'hdr-perfil-badge ' + perfil;
+  badge.style.display = '';
+  const disp = document.getElementById('anotUserDisplay');
+  if (disp) disp.textContent = nombre;
+}
+
+function openUserModal() {
+  // Poblar dropdown
+  const sel = document.getElementById('userSelect');
+  sel.innerHTML = '<option value="">— Seleccioná tu usuario —</option>';
+  USUARIOS.forEach((u, i) => {
+    const opt = document.createElement('option');
+    opt.value = i; opt.textContent = u.nombre;
+    if (u.nombre === getCurrentUser()) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  document.getElementById('userPassInput').value = '';
+  document.getElementById('userLoginError').style.display = 'none';
+  document.getElementById('userModal').classList.add('open');
+  setTimeout(() => sel.focus(), 80);
+}
+
+document.getElementById('userNameSave').addEventListener('click', () => {
+  const idx = parseInt(document.getElementById('userSelect').value);
+  const pass = document.getElementById('userPassInput').value;
+  const errEl = document.getElementById('userLoginError');
+  if (isNaN(idx) || idx < 0 || !USUARIOS[idx]) {
+    errEl.textContent = 'Seleccioná un usuario.'; errEl.style.display = ''; return;
+  }
+  const u = USUARIOS[idx];
+  if (pass !== u.pass) {
+    errEl.textContent = 'Contraseña incorrecta.'; errEl.style.display = '';
+    document.getElementById('userPassInput').value = '';
+    document.getElementById('userPassInput').focus(); return;
+  }
+  errEl.style.display = 'none';
+  setCurrentUser(u.nombre, u.perfil);
+  document.getElementById('userModal').classList.remove('open');
+  updateAdminUI();
+  loadAppState();
+  if (typeof activeId !== 'undefined' && activeId) {
+    showDetail(activeId);
+    loadAnotacionesUI(activeId);
+    loadVotosUI(activeId);
+  }
+});
+
+document.getElementById('userPassInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('userNameSave').click();
+});
+document.getElementById('btnChangeUser').addEventListener('click', openUserModal);
+document.getElementById('anotChangeUser').addEventListener('click', openUserModal);
+
+// Verificar sesión guardada
+const _storedUser = getCurrentUser();
+const _validUser  = _storedUser && USUARIOS.some(u => u.nombre === _storedUser);
+if (!_validUser) {
+  localStorage.removeItem('issys_username');
+  localStorage.removeItem('issys_user_perfil');
+  openUserModal();
+} else {
+  setCurrentUser(_storedUser, getCurrentPerfil());
+  updateAdminUI();
+  loadAppState();
+}
+
+// ── Persistencia en Firestore ─────────────────────────────
+
+async function saveTreeState() {
+  try {
+    const data = {};
+    Object.keys(DELEGACIONES).forEach(delId => {
+      data[delId] = JSON.stringify(DELEGACIONES[delId].tree);
+    });
+    await db.collection('configuracion').doc('arboles').set(data);
+  } catch(e) { console.warn('Error al guardar árbol:', e); }
+}
+
+async function saveCargoChanges() {
+  try {
+    // Guardar todos los cargos únicos (fuente: DATA + específicos de delegaciones)
+    const allCargos = {};
+    Object.values(DELEGACIONES).forEach(deleg => {
+      Object.entries(deleg.cargos).forEach(([id, d]) => {
+        allCargos[id] = JSON.stringify(d);
+      });
+    });
+    await db.collection('configuracion').doc('cargos').set({ allCargos });
+  } catch(e) { console.warn('Error al guardar cargos:', e); }
+}
+
+async function loadCargoChanges() {
+  try {
+    const snap = await db.collection('configuracion').doc('cargos').get();
+    if (!snap.exists) return;
+    const { allCargos } = snap.data();
+    if (!allCargos) return;
+
+    const savedIds = new Set(Object.keys(allCargos));
+
+    // Parsear todos los cargos guardados
+    const parsedCargos = {};
+    Object.entries(allCargos).forEach(([id, json]) => {
+      try { parsedCargos[id] = JSON.parse(json); } catch(e) {}
+    });
+
+    // Actualizar DATA: solo cargos que ya están en DATA, o nuevos que pertenecen a comodoro
+    Object.entries(parsedCargos).forEach(([id, d]) => {
+      if (DATA[id]) {
+        Object.assign(DATA[id], d);
+      } else if (!d.delegaciones || d.delegaciones.includes('comodoro')) {
+        DATA[id] = d;
+      }
+    });
+    // Eliminar de DATA cargos que ya no existen
+    Object.keys(DATA).forEach(id => { if (!savedIds.has(id)) delete DATA[id]; });
+
+    // Reconstruir cargos de delegaciones no-comodoro
+    Object.keys(DELEGACIONES).forEach(delId => {
+      if (delId === 'comodoro') return;
+      const newCargos = {};
+      // Cargos compartidos desde DATA (delegado, subdelegado, etc.)
+      Object.entries(DATA).forEach(([id, d]) => {
+        if (d.delegaciones && d.delegaciones.includes(delId)) {
+          newCargos[id] = d;
+        }
+      });
+      // Cargos específicos de esta delegación guardados en Firestore
+      Object.entries(parsedCargos).forEach(([id, d]) => {
+        if (!newCargos[id] && d.delegaciones && d.delegaciones.includes(delId)) {
+          newCargos[id] = d;
+        }
+      });
+      // Preservar cargos hardcodeados que aún no fueron guardados en Firestore
+      Object.entries(DELEGACIONES[delId].cargos).forEach(([id, d]) => {
+        if (!newCargos[id] && !DATA[id]) {
+          newCargos[id] = d;
+        }
+      });
+      DELEGACIONES[delId].cargos = newCargos;
+    });
+  } catch(e) { console.warn('Error al cargar cargos:', e); }
+}
+
+function cleanTree(node, validIds, seen = new Set()) {
+  if (!node) return node;
+  node.children = (node.children || [])
+    .filter(c => validIds.has(c.id) && !seen.has(c.id))
+    .map(c => { seen.add(c.id); return cleanTree(c, validIds, seen); });
+  return node;
+}
+
+async function loadAppState() {
+  await loadCargoChanges();
+  // Cargar árbol
+  try {
+    const snap = await db.collection('configuracion').doc('arboles').get();
+    if (snap.exists) {
+      const data = snap.data();
+      Object.keys(DELEGACIONES).forEach(delId => {
+        if (data[delId]) {
+          try { DELEGACIONES[delId].tree = JSON.parse(data[delId]); } catch(e) {}
+        }
+      });
+    }
+  } catch(e) { console.warn('Error al cargar árbol:', e); }
+
+  // Restaurar nodos hardcodeados que Firestore puede haber omitido
+  Object.entries(DELEGACIONES).forEach(([delId, deleg]) => {
+    const init = INITIAL_TREES[delId];
+    if (!init) return;
+    const existing = new Set();
+    (function collectIds(n){ if(!n)return; existing.add(n.id); (n.children||[]).forEach(collectIds); })(deleg.tree);
+    (function addMissing(hN, tN){
+      if(!hN||!tN) return;
+      (hN.children||[]).forEach(hC => {
+        if(!existing.has(hC.id)){
+          if(!tN.children) tN.children=[];
+          tN.children.push({id:hC.id, children:[]});
+          existing.add(hC.id);
+        }
+        const tC=(tN.children||[]).find(c=>c.id===hC.id);
+        if(tC) addMissing(hC,tC);
+      });
+    })(init, deleg.tree);
+  });
+
+  // Limpiar árboles: quitar nodos sin cargo válido en esa delegación y duplicados
+  let needsSave = false;
+  Object.entries(DELEGACIONES).forEach(([delId, deleg]) => {
+    const validIds = new Set(Object.keys(deleg.cargos));
+    const before = JSON.stringify(deleg.tree);
+    deleg.tree = cleanTree(deleg.tree, validIds);
+    if (JSON.stringify(deleg.tree) !== before) needsSave = true;
+  });
+  if (needsSave) saveTreeState(); // Sobreescribir Firestore con el árbol limpio
+
+  appLoaded = true;
+  renderTree(DELEGACIONES[currentDeleg]);
+}
+
+// ── Helpers ───────────────────────────────────────────────
+function getAvatarColor(name) {
+  const p = ['#e74c3c','#e67e22','#27ae60','#2980b9','#8e44ad','#16a085','#d35400','#2c3e50','#c0392b','#1abc9c'];
+  return p[(name.charCodeAt(0) || 0) % p.length];
+}
+function formatFecha(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})
+       + ' ' + d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+}
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2,6);
+}
+
+// ── Carga y renderizado ───────────────────────────────────
+async function loadAnotacionesUI(cargoId) {
+  const list = document.getElementById('anotList');
+  if (!list) return;
+  list.innerHTML = '<div class="anot-loading">Cargando…</div>';
+  try {
+    const snap = await db.collection('comentarios').doc(cargoId).get();
+    const items = snap.exists ? (snap.data().anotaciones || []) : [];
+    items.sort((a,b) => a.fecha < b.fecha ? -1 : 1);
+    renderAnotList(items, cargoId);
+  } catch(e) {
+    list.innerHTML = '<div class="anot-empty">Error al cargar. Verificá la conexión.</div>';
+    console.error(e);
+  }
+}
+
+function renderAnotList(items, cargoId) {
+  const list = document.getElementById('anotList');
+  list.innerHTML = '';
+  if (!items.length) {
+    list.innerHTML = '<div class="anot-empty">Sin anotaciones aún.</div>';
+    return;
+  }
+  items.forEach(a => list.appendChild(buildAnotItem(a, cargoId)));
+  list.scrollTop = list.scrollHeight;
+}
+
+function buildAnotItem(anot, cargoId) {
+  const user = getCurrentUser();
+  const isOwn = anot.autor === user;
+  const wrap = document.createElement('div');
+  wrap.className = 'anot-item';
+  const av = document.createElement('div');
+  av.className = 'anot-avatar';
+  av.style.background = getAvatarColor(anot.autor);
+  av.textContent = anot.autor.charAt(0).toUpperCase();
+  const body = document.createElement('div');
+  body.className = 'anot-body';
+  const meta = document.createElement('div');
+  meta.className = 'anot-meta';
+  meta.innerHTML = `<span class="anot-autor">${anot.autor}</span><span class="anot-fecha">${formatFecha(anot.fecha)}</span>`;
+  if (isOwn) {
+    const del = document.createElement('button');
+    del.className = 'anot-del';
+    del.title = 'Eliminar mi anotación';
+    del.textContent = '✕';
+    del.addEventListener('click', () => deleteAnotacion(cargoId, anot.id));
+    meta.appendChild(del);
+  }
+  body.appendChild(meta);
+  if (anot.contexto) {
+    const ctx = document.createElement('div');
+    ctx.className = 'anot-contexto';
+    const tipo = anot.contexto.tipo === 'mision' ? 'Misión' : 'Función';
+    ctx.innerHTML = `<span class="anot-ctx-label">${tipo} ${anot.contexto.idx + 1}</span>: "${anot.contexto.resumen}"`;
+    body.appendChild(ctx);
+  }
+  const txt = document.createElement('div');
+  txt.className = 'anot-texto';
+  txt.textContent = anot.texto;
+  body.appendChild(txt);
+  wrap.appendChild(av);
+  wrap.appendChild(body);
+  return wrap;
+}
+
+// ── CRUD Firestore ────────────────────────────────────────
+async function addAnotacion(cargoId) {
+  const user = getCurrentUser();
+  if (!user) { openUserModal(); return; }
+  const ta = document.getElementById('anotTexto');
+  const texto = ta.value.trim();
+  if (!texto) { ta.focus(); return; }
+  const anot = { id: genId(), autor: user, texto, fecha: new Date().toISOString() };
+  ta.value = '';
+  ta.disabled = true;
+  try {
+    await db.collection('comentarios').doc(cargoId).set(
+      { anotaciones: firebase.firestore.FieldValue.arrayUnion(anot) },
+      { merge: true }
+    );
+    await loadAnotacionesUI(cargoId);
+  } catch(e) {
+    console.error('Error al agregar:', e);
+    alert('No se pudo guardar la anotación. Verificá la conexión.');
+  } finally {
+    ta.disabled = false;
+    ta.focus();
+  }
+}
+
+async function deleteAnotacion(cargoId, anotId) {
+  if (!confirm('¿Eliminar esta anotación?')) return;
+  try {
+    const ref = db.collection('comentarios').doc(cargoId);
+    const snap = await ref.get();
+    if (!snap.exists) return;
+    const anotaciones = (snap.data().anotaciones || []).filter(a => a.id !== anotId);
+    await ref.update({ anotaciones });
+    await loadAnotacionesUI(cargoId);
+  } catch(e) {
+    console.error('Error al eliminar:', e);
+  }
+}
+
+// ── Comentario inline sobre misión/función ────────────────
+function openInlineComment(itemEl, cargoId, contexto) {
+  document.querySelectorAll('.inline-comment-form').forEach(f => f.remove());
+  const form = document.createElement('div');
+  form.className = 'inline-comment-form';
+  const label = document.createElement('div');
+  label.style.cssText = 'font-size:11px;font-weight:700;color:#1a5276;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px';
+  label.textContent = `Comentar ${contexto.tipo === 'mision' ? 'misión' : 'función'} ${contexto.idx + 1}`;
+  const ta = document.createElement('textarea');
+  ta.className = 'inline-comment-ta';
+  ta.placeholder = `Tu comentario sobre esta ${contexto.tipo}…`;
+  ta.rows = 2;
+  const btnRow = document.createElement('div');
+  btnRow.style.cssText = 'display:flex;gap:6px;margin-top:8px';
+  const save = document.createElement('button');
+  save.className = 'btn-func btn-save';
+  save.textContent = '✓ Guardar';
+  save.onclick = async () => {
+    const texto = ta.value.trim();
+    if (!texto) { ta.focus(); return; }
+    const user = getCurrentUser();
+    if (!user) { openUserModal(); return; }
+    const anot = { id: genId(), autor: user, texto, fecha: new Date().toISOString(), contexto };
+    save.disabled = true;
+    try {
+      await db.collection('comentarios').doc(cargoId).set(
+        { anotaciones: firebase.firestore.FieldValue.arrayUnion(anot) },
+        { merge: true }
+      );
+      form.remove();
+      await loadAnotacionesUI(cargoId);
+      document.getElementById('dAnotaciones').scrollIntoView({behavior:'smooth', block:'nearest'});
+    } catch(e) { console.error(e); }
+    finally { save.disabled = false; }
+  };
+  const cancel = document.createElement('button');
+  cancel.className = 'btn-func btn-cancel';
+  cancel.textContent = '✕ Cancelar';
+  cancel.onclick = () => form.remove();
+  btnRow.appendChild(save); btnRow.appendChild(cancel);
+  form.appendChild(label); form.appendChild(ta); form.appendChild(btnRow);
+  itemEl.appendChild(form);
+  ta.focus();
+}
+
+// ── Tooltip de votos ─────────────────────────────────────
+(function(){
+  function getTip(){ return document.getElementById('votoTooltip'); }
+  document.addEventListener('mouseover', function(e) {
+    const btn = e.target.closest('.voto-btn');
+    if (!btn || !btn.dataset.voters) return;
+    let voters;
+    try { voters = JSON.parse(btn.dataset.voters); } catch(err){ return; }
+    if (!voters.length) return;
+    const tip = getTip();
+    if (!tip) return;
+    const isUp = btn.classList.contains('voto-up');
+    tip.innerHTML = '<div class="voto-tooltip-title">' +
+      (isUp ? '👍 A favor' : '👎 En contra') +
+      '</div>' +
+      voters.map(u => '<span class="voto-tooltip-name">• ' + u + '</span>').join('');
+    tip.style.display = 'block';
+    const rect = btn.getBoundingClientRect();
+    tip.style.top  = (rect.bottom + 7) + 'px';
+    tip.style.left = Math.min(rect.left, window.innerWidth - tip.offsetWidth - 8) + 'px';
+  });
+  document.addEventListener('mouseout', function(e) {
+    if (e.target.closest('.voto-btn')) { var t = getTip(); if(t) t.style.display = 'none'; }
+  });
+})();
+
+// ── Eventos de la sección anotaciones ────────────────────
+document.getElementById('anotAgregar').addEventListener('click', () => {
+  if (typeof activeId !== 'undefined' && activeId) addAnotacion(activeId);
+});
+document.getElementById('anotTexto').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+    document.getElementById('anotAgregar').click();
+  }
+});
+</script>
+
+</body>
+</html>
