@@ -240,11 +240,49 @@ button:hover .btn-lbl{display:inline}
   .pr-comment{margin-top:8pt;padding:6pt 8pt;border:1pt solid #ccc;background:#f9f9f9;font-size:10pt}
 }
 #printArea{display:none}
+
+/* AUTH OVERLAY */
+.auth-overlay{position:fixed;inset:0;background:rgba(13,43,78,.97);z-index:9999;display:flex;align-items:center;justify-content:center}
+.auth-box{background:#fff;border-radius:16px;width:380px;max-width:95vw;box-shadow:0 12px 48px rgba(0,0,0,.4);overflow:hidden}
+.auth-header{background:linear-gradient(135deg,var(--navy),var(--navy2));padding:28px 40px 22px;text-align:center}
+.auth-header img{width:52px}
+.auth-title{font-size:17px;font-weight:800;color:#fff;margin-top:10px}
+.auth-sub{font-size:12px;color:rgba(255,255,255,.65);margin-top:4px}
+.auth-body{padding:26px 40px 32px}
+.auth-field{margin-bottom:13px}
+.auth-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:5px}
+.auth-input{width:100%;font-family:inherit;font-size:14px;padding:10px 13px;border:1.5px solid var(--border);border-radius:8px;outline:none;color:var(--text)}
+.auth-input:focus{border-color:var(--navy2)}
+.auth-btn{width:100%;padding:11px;background:var(--navy2);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px}
+.auth-btn:hover{background:var(--navy3)}
+.auth-btn:disabled{opacity:.5;cursor:not-allowed}
+.auth-error{background:var(--red-bg);color:var(--red);border:1.5px solid var(--red-bd);border-radius:7px;padding:8px 12px;font-size:12px;font-weight:600;margin-bottom:12px;display:none}
+.auth-error.visible{display:block}
+
+/* ROLE BADGE */
+.role-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;line-height:1.6}
+.role-admin{background:#e8d5ff;color:#6b3fa0;border:1px solid #c9a8f0}
+.role-editor{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-bd)}
+.role-revisor{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-bd)}
+.role-lector{background:#f0f4f8;color:var(--muted);border:1px solid var(--border)}
+
+/* USER MANAGEMENT */
+.umgmt-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.umgmt-table th{background:#f0f4f8;padding:7px 10px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.umgmt-table td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+.umgmt-table tr:last-child td{border-bottom:none}
+.umgmt-add{background:var(--blue-bg);border:1.5px dashed var(--blue-bd);border-radius:10px;padding:14px 16px;margin-top:14px}
+.umgmt-add-title{font-size:12px;font-weight:700;color:var(--navy2);margin-bottom:10px}
+.umgmt-row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.umgmt-input{font-family:inherit;font-size:12.5px;padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;outline:none;color:var(--text);background:#fff}
+.umgmt-input:focus{border-color:var(--navy2)}
+.umgmt-sel{font-family:inherit;font-size:12.5px;padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;outline:none;color:var(--text);background:#fff;cursor:pointer}
 </style>
 <!-- Firebase SDK -->
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-  import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+  import { getFirestore, doc, setDoc, getDoc, getDocs, collection } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
   const firebaseConfig = {
     apiKey: "AIzaSyCEYxLYrmWLFqapZ2_XEIkat3XpqmH5ZHY",
@@ -259,10 +297,15 @@ button:hover .btn-lbl{display:inline}
   const db = getFirestore(app);
 
   // Exponer globalmente para que saveToFirebase() y loadFromFirebase() puedan usarlos
+  const auth = getAuth(app);
   window._fbDb = db;
   window._fbDoc = doc;
   window._fbSetDoc = setDoc;
   window._fbGetDoc = getDoc;
+  window._fbFirestore = { getDocs, collection };
+  window._fbSignIn = (e, p) => signInWithEmailAndPassword(auth, e, p);
+  window._fbSignOut = () => signOut(auth);
+  window._fbOnAuthChanged = cb => onAuthStateChanged(auth, cb);
 
   // Intentar cargar desde Firestore al iniciar (complementa localStorage)
   window.addEventListener('DOMContentLoaded', async () => {
@@ -312,6 +355,28 @@ button:hover .btn-lbl{display:inline}
       </div>
     </div>
     <button class="hdr-btn" id="ghBtn" data-tooltip="Guardar en GitHub + Firebase" onclick="saveToGitHub()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg></button>
+    <div class="hdr-sep"></div>
+    <div class="hdr-dropdown" id="userDropdown">
+      <button class="hdr-btn" id="userBtn" data-tooltip="Mi cuenta" onclick="toggleUserDropdown(event)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </button>
+      <div class="hdr-dropdown-menu" id="userDropdownMenu">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--border);min-width:200px">
+          <div id="userMenuName" style="font-size:13px;font-weight:700;color:var(--text)"></div>
+          <div id="userMenuEmail" style="font-size:11px;color:var(--muted);margin-top:2px"></div>
+          <div id="userMenuRole" class="role-badge" style="margin-top:6px"></div>
+        </div>
+        <button class="hdr-dropdown-item" id="btnUserMgmt" onclick="closeUserDropdown();openUserMgmt()" style="display:none">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 1 0-7.75"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span style="font-size:13px">Gestión de usuarios</span>
+        </button>
+        <div class="hdr-dropdown-sep"></div>
+        <button class="hdr-dropdown-item" onclick="doSignOut()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span style="font-size:13px">Cerrar sesión</span>
+        </button>
+      </div>
+    </div>
     <button class="hdr-btn accent" data-tooltip="Imprimir" onclick="printDoc()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>
   </div>
 </div>
@@ -1127,12 +1192,30 @@ function submitAddArticle(){
 function toggleNuevoDropdown(e){
   e.stopPropagation();
   const m = document.getElementById('nuevoDropdownMenu');
-  m.style.display = m.style.display === 'block' ? 'none' : 'block';
+  const isOpen = m.style.display === 'block';
+  closeAllDropdowns();
+  if(!isOpen) m.style.display = 'block';
 }
 function closeNuevo(){
   document.getElementById('nuevoDropdownMenu').style.display = 'none';
 }
-document.addEventListener('click', ()=>closeNuevo());
+function toggleUserDropdown(e){
+  e.stopPropagation();
+  const m = document.getElementById('userDropdownMenu');
+  const isOpen = m.style.display === 'block';
+  closeAllDropdowns();
+  if(!isOpen) m.style.display = 'block';
+}
+function closeUserDropdown(){
+  document.getElementById('userDropdownMenu').style.display = 'none';
+}
+function closeAllDropdowns(){
+  document.getElementById('nuevoDropdownMenu').style.display = 'none';
+  document.getElementById('userDropdownMenu').style.display = 'none';
+  const fm = document.getElementById('flagMenu');
+  if(fm) fm.style.display = 'none';
+}
+document.addEventListener('click', ()=>closeAllDropdowns());
 
 // MODAL SIMPLE (Título / Capítulo)
 let _simpleSubmitFn = null;
@@ -1787,7 +1870,272 @@ tree = buildTree(RAW_DATA);
 renderTree();
 updateStats();
 document.getElementById('versionDisplay').textContent = 'Versión ' + CURRENT_VERSION;
+
+// ─────────────────────────────────────────────
+// AUTH
+// ─────────────────────────────────────────────
+let currentUser = null;
+let currentUserProfile = null;
+
+const ROLE_LABELS = { admin:'Admin', editor:'Editor', revisor:'Revisor', lector:'Lector' };
+const ROLE_CLASS  = { admin:'role-admin', editor:'role-editor', revisor:'role-revisor', lector:'role-lector' };
+
+function canEdit()    { return currentUserProfile && ['admin','editor'].includes(currentUserProfile.role); }
+function canComment() { return currentUserProfile && ['admin','editor','revisor'].includes(currentUserProfile.role); }
+function canFlag()    { return currentUserProfile && ['admin','editor','revisor'].includes(currentUserProfile.role); }
+function canSave()    { return currentUserProfile && ['admin','editor'].includes(currentUserProfile.role); }
+function isAdmin()    { return currentUserProfile?.role === 'admin'; }
+
+function initAuth(){
+  window._fbOnAuthChanged(async user => {
+    if(user){
+      currentUser = user;
+      try{
+        const snap = await window._fbGetDoc(window._fbDoc(window._fbDb,'users',user.uid));
+        if(snap.exists()){
+          currentUserProfile = snap.data();
+        } else {
+          // Si no existe el documento del usuario, verificar si hay otros usuarios
+          const usersSnap = await window._fbFirestore.getDocs(
+            window._fbFirestore.collection(window._fbDb,'users')
+          );
+          const role = usersSnap.empty ? 'admin' : 'lector';
+          currentUserProfile = { email:user.email, name:user.email, role, active:true, createdAt:Date.now() };
+          await window._fbSetDoc(window._fbDoc(window._fbDb,'users',user.uid), currentUserProfile);
+        }
+      }catch(e){
+        console.error('Error cargando perfil:', e);
+        currentUserProfile = { email:user.email, name:user.email, role:'lector', active:true };
+      }
+      if(currentUserProfile.active === false){
+        showToast('❌ Tu cuenta está desactivada');
+        await doSignOut();
+        return;
+      }
+      document.getElementById('authOverlay').style.display = 'none';
+      updateUserMenu();
+      applyRoleUI();
+    } else {
+      currentUser = null;
+      currentUserProfile = null;
+      document.getElementById('authOverlay').style.display = 'flex';
+    }
+  });
+}
+
+async function doSignIn(){
+  const email = document.getElementById('authEmail').value.trim();
+  const pass  = document.getElementById('authPassword').value;
+  const btn   = document.getElementById('authBtn');
+  const err   = document.getElementById('authError');
+  if(!email || !pass){ showAuthError('Completá email y contraseña'); return; }
+  btn.disabled = true; btn.textContent = 'Iniciando…';
+  err.classList.remove('visible');
+  try{
+    await window._fbSignIn(email, pass);
+  }catch(e){
+    const msgs = {
+      'auth/user-not-found':'Usuario no encontrado',
+      'auth/wrong-password':'Contraseña incorrecta',
+      'auth/invalid-email':'Email inválido',
+      'auth/too-many-requests':'Demasiados intentos. Esperá unos minutos.',
+      'auth/invalid-credential':'Email o contraseña incorrectos'
+    };
+    showAuthError(msgs[e.code] || e.message);
+  }finally{
+    btn.disabled = false; btn.textContent = 'Iniciar sesión';
+  }
+}
+
+function showAuthError(msg){
+  const e = document.getElementById('authError');
+  e.textContent = msg; e.classList.add('visible');
+}
+
+async function doSignOut(){
+  try{ await window._fbSignOut(); closeAllDropdowns(); }
+  catch(e){ showToast('❌ Error al cerrar sesión'); }
+}
+
+function updateUserMenu(){
+  if(!currentUserProfile) return;
+  const p = currentUserProfile;
+  document.getElementById('userMenuName').textContent  = p.name || p.email;
+  document.getElementById('userMenuEmail').textContent = p.email;
+  const roleEl = document.getElementById('userMenuRole');
+  roleEl.textContent = ROLE_LABELS[p.role] || p.role;
+  roleEl.className = 'role-badge ' + (ROLE_CLASS[p.role] || '');
+  document.getElementById('btnUserMgmt').style.display = isAdmin() ? 'flex' : 'none';
+}
+
+function applyRoleUI(){
+  const ghBtn = document.getElementById('ghBtn');
+  if(ghBtn) ghBtn.style.display = canSave() ? '' : 'none';
+  const nd = document.getElementById('nuevoDropdown');
+  if(nd) nd.style.display = canEdit() ? '' : 'none';
+}
+
+// ─── GESTIÓN DE USUARIOS (Admin) ───
+async function openUserMgmt(){
+  if(!isAdmin()) return;
+  document.getElementById('userMgmtModal').style.display = 'flex';
+  await loadUserList();
+}
+function closeUserMgmt(){
+  document.getElementById('userMgmtModal').style.display = 'none';
+}
+async function loadUserList(){
+  const tbody = document.getElementById('userMgmtList');
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:14px">Cargando…</td></tr>';
+  try{
+    const snap = await window._fbFirestore.getDocs(
+      window._fbFirestore.collection(window._fbDb,'users')
+    );
+    if(snap.empty){ tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:14px">Sin usuarios registrados</td></tr>'; return; }
+    tbody.innerHTML = '';
+    snap.forEach(docSnap=>{
+      const u = docSnap.data(), uid = docSnap.id;
+      const isSelf = currentUser && uid === currentUser.uid;
+      const isActive = u.active !== false;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="font-weight:600">${escHtml(u.name||'')}</td>
+        <td style="color:var(--muted);font-size:12px">${escHtml(u.email||'')}</td>
+        <td>
+          <select onchange="changeUserRole('${uid}',this.value)" ${isSelf?'disabled':''} style="font-size:12px;padding:3px 7px;border:1.5px solid var(--border);border-radius:5px">
+            ${['admin','editor','revisor','lector'].map(r=>`<option value="${r}"${u.role===r?' selected':''}>${ROLE_LABELS[r]}</option>`).join('')}
+          </select>
+        </td>
+        <td><span style="font-size:11px;font-weight:700;color:${isActive?'var(--green)':'var(--red)'}">${isActive?'Activo':'Inactivo'}</span></td>
+        <td>${!isSelf?`<button class="art-card-btn ${isActive?'art-card-btn-del':'art-card-btn-edit'}" onclick="toggleUserActive('${uid}',${isActive})">${isActive?'Desactivar':'Activar'}</button>`:''}</td>`;
+      tbody.appendChild(tr);
+    });
+  }catch(e){
+    tbody.innerHTML=`<tr><td colspan="5" style="color:var(--red);padding:14px">Error: ${e.message}</td></tr>`;
+  }
+}
+async function changeUserRole(uid, role){
+  try{
+    await window._fbSetDoc(window._fbDoc(window._fbDb,'users',uid),{role},{merge:true});
+    showToast('✅ Rol actualizado');
+  }catch(e){ showToast('❌ '+e.message); }
+}
+async function toggleUserActive(uid, currentlyActive){
+  try{
+    await window._fbSetDoc(window._fbDoc(window._fbDb,'users',uid),{active:!currentlyActive},{merge:true});
+    await loadUserList();
+    showToast('✅ Usuario '+(currentlyActive?'desactivado':'activado'));
+  }catch(e){ showToast('❌ '+e.message); }
+}
+async function createUser(){
+  const name  = document.getElementById('newUserName').value.trim();
+  const email = document.getElementById('newUserEmail').value.trim();
+  const pass  = document.getElementById('newUserPass').value;
+  const role  = document.getElementById('newUserRole').value;
+  const errEl = document.getElementById('createUserError');
+  const btn   = document.getElementById('createUserBtn');
+  errEl.style.display = 'none';
+  if(!name||!email||!pass){ showCreateUserErr('Completá todos los campos'); return; }
+  if(pass.length < 6){ showCreateUserErr('La contraseña debe tener al menos 6 caracteres'); return; }
+  btn.disabled = true; btn.textContent = 'Creando…';
+  try{
+    const apiKey = 'AIzaSyCEYxLYrmWLFqapZ2_XEIkat3XpqmH5ZHY';
+    const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email, password:pass, returnSecureToken:false})
+    });
+    const data = await res.json();
+    if(data.error) throw new Error({
+      'EMAIL_EXISTS':'Ya existe un usuario con ese email',
+      'INVALID_EMAIL':'Email inválido',
+      'WEAK_PASSWORD':'Contraseña muy corta (mínimo 6 caracteres)'
+    }[data.error.message] || data.error.message);
+    await window._fbSetDoc(window._fbDoc(window._fbDb,'users',data.localId),{
+      email, name, role, active:true, createdAt:Date.now(), createdBy:currentUser.uid
+    });
+    document.getElementById('newUserName').value  = '';
+    document.getElementById('newUserEmail').value = '';
+    document.getElementById('newUserPass').value  = '';
+    await loadUserList();
+    showToast('✅ Usuario creado: '+name);
+  }catch(e){ showCreateUserErr(e.message); }
+  finally{ btn.disabled=false; btn.textContent='Crear'; }
+}
+function showCreateUserErr(msg){
+  const e = document.getElementById('createUserError');
+  e.textContent = msg; e.style.display = 'block';
+}
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// Inicializar auth — solo una vez
+let _authInited = false;
+function tryInitAuth(){ if(!_authInited && window._fbOnAuthChanged){ _authInited=true; initAuth(); } }
+document.addEventListener('DOMContentLoaded', tryInitAuth);
+window.addEventListener('load', tryInitAuth);
 </script>
+
+<!-- AUTH OVERLAY — bloquea la app hasta que el usuario inicie sesión -->
+<div id="authOverlay" class="auth-overlay">
+  <div class="auth-box">
+    <div class="auth-header">
+      <img src="logo128x128_blanco.png" alt="ISSyS">
+      <div class="auth-title">ISSyS · Editor EER</div>
+      <div class="auth-sub">Iniciá sesión para continuar</div>
+    </div>
+    <div class="auth-body">
+      <div class="auth-error" id="authError"></div>
+      <div class="auth-field">
+        <div class="auth-label">Email</div>
+        <input id="authEmail" class="auth-input" type="email" placeholder="usuario@ejemplo.com" autocomplete="username">
+      </div>
+      <div class="auth-field">
+        <div class="auth-label">Contraseña</div>
+        <input id="authPassword" class="auth-input" type="password" placeholder="••••••••" autocomplete="current-password"
+          onkeydown="if(event.key==='Enter') doSignIn()">
+      </div>
+      <button class="auth-btn" id="authBtn" onclick="doSignIn()">Iniciar sesión</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Gestión de usuarios (solo Admin) -->
+<div id="userMgmtModal" class="modal-overlay" style="display:none">
+  <div class="modal-box" style="width:640px;max-width:97vw">
+    <div class="modal-title">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 1 0-7.75"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Gestión de usuarios
+    </div>
+    <div style="max-height:260px;overflow-y:auto;border:1.5px solid var(--border);border-radius:8px">
+      <table class="umgmt-table">
+        <thead><tr>
+          <th>Nombre</th><th>Email</th><th>Rol</th><th>Estado</th><th></th>
+        </tr></thead>
+        <tbody id="userMgmtList">
+          <tr><td colspan="5" style="text-align:center;color:var(--muted);padding:14px">Cargando…</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="umgmt-add">
+      <div class="umgmt-add-title">➕ Nuevo usuario</div>
+      <div class="umgmt-row">
+        <input id="newUserName"  class="umgmt-input" placeholder="Nombre completo" style="flex:1;min-width:130px">
+        <input id="newUserEmail" class="umgmt-input" placeholder="Email" type="email" style="flex:1;min-width:160px">
+        <input id="newUserPass"  class="umgmt-input" placeholder="Contraseña" type="password" style="min-width:120px">
+        <select id="newUserRole" class="umgmt-sel">
+          <option value="lector">Lector</option>
+          <option value="revisor">Revisor</option>
+          <option value="editor" selected>Editor</option>
+          <option value="admin">Admin</option>
+        </select>
+        <button class="add-comment-submit" id="createUserBtn" onclick="createUser()">Crear</button>
+      </div>
+      <div id="createUserError" style="color:var(--red);font-size:12px;margin-top:8px;display:none"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="closeUserMgmt()">Cerrar</button>
+    </div>
+  </div>
+</div>
 
 <!-- Modal: Picker de referencia inline -->
 <div id="refPickerModal" class="modal-overlay" style="display:none">
