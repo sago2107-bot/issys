@@ -56,7 +56,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .section-header:hover{background:rgba(13,43,78,.05);border-radius:6px 6px 0 0}
 .section-tgl{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--navy);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--navy);flex-shrink:0;transition:transform .2s}
 .section-tgl.open{transform:rotate(90deg)}
-.section-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--navy)}
+.section-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--navy);flex:1}
 .section-count{font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;background:var(--blue-bg);color:var(--blue);border:1.5px solid var(--blue-bd);line-height:1.6;flex-shrink:0}
 .cap-count{font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;background:#f0f4f8;color:var(--muted);border:1px solid var(--border);line-height:1.6;flex-shrink:0}
 .section-body{overflow:hidden;transition:max-height .25s ease,opacity .2s;max-height:6000px;opacity:1}
@@ -66,7 +66,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .cap-header:hover .cap-label{text-decoration:underline}
 .cap-tgl{width:16px;height:16px;border-radius:50%;border:1.5px solid #8fa3b8;display:flex;align-items:center;justify-content:center;font-size:8px;color:#8fa3b8;flex-shrink:0;transition:transform .2s}
 .cap-tgl.open{transform:rotate(90deg)}
-.cap-label{font-size:11.5px;font-weight:600;color:var(--navy3)}
+.cap-label{font-size:11.5px;font-weight:600;color:var(--navy3);flex:1}
 .cap-body{overflow:hidden;transition:max-height .22s ease,opacity .18s;max-height:3000px;opacity:1}
 .cap-body.collapsed{max-height:0;opacity:0}
 
@@ -693,7 +693,7 @@ function renderTree(){
       capsHtml += `<div class="cap-block">
         <div class="cap-header" onclick="toggleCap('${capId}')">
           <div class="cap-tgl${capOpen?' open':''}" id="ctgl_${capId}">▶</div>
-          <div style="flex:1"></div>
+          <div class="cap-label">${q?highlight(shortCap,q):esc(shortCap)}</div>
           <span class="hdr-cap-acts">
             ${!isFirstCap?`<button class="hdr-sec-btn" onclick="event.stopPropagation();moveCapUp('${capT}','${capC}')">▲<span class="btn-lbl"> Subir</span></button>`:''}
             ${!isLastCap?`<button class="hdr-sec-btn" onclick="event.stopPropagation();moveCapDown('${capT}','${capC}')">▼<span class="btn-lbl"> Bajar</span></button>`:''}
@@ -703,7 +703,6 @@ function renderTree(){
           </span>
           ${capAssocTag}
           <span class="cap-count">${capArtCount}</span>
-          <div class="cap-label">${q?highlight(shortCap,q):esc(shortCap)}</div>
         </div>
         <div class="cap-body${capOpen?'':' collapsed'}" id="cbody_${capId}">${artHtml}</div>
       </div>`;
@@ -717,7 +716,7 @@ function renderTree(){
     html += `<div class="section-block">
       <div class="section-header" onclick="toggleSec('${secId}')">
         <div class="section-tgl${isOpen?' open':''}" id="stgl_${secId}">▶</div>
-        <div style="flex:1"></div>
+        <div class="section-label">${q?highlight(shortTit,q):esc(shortTit)}</div>
         <span class="hdr-sec-acts">
           ${titList.indexOf(titulo)>0?`<button class="hdr-sec-btn" onclick="event.stopPropagation();moveTituloUp('${titE}')">▲<span class="btn-lbl"> Subir</span></button>`:''}
           ${titList.indexOf(titulo)<titList.length-1?`<button class="hdr-sec-btn" onclick="event.stopPropagation();moveTituloDown('${titE}')">▼<span class="btn-lbl"> Bajar</span></button>`:''}
@@ -725,7 +724,6 @@ function renderTree(){
           <button class="hdr-sec-btn hdr-sec-btn-del" onclick="event.stopPropagation();deleteTitulo('${titE}')">✕<span class="btn-lbl"> Eliminar</span></button>
         </span>
         <span class="section-count">${secArtCount}</span>
-        <div class="section-label">${q?highlight(shortTit,q):esc(shortTit)}</div>
       </div>
       <div class="section-body${isOpen?'':' collapsed'}" id="sbody_${secId}">${capsHtml}</div>
     </div>`;
