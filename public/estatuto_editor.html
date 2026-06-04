@@ -242,10 +242,10 @@ button:hover .btn-lbl{display:inline}
 #printArea{display:none}
 
 /* AUTH OVERLAY */
-.auth-overlay{position:fixed;inset:0;background:rgba(13,43,78,.97);z-index:9999;display:flex;align-items:center;justify-content:center}
-.auth-box{background:#fff;border-radius:16px;width:380px;max-width:95vw;box-shadow:0 12px 48px rgba(0,0,0,.4);overflow:hidden}
+.auth-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#0a2e18 0%,#1a7a3c 50%,#0d4d24 100%);z-index:9999;display:flex;align-items:center;justify-content:center}
+.auth-box{background:rgba(255,255,255,0.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:16px;width:380px;max-width:95vw;box-shadow:0 12px 48px rgba(0,0,0,.4);overflow:hidden}
 .auth-header{background:linear-gradient(135deg,var(--navy),var(--navy2));padding:28px 40px 22px;text-align:center}
-.auth-header img{width:52px}
+.auth-header img{width:74px}
 .auth-title{font-size:17px;font-weight:800;color:#fff;margin-top:10px}
 .auth-sub{font-size:12px;color:rgba(255,255,255,.65);margin-top:4px}
 .auth-body{padding:26px 40px 32px}
@@ -258,6 +258,26 @@ button:hover .btn-lbl{display:inline}
 .auth-btn:disabled{opacity:.5;cursor:not-allowed}
 .auth-error{background:var(--red-bg);color:var(--red);border:1.5px solid var(--red-bd);border-radius:7px;padding:8px 12px;font-size:12px;font-weight:600;margin-bottom:12px;display:none}
 .auth-error.visible{display:block}
+
+/* INCISOS */
+.inciso-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.inciso-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;background:#fafcff}
+.inciso-letra{font-weight:800;color:var(--navy2);font-size:13px;min-width:22px;padding-top:1px}
+.inciso-texto{flex:1;font-size:16px;line-height:1.7;color:var(--text);word-break:break-word;font-family:inherit}
+.inciso-actions{display:flex;gap:4px;flex-shrink:0}
+.inciso-btn{font-size:10px;padding:2px 7px;border-radius:4px;border:1.5px solid;cursor:pointer;font-weight:700;line-height:1.4;background:transparent}
+.inciso-btn-edit{color:#2c5fbd;border-color:#a8c0f0}.inciso-btn-edit:hover{background:#e8f0fe}
+.inciso-btn-del{color:#c0392b;border-color:#f0a8a8}.inciso-btn-del:hover{background:#fdecea}
+.inciso-btn-ok{color:#1a7a3c;border-color:#a8e0bc}.inciso-btn-ok:hover{background:#e8f9ee}
+.inciso-edit-ta{width:100%;font-family:inherit;font-size:14px;line-height:1.6;border:1.5px solid var(--navy2);border-radius:6px;padding:5px 8px;outline:none;resize:vertical;min-height:60px}
+.inciso-add-box{border:1.5px dashed #b0c8e0;border-radius:8px;padding:10px 12px;background:#f5f9fd;margin-top:4px}
+.inciso-add-ta{width:100%;font-family:inherit;font-size:14px;line-height:1.6;border:1.5px solid var(--border);border-radius:6px;padding:7px 10px;outline:none;resize:vertical;min-height:60px;background:#fff;box-sizing:border-box}
+.inciso-add-ta:focus{border-color:var(--navy2)}
+.inciso-nombre{font-size:11px;font-weight:700;color:var(--navy2);margin-bottom:2px}
+.inciso-node{display:flex;align-items:center;gap:6px;padding:3px 8px 3px 28px;cursor:pointer;border-radius:5px;transition:background .12s}
+.inciso-node:hover{background:rgba(13,43,78,.06)}
+.inciso-node-letra{font-size:10px;font-weight:800;color:var(--navy2);min-width:18px}
+.inciso-node-nombre{font-size:11px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* ROLE BADGE */
 .role-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;line-height:1.6}
@@ -485,6 +505,7 @@ const state = {
   customTitulos: [],   // extra secciones agregadas por el usuario
   customCapitulos: {}, // titulo -> [cap1, cap2, ...]
   capAssoc: {},        // "titulo\ncapitulo" -> articuloId del estatuto que reglamenta
+  incisos: {},         // artId -> [{id, texto}]
   newArtTipo: 'articulo',
   order: [],
   editingArtId: null,
@@ -504,6 +525,7 @@ function loadState(){
       Object.assign(state.artMeta, p.artMeta||{});
       Object.assign(state.customCapitulos, p.customCapitulos||{});
       Object.assign(state.capAssoc, p.capAssoc||{});
+      Object.assign(state.incisos, p.incisos||{});
       // Default associations for built-in reglamentos
       const capKey = 'REGLAMENTACIÓN\nREGLAMENTACIÓN DEL PROCESO DE SELECCIÓN PARA EL INGRESO';
       if(!state.capAssoc[capKey]) state.capAssoc[capKey] = 'a6';
@@ -544,20 +566,40 @@ function loadState(){
   }catch(e){}
 }
 
+function buildStateSnapshot(){
+  return {
+    texts: state.texts,
+    comments: state.comments,
+    flags: state.flags,
+    newArticles: state.newArticles,
+    artMeta: state.artMeta,
+    customTitulos: state.customTitulos,
+    customCapitulos: state.customCapitulos,
+    capAssoc: state.capAssoc,
+    incisos: state.incisos,
+    order: RAW_DATA.map(a=>a.id)
+  };
+}
+
+let _autoSaveTimer = null;
+function scheduleAutoSave(){
+  clearTimeout(_autoSaveTimer);
+  _autoSaveTimer = setTimeout(async ()=>{
+    if(!window._fbDb || !window._fbDoc) return;
+    try{
+      const ts = Date.now();
+      const st = { ...buildStateSnapshot(), version: CURRENT_VERSION, _ts: ts, _savedAt: new Date().toLocaleString('es-AR') };
+      await window._fbSetDoc(window._fbDoc(window._fbDb,'eerEditor','state'), st);
+      localStorage.setItem('eerEditorState', JSON.stringify(st));
+    }catch(e){ console.warn('auto-save Firebase:', e.message); }
+  }, 2000);
+}
+
 function saveState(){
   try{
-    localStorage.setItem('eerEditorState', JSON.stringify({
-      texts: state.texts,
-      comments: state.comments,
-      flags: state.flags,
-      newArticles: state.newArticles,
-      artMeta: state.artMeta,
-      customTitulos: state.customTitulos,
-      customCapitulos: state.customCapitulos,
-      capAssoc: state.capAssoc,
-      order: RAW_DATA.map(a=>a.id)
-    }));
+    localStorage.setItem('eerEditorState', JSON.stringify(buildStateSnapshot()));
   }catch(e){}
+  scheduleAutoSave();
 }
 
 // Build tree structure
@@ -665,6 +707,13 @@ function renderTree(){
         const shortName = lbl.replace(/\*+/g,'').replace(/\.\./g,'').trim();
         const displayName = q ? highlight(shortName, q) : esc(shortName);
 
+        const artIncisos = state.incisos[art.id] || [];
+        const incisosTreeHtml = artIncisos.map((inc, ii) =>
+          `<div class="inciso-node" onclick="selectArtToInciso('${art.id}',${ii})">
+            <span class="inciso-node-letra">${letraInciso(ii)})</span>
+            <span class="inciso-node-nombre">${inc.nombre ? esc(inc.nombre) : '<span style="color:var(--muted);font-style:italic">sin nombre</span>'}</span>
+          </div>`
+        ).join('');
         artHtml += `<div class="art-node">
           <div class="art-card${active?' active':''}${flagClass}" data-id="${art.id}" onclick="selectArt('${art.id}')">
             <span class="art-ico">${artIco}</span>
@@ -676,6 +725,7 @@ function renderTree(){
               <button class="art-card-btn art-card-btn-del" onclick="event.stopPropagation();confirmDeleteArticle('${art.id}')">✕<span class="btn-lbl"> Eliminar</span></button>
             </span>
           </div>
+          ${incisosTreeHtml}
         </div>`;
       }
       
@@ -824,6 +874,19 @@ function selectArt(id){
   }, 60);
 }
 
+function selectArtToInciso(artId, incisoIdx){
+  selectArt(artId);
+  setTimeout(()=>{
+    const el = document.getElementById('incisoItem_'+artId+'_'+incisoIdx);
+    if(el){
+      el.scrollIntoView({behavior:'smooth', block:'center'});
+      el.style.outline = '2.5px solid var(--navy2)';
+      el.style.borderRadius = '8px';
+      setTimeout(()=>{ el.style.outline = ''; }, 1400);
+    }
+  }, 80);
+}
+
 function renderEditPanel(id){
   const art = RAW_DATA.find(a=>a.id===id);
   if(!art) return;
@@ -935,6 +998,16 @@ function renderEditPanel(id){
     <div class="ep-sec">📝 Texto del artículo</div>
     <div class="ep-editor" id="artEditor_${id}" contenteditable="true" spellcheck="false" oninput="checkDirty('${id}')" onmouseup="checkRefBtn('${id}')" onkeyup="checkRefBtn('${id}')"></div>
 
+    <div class="ep-sec" style="margin-top:18px">📎 Incisos</div>
+    <div id="incisoList_${id}" class="inciso-list"></div>
+    <div class="inciso-add-box">
+      <input class="inciso-add-ta" id="incisoAddNombre_${id}" placeholder="Nombre del inciso (ej: Definición de cargo)…" style="min-height:unset;padding:7px 10px;margin-bottom:7px">
+      <textarea class="inciso-add-ta" id="incisoAddTa_${id}" placeholder="Texto del nuevo inciso…"></textarea>
+      <div style="display:flex;justify-content:flex-end;margin-top:7px">
+        <button class="add-comment-submit" onclick="addInciso('${id}')">➕ Agregar inciso</button>
+      </div>
+    </div>
+
     ${assocHtml}
 
     <div class="ep-sec" style="margin-top:18px">💬 Comentarios y observaciones</div>
@@ -946,7 +1019,7 @@ function renderEditPanel(id){
           <option value="prop">Propuesta</option>
           <option value="duda">Duda</option>
         </select>
-        <input type="text" class="add-comment-sel" id="comAuthor_${id}" placeholder="Autor" value="Lic. Galdame" style="flex:1">
+        <span style="font-size:12px;color:var(--muted);padding:0 6px;align-self:center">👤 ${esc(currentUserProfile?.name || currentUser?.email || 'Usuario')}</span>
       </div>
       <textarea class="add-comment-ta" id="comText_${id}" placeholder="Escribir comentario…"></textarea>
       <div style="display:flex;justify-content:flex-end;margin-top:7px">
@@ -960,6 +1033,84 @@ function renderEditPanel(id){
   if(editor){
     editor.innerHTML = parseToEditor(txt);
   }
+  renderIncisos(id);
+}
+
+// ── INCISOS ──────────────────────────────────────────────────────────────────
+
+const LETRAS = 'abcdefghijklmnopqrstuvwxyz';
+function letraInciso(i){ return LETRAS[i] || (i+1)+''; }
+
+function renderIncisos(artId){
+  const container = document.getElementById('incisoList_'+artId);
+  if(!container) return;
+  const lista = state.incisos[artId] || [];
+  if(!lista.length){ container.innerHTML = ''; return; }
+  container.innerHTML = lista.map((inc, i) => `
+    <div class="inciso-item" id="incisoItem_${artId}_${i}">
+      <div class="inciso-letra">${letraInciso(i)})</div>
+      <div style="flex:1">
+        ${inc.nombre ? `<div class="inciso-nombre">${esc(inc.nombre)}</div>` : ''}
+        <div class="inciso-texto" id="incisoTexto_${artId}_${i}" style="white-space:pre-wrap">${esc(inc.texto)}</div>
+      </div>
+      <div class="inciso-actions">
+        <button class="inciso-btn inciso-btn-edit" onclick="startEditInciso('${artId}',${i})">✎</button>
+        <button class="inciso-btn inciso-btn-del" onclick="deleteInciso('${artId}',${i})">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addInciso(artId){
+  const ta = document.getElementById('incisoAddTa_'+artId);
+  const ni = document.getElementById('incisoAddNombre_'+artId);
+  if(!ta) return;
+  const txt = ta.value.trim();
+  if(!txt) return;
+  const nombre = ni ? ni.value.trim() : '';
+  if(!state.incisos[artId]) state.incisos[artId] = [];
+  state.incisos[artId].push({ id: Date.now()+'', nombre, texto: txt });
+  ta.value = '';
+  if(ni) ni.value = '';
+  saveState();
+  renderIncisos(artId);
+  renderTree();
+}
+
+function deleteInciso(artId, idx){
+  if(!state.incisos[artId]) return;
+  state.incisos[artId].splice(idx, 1);
+  saveState();
+  renderIncisos(artId);
+  renderTree();
+}
+
+function startEditInciso(artId, idx){
+  const item = document.getElementById('incisoItem_'+artId+'_'+idx);
+  if(!item) return;
+  const inc = (state.incisos[artId]||[])[idx];
+  if(!inc) return;
+  const bodyDiv = item.querySelector('div[style*="flex:1"]') || item;
+  bodyDiv.innerHTML = `
+    <input class="inciso-edit-ta" id="incisoEditNombre_${artId}_${idx}" value="${esc(inc.nombre||'')}" placeholder="Nombre del inciso…" style="min-height:unset;padding:5px 8px;margin-bottom:5px">
+    <textarea class="inciso-edit-ta" id="incisoEditTa_${artId}_${idx}" style="min-height:80px">${esc(inc.texto)}</textarea>`;
+  item.querySelector('.inciso-actions').innerHTML =
+    `<button class="inciso-btn inciso-btn-ok" onclick="saveEditInciso('${artId}',${idx})">✓</button>
+     <button class="inciso-btn inciso-btn-del" onclick="renderIncisos('${artId}')">✕</button>`;
+  document.getElementById('incisoEditNombre_'+artId+'_'+idx).focus();
+}
+
+function saveEditInciso(artId, idx){
+  const ta     = document.getElementById('incisoEditTa_'+artId+'_'+idx);
+  const ni     = document.getElementById('incisoEditNombre_'+artId+'_'+idx);
+  if(!ta) return;
+  const txt = ta.value.trim();
+  if(!txt) return;
+  state.incisos[artId][idx].texto  = txt;
+  state.incisos[artId][idx].nombre = ni ? ni.value.trim() : '';
+  saveState();
+  renderIncisos(artId);
+  renderTree();
 }
 
 function saveArt(id){
@@ -1032,7 +1183,7 @@ document.addEventListener('click', e => {
 
 function addComment(id){
   const type = document.getElementById('comType_'+id).value;
-  const author = document.getElementById('comAuthor_'+id).value.trim() || 'Anónimo';
+  const author = currentUserProfile?.name || currentUser?.email || 'Anónimo';
   const text = document.getElementById('comText_'+id).value.trim();
   if(!text) return;
   
@@ -1708,7 +1859,7 @@ async function saveToGitHub(){
       texts:state.texts, comments:state.comments, flags:state.flags,
       newArticles:state.newArticles, artMeta:state.artMeta,
       customTitulos:state.customTitulos, customCapitulos:state.customCapitulos,
-      capAssoc:state.capAssoc, order:RAW_DATA.map(a=>a.id)
+      capAssoc:state.capAssoc, incisos:state.incisos, order:RAW_DATA.map(a=>a.id)
     };
     // Increment version
     const verMatch = html.match(/\/\*__GH_VER_START__\*\/const CURRENT_VERSION = "([^"]+)";\/\*__GH_VER_END__\*\//);
@@ -1796,6 +1947,7 @@ async function saveToFirebase() {
       customTitulos: state.customTitulos,
       customCapitulos: state.customCapitulos,
       capAssoc: state.capAssoc,
+      incisos: state.incisos,
       order: RAW_DATA.map(a => a.id),
       version: CURRENT_VERSION,
       _ts: ts,
@@ -2085,7 +2237,7 @@ window.addEventListener('load', tryInitAuth);
   <div class="auth-box">
     <div class="auth-header">
       <img src="logo128x128_blanco.png" alt="ISSyS">
-      <div class="auth-title">ISSyS · Editor EER</div>
+      <div class="auth-title">Estatuto Escalafon Reglamentario</div>
       <div class="auth-sub">Iniciá sesión para continuar</div>
     </div>
     <div class="auth-body">
