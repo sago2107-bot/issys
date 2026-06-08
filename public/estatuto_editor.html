@@ -15,43 +15,50 @@
   --red:#c0392b;--red-bg:#fdecea;--red-bd:#f0a8a8;
   --blue-bg:#e8f0fe;--blue:#2c5fbd;--blue-bd:#a8c0f0;
   --warn:#d4a017;--warn-bg:#fef9e7;--warn-bd:#f7dc6f;
-  --pnl-w:680px;
+  --pnl-w:760px;
 }
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 
 /* HEADER */
-.hdr{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:13px 22px;display:flex;align-items:center;gap:14px;box-shadow:0 3px 10px rgba(0,0,0,.3);position:sticky;top:0;z-index:100}
-.hdr-ico{width:42px;height:42px;background:rgba(255,255,255,.15);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.hdr{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:16px 24px;display:flex;align-items:center;gap:16px;box-shadow:0 3px 10px rgba(0,0,0,.3);position:sticky;top:0;z-index:100}
+.hdr-logo{width:48px;height:48px;object-fit:contain;flex-shrink:0}
 .hdr-info{flex:1}
-.hdr-title{font-size:15px;font-weight:700;letter-spacing:.2px}
-.hdr-sub{font-size:11px;opacity:.7;margin-top:1px}
+.hdr-title{font-size:14px;font-weight:800;letter-spacing:.6px;text-transform:uppercase}
+.hdr-sub{font-size:11px;opacity:.75;margin-top:3px;font-weight:400;letter-spacing:.2px}
 .hdr-btns{display:flex;align-items:center;gap:8px;margin-left:auto}
-.hdr-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:8px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s;white-space:nowrap}
+.hdr-btn{position:relative;width:44px;height:44px;padding:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.15);border:none;border-radius:10px;color:#fff;cursor:pointer;transition:background .15s;flex-shrink:0}
 .hdr-btn:hover{background:rgba(255,255,255,.28)}
-.hdr-btn.accent{background:var(--accent);border-color:var(--accent2);color:#1a1a00}
-.hdr-btn.accent:hover{background:var(--accent2)}
-.hdr-sep{width:1px;height:28px;background:rgba(255,255,255,.2);margin:0 2px}
+.hdr-btn.accent{background:rgba(255,255,255,.15);color:#fff}
+.hdr-btn.accent:hover{background:rgba(255,255,255,.28)}
+.hdr-btn::after{content:attr(data-tooltip);position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);background:rgba(15,25,40,.92);color:#fff;padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .18s;z-index:1000}
+.hdr-btn:hover::after{opacity:1}
+.hdr-sep{width:1px;height:32px;background:rgba(255,255,255,.2);margin:0 2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin-ico{animation:spin .7s linear infinite;display:block}
 
 /* LAYOUT */
-.main{display:flex;height:calc(100vh - 68px);overflow:hidden}
-.tree-pnl{flex:1;overflow-y:auto;padding:16px 14px 40px;min-width:0}
+.main{display:flex;height:calc(100vh - 82px);overflow:hidden}
+.tree-pnl{flex:1;overflow-y:auto;padding:16px 22px 40px;min-width:0}
 .edit-pnl{width:var(--pnl-w);flex-shrink:0;background:var(--white);border-left:1.5px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
 
-/* SEARCH BAR */
-.search-bar{padding:10px 14px 4px;position:sticky;top:0;background:var(--bg);z-index:10}
-.search-wrap{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--border);border-radius:9px;padding:7px 12px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.search-ico{color:var(--muted);font-size:15px;flex-shrink:0}
-.search-input{border:none;outline:none;font-size:13px;color:var(--text);flex:1;background:transparent}
-.search-clear{color:var(--muted);cursor:pointer;font-size:14px;line-height:1}
-.search-clear:hover{color:var(--red)}
+/* SEARCH BAR (header) */
+.hdr-search{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.13);border:1.5px solid rgba(255,255,255,.22);border-radius:10px;padding:8px 13px;width:380px;flex-shrink:0;transition:background .2s,border-color .2s}
+.hdr-search:focus-within{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.45)}
+.hdr-search-ico{color:rgba(255,255,255,.65);flex-shrink:0}
+.hdr-search-input{border:none;outline:none;background:transparent;color:#fff;font-size:13px;flex:1;min-width:0}
+.hdr-search-input::placeholder{color:rgba(255,255,255,.5)}
+.hdr-search-clear{color:rgba(255,255,255,.5);cursor:pointer;font-size:13px;line-height:1;flex-shrink:0;display:none}
+.hdr-search-clear:hover{color:#fff}
+.hdr-search-clear.visible{display:block}
 
 /* TREE */
 .section-header{display:flex;align-items:center;gap:8px;padding:10px 12px 6px;margin:10px 0 4px;border-bottom:2px solid var(--navy);cursor:pointer;user-select:none}
 .section-header:hover{background:rgba(13,43,78,.05);border-radius:6px 6px 0 0}
 .section-tgl{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--navy);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--navy);flex-shrink:0;transition:transform .2s}
 .section-tgl.open{transform:rotate(90deg)}
-.section-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--navy);flex:1}
-.section-count{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--blue-bg);color:var(--blue);border:1.5px solid var(--blue-bd)}
+.section-label{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--navy);flex:1}
+.section-count{font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;background:var(--blue-bg);color:var(--blue);border:1.5px solid var(--blue-bd);line-height:1.6;flex-shrink:0}
+.cap-count{font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;background:#f0f4f8;color:var(--muted);border:1px solid var(--border);line-height:1.6;flex-shrink:0}
 .section-body{overflow:hidden;transition:max-height .25s ease,opacity .2s;max-height:6000px;opacity:1}
 .section-body.collapsed{max-height:0;opacity:0}
 
@@ -59,7 +66,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .cap-header:hover .cap-label{text-decoration:underline}
 .cap-tgl{width:16px;height:16px;border-radius:50%;border:1.5px solid #8fa3b8;display:flex;align-items:center;justify-content:center;font-size:8px;color:#8fa3b8;flex-shrink:0;transition:transform .2s}
 .cap-tgl.open{transform:rotate(90deg)}
-.cap-label{font-size:11.5px;font-weight:600;color:var(--navy3);flex:1}
+.cap-label{font-size:14px;font-weight:700;color:var(--navy3);flex:1}
 .cap-body{overflow:hidden;transition:max-height .22s ease,opacity .18s;max-height:3000px;opacity:1}
 .cap-body.collapsed{max-height:0;opacity:0}
 
@@ -70,9 +77,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .art-card.active{border-color:var(--navy2);box-shadow:0 0 0 2.5px rgba(26,82,118,.25),0 3px 10px rgba(0,0,0,.12);background:var(--blue-bg);transform:translateY(-1px)}
 .art-card.modified{border-color:var(--warn);background:var(--warn-bg)}
 .art-card.modified.active{border-color:var(--accent);box-shadow:0 0 0 2.5px rgba(232,160,32,.3)}
-.art-ico{font-size:14px;flex-shrink:0;margin-top:1px}
+.art-ico{font-size:14px;flex-shrink:0;margin-top:1px;display:flex;align-items:center}
 .art-label{font-size:13px;font-weight:600;line-height:1.35;color:var(--text);flex:1}
-.art-num{font-size:11px;font-weight:700;color:var(--navy2);min-width:20px;text-align:right;flex-shrink:0;margin-top:2px}
+.art-num{font-size:12px;font-weight:700;color:var(--navy2);min-width:20px;text-align:right;flex-shrink:0;margin-top:2px}
 .art-card-btns{display:flex;gap:3px;margin-left:4px;flex-shrink:0;opacity:0;transition:opacity .15s}
 .art-node:hover .art-card-btns,.art-card.active .art-card-btns{opacity:1}
 .art-card-btn{font-size:10px;padding:2px 6px;border-radius:4px;border:1.5px solid;cursor:pointer;font-weight:700;line-height:1.4;background:transparent;white-space:nowrap}
@@ -82,7 +89,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .btn-lbl{display:none;font-size:inherit}
 button:hover .btn-lbl{display:inline}
 /* Section / Cap edit-delete buttons */
-.hdr-sec-acts,.hdr-cap-acts{display:flex;gap:3px;flex-shrink:0;opacity:0;transition:opacity .15s;margin-left:4px}
+.hdr-sec-acts,.hdr-cap-acts{display:flex;gap:3px;flex-shrink:0;opacity:0;transition:opacity .15s}
 .section-header:hover .hdr-sec-acts,.cap-header:hover .hdr-cap-acts{opacity:1}
 .hdr-sec-btn{font-size:10px;padding:2px 5px;border-radius:4px;border:1.5px solid;cursor:pointer;font-weight:700;line-height:1.4;background:transparent}
 .hdr-sec-btn-edit{color:#2c5fbd;border-color:#a8c0f0}.hdr-sec-btn-edit:hover{background:#e8f0fe}
@@ -98,21 +105,85 @@ button:hover .btn-lbl{display:inline}
 .ep-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--muted);font-size:15px;text-align:center;padding:24px}
 .ep-empty .ico{font-size:44px;opacity:.28}
 
-.ep-header{padding:16px 18px 12px;border-bottom:1.5px solid var(--border);position:sticky;top:0;background:var(--white);z-index:5}
+.ep-header{padding:16px 26px 12px;border-bottom:1.5px solid var(--border);position:sticky;top:0;background:var(--white);z-index:5}
 .ep-breadcrumb{font-size:10.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
 .ep-bread-sep{opacity:.4}
-.ep-title{font-size:17px;font-weight:700;line-height:1.35;color:var(--text);margin-bottom:10px}
+.ep-title{font-size:17px;font-weight:700;line-height:1.35;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .ep-actions{display:flex;gap:7px;flex-wrap:wrap}
-.ep-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:7px;border:1.5px solid;font-size:12px;font-weight:600;cursor:pointer;transition:background .12s}
-.ep-btn-save{background:var(--green-bg);color:var(--green);border-color:var(--green-bd)}.ep-btn-save:hover{background:#cef0da}
-.ep-btn-reset{background:#f5f5f5;color:#666;border-color:#ccc}.ep-btn-reset:hover{background:#eee}
-.ep-btn-comment{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-bd)}.ep-btn-comment:hover{background:#d0e1fc}
-.ep-btn-flag{background:var(--warn-bg);color:var(--warn);border-color:var(--warn-bd)}.ep-btn-flag:hover{background:#fdf0c0}
-.ep-btn-nav{background:#f0f4f8;color:var(--text);border-color:var(--border)}.ep-btn-nav:hover{background:#e0eaf4}
+.ep-btn{display:flex;align-items:center;gap:7px;padding:9px 16px;border-radius:10px;border:1.5px solid var(--blue-bd);font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,box-shadow .15s;background:var(--blue-bg);color:var(--navy2)}
+.ep-btn:hover{background:#d7e6fb;box-shadow:0 2px 8px rgba(26,82,118,.14)}
+.ep-btn svg{flex-shrink:0;stroke:var(--navy2)}
+.ep-icon-btn{position:relative;width:40px;height:40px;padding:0;display:flex;align-items:center;justify-content:center;background:var(--blue-bg);border:1.5px solid var(--blue-bd);border-radius:10px;color:var(--navy2);cursor:pointer;transition:background .15s,box-shadow .15s;flex-shrink:0}
+.ep-icon-btn:hover{background:#d7e6fb;box-shadow:0 2px 8px rgba(26,82,118,.14)}
+.ep-icon-btn svg{stroke:var(--navy2)}
+.ep-icon-btn::after{content:attr(data-tooltip);position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);background:rgba(15,25,40,.92);color:#fff;padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .18s;z-index:1000}
+.ep-icon-btn:hover::after{opacity:1}
 
-.ep-body{padding:14px 18px;flex:1}
-.ep-sec{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);margin-bottom:8px;margin-top:16px}
+.ep-body{padding:14px 26px;flex:1}
+.ep-sec{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);margin-bottom:8px;margin-top:16px}
 .ep-sec:first-child{margin-top:0}
+.ep-btn-regl{min-width:160px;justify-content:center}
+.comment-avatar{width:26px;height:26px;border-radius:50%;background:#59B57E;color:#fff;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;cursor:default;position:relative;vertical-align:middle}
+.comment-avatar[title]:hover::after{content:attr(title);position:absolute;top:calc(100% + 5px);left:50%;transform:translateX(-50%);background:rgba(15,25,40,.92);color:#fff;padding:4px 9px;border-radius:6px;font-size:11px;font-weight:600;white-space:nowrap;z-index:100;pointer-events:none}
+/* SLIDESHOW */
+.ss-overlay{position:fixed;inset:0;z-index:9000;background:linear-gradient(160deg,#091929 0%,#0d2b4e 60%,#0a2035 100%);display:flex;flex-direction:column;color:#fff;font-family:inherit}
+.ss-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 32px;background:linear-gradient(135deg,var(--navy),var(--navy2));box-shadow:0 2px 12px rgba(0,0,0,.4);flex-shrink:0;gap:16px;position:relative;z-index:1}
+.ss-hdr-left{display:flex;align-items:center;gap:14px}
+.ss-hdr-logo{width:52px;height:52px;object-fit:contain;animation:ss-logo-fade 18s ease-in-out infinite}
+@keyframes ss-logo-fade{
+  0%,65%{opacity:1;transform:scale(1);filter:blur(0px)}
+  78%{opacity:0;transform:scale(.82);filter:blur(4px)}
+  88%{opacity:0;transform:scale(.82);filter:blur(4px)}
+  98%{opacity:1;transform:scale(1.04);filter:blur(0px)}
+  100%{opacity:1;transform:scale(1);filter:blur(0px)}
+}
+.ss-hdr-title{font-size:16px;font-weight:800;color:#fff;line-height:1.2}
+.ss-hdr-sub{font-size:14px;color:rgba(255,255,255,.6);margin-top:1px}
+.ss-hdr-right{display:flex;align-items:center;gap:10px}
+.ss-progress{font-size:14px;font-weight:700;color:rgba(255,255,255,.55);background:rgba(255,255,255,.12);padding:4px 13px;border-radius:20px;letter-spacing:.5px}
+.ss-close{background:linear-gradient(135deg,var(--accent),var(--red));border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.ss-close:hover{background:linear-gradient(135deg,var(--accent2),#d8453a);color:#fff;box-shadow:0 2px 10px rgba(192,57,43,.45)}
+.ss-main{flex:1;display:flex;overflow:hidden;min-height:0;position:relative;z-index:1}
+.ss-left{width:36%;min-width:280px;max-width:440px;padding:44px 44px 36px 52px;display:flex;flex-direction:column;border-right:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.18);overflow-y:auto;flex-shrink:0}
+.ss-ctx-label{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.3);margin-bottom:4px}
+.ss-ctx-titulo{font-size:14px;font-weight:700;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.6px;line-height:1.4;margin-bottom:3px}
+.ss-ctx-capitulo{font-size:14px;font-weight:600;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.5px;line-height:1.4;margin-bottom:28px}
+.ss-divider{width:40px;height:3px;background:linear-gradient(90deg,#59B57E,rgba(89,181,126,.3));border-radius:2px;margin-bottom:20px}
+.ss-num-row{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.ss-num{font-size:20px;font-weight:600;color:#fff;letter-spacing:0;line-height:1}
+.ss-status{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:6px 14px;border-radius:20px;width:fit-content}
+.ss-status-none{background:rgba(255,255,255,.08);color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.15)}
+.ss-status-pending{background:rgba(212,160,23,.16);color:#f0c14b;border:1px solid rgba(212,160,23,.4)}
+.ss-status-review{background:rgba(192,57,43,.16);color:#e6776a;border:1px solid rgba(192,57,43,.4)}
+.ss-status-approved{background:rgba(26,122,60,.16);color:#6fd194;border:1px solid rgba(26,122,60,.4)}
+.ss-title{font-size:36px;font-weight:800;line-height:1.25;color:rgba(255,255,255,.88);flex:1}
+.ss-refs{display:flex;flex-direction:column;gap:7px;margin-top:28px;padding-top:20px;border-top:1px solid rgba(255,255,255,.08)}
+.ss-ref-btn{display:flex;align-items:center;gap:8px;padding:9px 14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:rgba(255,255,255,.75);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;text-align:left;width:100%}
+.ss-ref-btn:hover{background:rgba(255,255,255,.14);color:#fff}
+.ss-right{flex:1;padding:44px 60px 36px;overflow-y:auto;min-width:0}
+.ss-right::-webkit-scrollbar{width:8px}
+.ss-right::-webkit-scrollbar-track{background:transparent}
+.ss-right::-webkit-scrollbar-thumb{background:rgba(255,255,255,.25);border-radius:4px}
+.ss-right::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.38)}
+.ss-left::-webkit-scrollbar{width:8px}
+.ss-left::-webkit-scrollbar-track{background:transparent}
+.ss-left::-webkit-scrollbar-thumb{background:rgba(255,255,255,.25);border-radius:4px}
+.ss-left::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.38)}
+.ss-text-body{font-size:30px;font-weight:600;line-height:1.7;color:rgba(255,255,255,.82);word-break:break-word;white-space:pre-wrap}
+.ss-incisos{margin-top:32px;padding-top:28px;border-top:1px solid rgba(255,255,255,.08)}
+.ss-inciso-row{display:flex;gap:14px;margin-bottom:22px}
+.ss-inciso-letra{font-weight:800;color:#59B57E;font-size:26px;min-width:32px;flex-shrink:0;padding-top:3px}
+.ss-inciso-nombre{font-size:30px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.55);margin-bottom:5px}
+.ss-inciso-txt{font-size:28px;font-weight:400;line-height:1.75;color:rgba(255,255,255,.75);white-space:pre-wrap}
+.ss-footer{display:flex;align-items:center;justify-content:space-between;padding:13px 52px;flex-shrink:0;border-top:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.2);position:relative;z-index:1}
+.ss-nav-btn{display:flex;align-items:center;gap:8px;padding:9px 24px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
+.ss-nav-btn:hover:not(:disabled){background:rgba(255,255,255,.17);border-color:rgba(255,255,255,.25)}
+.ss-nav-btn:disabled{opacity:.18;cursor:not-allowed}
+.ss-counter{font-size:14px;font-weight:600;color:rgba(255,255,255,.45)}
+.ss-ref-chip{display:inline;background:rgba(89,181,126,.18);border:1px solid rgba(89,181,126,.45);border-radius:6px;padding:2px 8px;white-space:nowrap;cursor:pointer;transition:background .15s}
+.ss-ref-chip:hover{background:rgba(89,181,126,.32);border-color:rgba(89,181,126,.7)}
+.ss-ref-chip-text{color:#a8e6c2;font-weight:600}
+.ss-ref-chip-num{color:#59B57E;font-weight:700;font-size:.88em;margin-left:3px}
 .ep-textarea{width:100%;min-height:260px;font-family:inherit;font-size:14.5px;line-height:1.7;color:var(--text);border:1.5px solid var(--border);border-radius:8px;padding:12px 14px;resize:vertical;outline:none;transition:border-color .15s;background:#fafcff}
 .ep-textarea:focus{border-color:var(--navy2);background:#fff}
 .ep-textarea.modified{border-color:var(--accent);background:var(--warn-bg)}
@@ -147,12 +218,31 @@ button:hover .btn-lbl{display:inline}
 .flag-pending{background:var(--warn-bg);color:var(--warn);border:1.5px solid var(--warn-bd)}
 .flag-approved{background:var(--green-bg);color:var(--green);border:1.5px solid var(--green-bd)}
 .flag-review{background:var(--red-bg);color:var(--red);border:1.5px solid var(--red-bd)}
+.art-card.flag-pending{border-color:var(--warn-bd);background:var(--warn-bg)}
+.art-card.flag-approved{border-color:var(--green-bd);background:var(--green-bg)}
+.art-card.flag-review{border-color:var(--red-bd);background:var(--red-bg)}
+.art-card.flag-pending.active{box-shadow:0 0 0 2.5px rgba(212,160,23,.3),0 3px 10px rgba(0,0,0,.12)}
+.art-card.flag-approved.active{box-shadow:0 0 0 2.5px rgba(26,122,60,.25),0 3px 10px rgba(0,0,0,.12)}
+.art-card.flag-review.active{box-shadow:0 0 0 2.5px rgba(192,57,43,.25),0 3px 10px rgba(0,0,0,.12)}
+.flag-dropdown{position:relative}
+.flag-menu{position:absolute;top:calc(100% + 5px);left:0;background:#fff;border:1.5px solid var(--border);border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.15);z-index:600;min-width:170px;overflow:hidden;display:none}
+.flag-menu-item{display:flex;align-items:center;gap:10px;padding:9px 14px;font-size:15px;font-weight:400;cursor:pointer;background:none;border:none;width:100%;text-align:left;color:var(--text)}
+.flag-menu-item:hover{background:var(--blue-bg)}
+.flag-menu-item.active-flag{background:var(--blue-bg);color:var(--navy2)}
 
-/* STATS BAR */
-.stats-bar{padding:10px 14px;background:var(--white);border-bottom:1.5px solid var(--border);display:flex;gap:14px;flex-wrap:wrap}
-.stat-item{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--muted)}
-.stat-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.stat-val{font-weight:700;color:var(--text)}
+/* KPI BAR */
+.kpi-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:14px 0 10px;position:sticky;top:0;background:var(--bg);z-index:9}
+.kpi-card{background:#fff;border-radius:9px;padding:9px 4px 7px;text-align:center;border:1.5px solid var(--border);cursor:pointer;transition:transform .1s,box-shadow .12s}
+.kpi-card:hover{transform:translateY(-1px);box-shadow:0 3px 10px rgba(0,0,0,.1)}
+.kpi-card.kpi-active{transform:translateY(-1px);box-shadow:0 0 0 2.5px var(--navy2)}
+.kpi-card.kpi-pending.kpi-active{box-shadow:0 0 0 2.5px var(--warn)}
+.kpi-card.kpi-review.kpi-active{box-shadow:0 0 0 2.5px var(--red)}
+.kpi-card.kpi-approved.kpi-active{box-shadow:0 0 0 2.5px var(--green)}
+.kpi-val{font-size:20px;font-weight:500;line-height:1;color:var(--text);font-variant-numeric:tabular-nums}
+.kpi-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-top:4px}
+.kpi-card.kpi-pending{border-color:var(--warn-bd);background:var(--warn-bg)}.kpi-card.kpi-pending .kpi-val{color:var(--warn)}
+.kpi-card.kpi-review{border-color:var(--red-bd);background:var(--red-bg)}.kpi-card.kpi-review .kpi-val{color:var(--red)}
+.kpi-card.kpi-approved{border-color:var(--green-bd);background:var(--green-bg)}.kpi-card.kpi-approved .kpi-val{color:var(--green)}
 
 /* HIGHLIGHT */
 .hl{background:#fff3c0;border-radius:2px}
@@ -180,67 +270,201 @@ button:hover .btn-lbl{display:inline}
 .modal-btn-ok{padding:7px 18px;border:none;border-radius:7px;background:var(--navy2);color:#fff;font-size:13px;font-weight:600;cursor:pointer}
 .modal-btn-ok:hover{background:var(--navy3)}
 .ep-btn-move{background:#f0f4ff;color:var(--navy2);border-color:#c0d0f0}.ep-btn-move:hover{background:#e0eaff}
+.ep-btn:disabled{opacity:.4;cursor:not-allowed}
+.ep-editor{width:100%;min-height:260px;font-family:inherit;font-size:16px;line-height:1.7;color:var(--text);border:1.5px solid var(--border);border-radius:8px;padding:12px 14px;outline:none;transition:border-color .15s;background:#fafcff;white-space:pre-wrap;word-break:break-word;overflow-wrap:break-word;cursor:text}
+.ep-editor:focus{border-color:var(--navy2);background:#fff}
+.ep-editor.dirty{border-color:var(--accent);background:var(--warn-bg)}
+.ref-chip{display:inline;background:#e8f0fe;border-radius:4px;padding:1px 5px;white-space:nowrap;user-select:all}
+.ref-chip-text{color:var(--navy2);font-weight:600}
+.ref-chip-num{color:var(--blue);font-weight:700;font-size:.9em;cursor:pointer}
+.ref-chip-num:hover{text-decoration:underline}
+.ref-chip-del{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;margin-left:5px;border-radius:50%;background:rgba(192,57,43,.15);color:var(--red);font-size:9px;font-weight:700;line-height:1;cursor:pointer;opacity:0;transition:opacity .12s,background .12s;vertical-align:middle}
+.ref-chip:hover .ref-chip-del{opacity:1}
+.ref-chip-del:hover{background:rgba(192,57,43,.35)}
+.ref-picker-list{max-height:280px;overflow-y:auto;border:1.5px solid var(--border);border-radius:8px;margin:10px 0 0}
+.ref-picker-item{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;border-bottom:1px solid var(--border);font-size:13px}
+.ref-picker-item:last-child{border-bottom:none}
+.ref-picker-item:hover{background:var(--blue-bg)}
+.ref-picker-num{font-size:11px;font-weight:700;color:var(--navy2);min-width:44px;flex-shrink:0}
+.ref-picker-name{flex:1;color:var(--text)}
+.ref-picker-loc{font-size:10px;color:var(--muted);margin-top:1px}
 /* DROPDOWN NUEVO */
 .hdr-dropdown{position:relative}
 .hdr-dropdown-menu{position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1.5px solid var(--border);border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.18);z-index:500;min-width:180px;overflow:hidden;display:none}
-.hdr-dropdown-item{display:flex;align-items:center;gap:9px;padding:10px 16px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;background:none;border:none;width:100%;text-align:left;white-space:nowrap}
+.hdr-dropdown-item{display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:17px;font-weight:400;color:var(--text);cursor:pointer;background:none;border:none;width:100%;text-align:left;white-space:nowrap}
+.hdr-dropdown-item svg{flex-shrink:0}
 .hdr-dropdown-item:hover{background:var(--blue-bg);color:var(--navy2)}
 .hdr-dropdown-sep{height:1px;background:var(--border);margin:3px 0}
 
-@media print{
-  body>*{display:none!important}
-  #printArea{display:block!important;font-family:'Segoe UI',sans-serif;padding:2cm;color:#000;font-size:12pt;line-height:1.7}
-  .pr-title{font-size:18pt;font-weight:700;text-align:center;margin-bottom:6pt;border-bottom:2pt solid #000;padding-bottom:8pt}
-  .pr-sub{font-size:11pt;text-align:center;color:#333;margin-bottom:20pt}
-  .pr-art-name{font-size:12pt;font-weight:700;margin-top:16pt;margin-bottom:4pt}
-  .pr-art-text{font-size:11pt;line-height:1.8;white-space:pre-wrap}
-  .pr-comment{margin-top:8pt;padding:6pt 8pt;border:1pt solid #ccc;background:#f9f9f9;font-size:10pt}
-}
-#printArea{display:none}
+
+/* AUTH OVERLAY */
+.auth-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#0a2e18 0%,#1a7a3c 50%,#0d4d24 100%);z-index:9999;display:flex;align-items:center;justify-content:center}
+.auth-box{background:rgba(255,255,255,0.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:16px;width:380px;max-width:95vw;box-shadow:0 12px 48px rgba(0,0,0,.4);overflow:hidden}
+.auth-header{background:linear-gradient(135deg,var(--navy),var(--navy2));padding:28px 40px 22px;text-align:center}
+.auth-header img{width:74px}
+.auth-title{font-size:17px;font-weight:800;color:#fff;margin-top:10px}
+.auth-sub{font-size:12px;color:rgba(255,255,255,.65);margin-top:4px}
+.auth-body{padding:26px 40px 32px}
+.auth-field{margin-bottom:13px}
+.auth-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:5px}
+.auth-input{width:100%;font-family:inherit;font-size:14px;padding:10px 13px;border:1.5px solid var(--border);border-radius:8px;outline:none;color:var(--text)}
+.auth-input:focus{border-color:var(--navy2)}
+.auth-btn{width:100%;padding:11px;background:var(--navy2);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px}
+.auth-btn:hover{background:var(--navy3)}
+.auth-btn:disabled{opacity:.5;cursor:not-allowed}
+.auth-error{background:var(--red-bg);color:var(--red);border:1.5px solid var(--red-bd);border-radius:7px;padding:8px 12px;font-size:12px;font-weight:600;margin-bottom:12px;display:none}
+.auth-error.visible{display:block}
+
+/* INCISOS */
+.inciso-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.inciso-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;background:#fafcff}
+.inciso-letra{font-weight:800;color:var(--navy2);font-size:13px;min-width:22px;padding-top:1px}
+.inciso-texto{flex:1;font-size:16px;line-height:1.7;color:var(--text);word-break:break-word;font-family:inherit}
+.inciso-actions{display:flex;gap:4px;flex-shrink:0}
+.inciso-btn{font-size:10px;padding:2px 7px;border-radius:4px;border:1.5px solid;cursor:pointer;font-weight:700;line-height:1.4;background:transparent}
+.inciso-btn-edit{color:#2c5fbd;border-color:#a8c0f0}.inciso-btn-edit:hover{background:#e8f0fe}
+.inciso-btn-del{color:#c0392b;border-color:#f0a8a8}.inciso-btn-del:hover{background:#fdecea}
+.inciso-btn-ok{color:#1a7a3c;border-color:#a8e0bc}.inciso-btn-ok:hover{background:#e8f9ee}
+.inciso-edit-ta{width:100%;font-family:inherit;font-size:14px;line-height:1.6;border:1.5px solid var(--navy2);border-radius:6px;padding:5px 8px;outline:none;resize:vertical;min-height:60px}
+.inciso-add-box{border:1.5px dashed #b0c8e0;border-radius:8px;padding:10px 12px;background:#f5f9fd;margin-top:4px}
+.inciso-add-ta{width:100%;font-family:inherit;font-size:14px;line-height:1.6;border:1.5px solid var(--border);border-radius:6px;padding:7px 10px;outline:none;resize:vertical;min-height:60px;background:#fff;box-sizing:border-box}
+.inciso-add-ta:focus{border-color:var(--navy2)}
+.inciso-nombre{font-size:11px;font-weight:700;color:var(--navy2);margin-bottom:2px}
+.inciso-node{display:flex;align-items:center;gap:6px;padding:3px 8px 3px 28px;cursor:pointer;border-radius:5px;transition:background .12s}
+.inciso-node:hover{background:rgba(13,43,78,.06)}
+.inciso-node-letra{font-size:10px;font-weight:800;color:var(--navy2);min-width:18px}
+.inciso-node-nombre{font-size:11px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ROLE BADGE */
+.role-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;line-height:1.6}
+.role-admin{background:#e8d5ff;color:#6b3fa0;border:1px solid #c9a8f0}
+.role-editor{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-bd)}
+.role-revisor{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-bd)}
+.role-lector{background:#f0f4f8;color:var(--muted);border:1px solid var(--border)}
+
+/* USER MANAGEMENT */
+.umgmt-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.umgmt-table th{background:#f0f4f8;padding:7px 10px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.umgmt-table td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+.umgmt-table tr:last-child td{border-bottom:none}
+.umgmt-add{background:var(--blue-bg);border:1.5px dashed var(--blue-bd);border-radius:10px;padding:14px 16px;margin-top:14px}
+.umgmt-add-title{font-size:12px;font-weight:700;color:var(--navy2);margin-bottom:10px}
+.umgmt-row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.umgmt-input{font-family:inherit;font-size:12.5px;padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;outline:none;color:var(--text);background:#fff}
+.umgmt-input:focus{border-color:var(--navy2)}
+.umgmt-sel{font-family:inherit;font-size:12.5px;padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;outline:none;color:var(--text);background:#fff;cursor:pointer}
 </style>
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+  import { getFirestore, doc, setDoc, getDoc, getDocs, collection } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCEYxLYrmWLFqapZ2_XEIkat3XpqmH5ZHY",
+    authDomain: "issys-eer.firebaseapp.com",
+    projectId: "issys-eer",
+    storageBucket: "issys-eer.firebasestorage.app",
+    messagingSenderId: "300033149212",
+    appId: "1:300033149212:web:93d951869e8a02c01d12d9"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Exponer globalmente para que saveToFirebase() y loadFromFirebase() puedan usarlos
+  const auth = getAuth(app);
+  window._fbDb = db;
+  window._fbDoc = doc;
+  window._fbSetDoc = setDoc;
+  window._fbGetDoc = getDoc;
+  window._fbFirestore = { getDocs, collection };
+  window._fbSignIn = (e, p) => signInWithEmailAndPassword(auth, e, p);
+  window._fbSignOut = () => signOut(auth);
+  window._fbOnAuthChanged = cb => onAuthStateChanged(auth, cb);
+
+  // Intentar cargar desde Firestore al iniciar (complementa localStorage)
+  window.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const snap = await getDoc(doc(db, 'eerEditor', 'state'));
+      if (snap.exists()) {
+        const p = snap.data();
+        // Solo aplicar si Firestore es más nuevo que localStorage
+        const localRaw = localStorage.getItem('eerEditorState');
+        const localTs = localRaw ? (JSON.parse(localRaw)._ts || 0) : 0;
+        const fbTs = p._ts || 0;
+        if (fbTs > localTs) {
+          localStorage.setItem('eerEditorState', JSON.stringify(p));
+          showToast('☁️ Estado restaurado desde Firebase');
+          // Recargar la página para aplicar el estado de Firestore
+          setTimeout(() => location.reload(), 800);
+        }
+      }
+    } catch(e) {
+      console.warn('Firebase load on init:', e.message);
+    }
+  });
+</script>
 </head>
 <body>
 <div class="hdr">
-  <div class="hdr-ico">📋</div>
+  <img class="hdr-logo" src="logo128x128_blanco.png" alt="ISSyS">
   <div class="hdr-info">
-    <div class="hdr-title">Editor EER — Estatuto Escalafón Reglamentario</div>
-    <div class="hdr-sub">ISSyS · Provincia del Chubut · Versión de trabajo</div>
+    <div class="hdr-title">Estatuto Escalafón Reglamentario</div>
+    <div class="hdr-sub">Instituto de Seguridad Social y Seguros &nbsp;·&nbsp; <span id="versionDisplay"></span></div>
+  </div>
+  <div class="hdr-search">
+    <svg class="hdr-search-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input class="hdr-search-input" id="searchInput" type="text" placeholder="Buscar artículo…" oninput="onSearch(this.value);this.nextElementSibling.classList.toggle('visible',this.value.length>0)">
+    <span class="hdr-search-clear" onclick="clearSearch();this.previousElementSibling.value='';this.classList.remove('visible')">✕</span>
   </div>
   <div class="hdr-btns">
-    <button class="hdr-btn" onclick="expandAll()">⊞ Expandir todo</button>
-    <button class="hdr-btn" onclick="collapseAll()">⊟ Colapsar todo</button>
     <div class="hdr-sep"></div>
     <div class="hdr-dropdown" id="nuevoDropdown">
-      <button class="hdr-btn" onclick="toggleNuevoDropdown(event)">➕ Nuevo ▾</button>
+      <button class="hdr-btn" data-tooltip="Nuevo" onclick="toggleNuevoDropdown(event)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
       <div class="hdr-dropdown-menu" id="nuevoDropdownMenu">
-        <button class="hdr-dropdown-item" onclick="closeNuevo();openAddTituloModal()">📑 Título</button>
-        <button class="hdr-dropdown-item" onclick="closeNuevo();openAddCapituloModal()">📂 Capítulo</button>
+        <button class="hdr-dropdown-item" onclick="closeNuevo();openAddTituloModal()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg> Título</button>
+        <button class="hdr-dropdown-item" onclick="closeNuevo();openAddCapituloModal()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Capítulo</button>
         <div class="hdr-dropdown-sep"></div>
-        <button class="hdr-dropdown-item" onclick="closeNuevo();openAddItemModal('articulo')">📄 Artículo</button>
-        <button class="hdr-dropdown-item" onclick="closeNuevo();openAddItemModal('reglamento')">📋 Reglamento</button>
+        <button class="hdr-dropdown-item" onclick="closeNuevo();openAddItemModal('articulo')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Artículo</button>
+        <button class="hdr-dropdown-item" onclick="closeNuevo();openAddItemModal('reglamento')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="14" y2="16"/></svg> Reglamento</button>
       </div>
     </div>
-    <button class="hdr-btn" id="ghBtn" onclick="saveToGitHub()">☁️ Guardar en GitHub</button>
-    <button class="hdr-btn" onclick="exportChanges()">💾 Exportar cambios</button>
-    <button class="hdr-btn accent" onclick="printDoc()">🖨 Imprimir</button>
+    <button class="hdr-btn" id="ghBtn" data-tooltip="Guardar en GitHub + Firebase" onclick="saveToGitHub()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg></button>
+    <button class="hdr-btn accent" data-tooltip="Imprimir" onclick="printDoc()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>
+    <div class="hdr-sep"></div>
+    <div class="hdr-dropdown" id="userDropdown">
+      <button class="hdr-btn" id="userBtn" data-tooltip="Mi cuenta" onclick="toggleUserDropdown(event)" style="font-size:15px;font-weight:500;letter-spacing:.5px;background:#59B57E;color:#fff">
+        <span id="userInitials">??</span>
+      </button>
+      <div class="hdr-dropdown-menu" id="userDropdownMenu">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--border);min-width:200px">
+          <div id="userMenuName" style="font-size:13px;font-weight:700;color:var(--text)"></div>
+          <div id="userMenuEmail" style="font-size:11px;color:var(--muted);margin-top:2px"></div>
+          <div id="userMenuRole" class="role-badge" style="margin-top:6px"></div>
+        </div>
+        <button class="hdr-dropdown-item" id="btnUserMgmt" onclick="closeUserDropdown();openUserMgmt()" style="display:none">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 1 0-7.75"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Gestión de usuarios
+        </button>
+        <div class="hdr-dropdown-sep"></div>
+        <button class="hdr-dropdown-item" onclick="doSignOut()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Cerrar sesión
+        </button>
+      </div>
+    </div>
   </div>
-</div>
-
-<div class="stats-bar" id="statsBar">
-  <div class="stat-item"><div class="stat-dot" style="background:#ddd"></div>Total artículos: <span class="stat-val" id="statTotal">0</span></div>
-  <div class="stat-item"><div class="stat-dot" style="background:#e8a020"></div>Modificados: <span class="stat-val" id="statMod">0</span></div>
-  <div class="stat-item"><div class="stat-dot" style="background:#1a7a3c"></div>Con comentarios: <span class="stat-val" id="statCom">0</span></div>
-  <div class="stat-item"><div class="stat-dot" style="background:#2c5fbd"></div>Marcados para revisión: <span class="stat-val" id="statFlag">0</span></div>
 </div>
 
 <div class="main">
   <div class="tree-pnl" id="treePnl">
-    <div class="search-bar">
-      <div class="search-wrap">
-        <span class="search-ico">🔍</span>
-        <input class="search-input" id="searchInput" type="text" placeholder="Buscar artículo, título o texto…" oninput="onSearch(this.value)">
-        <span class="search-clear" onclick="clearSearch()" title="Limpiar">✕</span>
-      </div>
+    <div class="kpi-bar">
+      <div class="kpi-card" style="cursor:default" id="kpiCardTotal"><div class="kpi-val" id="kpiTotal">0</div><div class="kpi-lbl">Total</div></div>
+      <div class="kpi-card" id="kpiCardNone" onclick="filterByKpi('none')"><div class="kpi-val" id="kpiNone">0</div><div class="kpi-lbl">Sin marca</div></div>
+      <div class="kpi-card kpi-pending" id="kpiCardPending" onclick="filterByKpi('pending')"><div class="kpi-val" id="kpiPending">0</div><div class="kpi-lbl">Pendiente</div></div>
+      <div class="kpi-card kpi-review" id="kpiCardReview" onclick="filterByKpi('review')"><div class="kpi-val" id="kpiReview">0</div><div class="kpi-lbl">Revisión</div></div>
+      <div class="kpi-card kpi-approved" id="kpiCardApproved" onclick="filterByKpi('approved')"><div class="kpi-val" id="kpiApproved">0</div><div class="kpi-lbl">Aprobado</div></div>
     </div>
     <div id="treeRoot"></div>
   </div>
@@ -256,8 +480,6 @@ button:hover .btn-lbl{display:inline}
     </div>
   </div>
 </div>
-
-<div id="printArea"></div>
 
 <!-- Modal simple reutilizable (Título / Capítulo) -->
 <div id="simpleModal" class="modal-overlay" style="display:none">
@@ -323,7 +545,8 @@ const RAW_DATA = [{"id": "a1", "titulo": "TITULO I: DISPOSICIONES GENERALES", "c
 ];
 
 // State
-/*__GH_STATE_START__*/const SAVED_STATE = {"texts":{"a6":"El ingreso al ISSyS se realizará previa acreditación de idoneidad, cumplimiento de los [[a7:requisitos]] establecidos y aprobación del proceso de selección conforme a la reglamentación\nEl ingreso de personal sin la aplicación de los sistemas de selección establecidos de conformidad con los principios convenidos en el presente EER no reviste en ningún caso carácter de permanente ni genera derecho a la incorporación al correspondiente régimen de estabilidad.","a3":"Los agrupamientos integran al personal que ejerce funciones afines según su formación académica y laboral. Se clasifican en:\n- Médico/Legal: Incluye el personal que realiza tareas relacionadas con la auditoria médica, así como aquellos profesional vinculados con el ámbito legal y judicial que desempeñen funciones en la Dirección Asesoría Legal.\n- Profesional: Incluye al personal que desempeña funciones específicas basadas en conocimientos académicos avanzados adquiridos a través de carreras de nivel superior.\n- Técnico: Está integrado por personal con formación técnica específica, generalmente adquirida mediante carreras de nivel terciario o técnico profesional.\n- Administrativo: Incluye al personal encargado de realizar tareas de gestión y soporte administrativo que garantizan el correcto funcionamiento de la institución.\n- Servicios: Este agrupamiento reúne al personal encargado de realizar actividades relacionadas con el mantenimiento, limpieza, seguridad y logística.\n- Hotelero: Comprende al personal que desempeña funciones de manera exclusiva en los hoteles o complejos turísticos pertenecientes al ISSyS, en virtud de la naturaleza atípica, comercial y de servicio continuo de dichas actividades. Este agrupamiento se regirá por las disposiciones especiales contenidas en el Título VI del presente Estatuto.","a8":"\nSin perjuicio de lo establecido en los [[a7:requisitos para el ingreso]], no pueden ingresar al Instituto de Seguridad Social y Seguros:- Quienes tienen inhabilitación judicial para ejercer cargos públicos;\n- Quienes han sido exonerados o cesanteados por mal desempeño en la Administración Pública nacional, provincial o municipal, salvo que hayan sido rehabilitados;\n- Quienes incurren en las [[new_1780574453554:incompatibilidades]] establecidas  del presente Estatuto;\n- Quienes se encuentren incluidos en el Registro de Alimentantes Morosos."},"comments":{},"flags":{"new_1780496663988":"approved","a6":"approved"},"newArticles":{"new_1780496663988":{"id":"new_1780496663988","titulo":"TITULO I: DISPOSICIONES GENERALES","capitulo":"CAPÍTULO I - OBJETO Y ÁMBITOS DE APLICACIÓN","nombre":"PERSONAL COMPRENDIDO","texto":"El presente Estatuto Escalafón Reglamentario (EER) se aplica a toda persona que presta servicios remunerados en el Instituto de Seguridad Social y Seguros (ISSyS) de la Provincia del Chubut."},"new_1780499897743":{"id":"new_1780499897743","titulo":"TITULO I: DISPOSICIONES GENERALES","capitulo":"CAPÍTULO III - DEFINICIONES BÁSICAS","nombre":"NIVELES","texto":"Los Niveles constituyen la estructura organizacional que determina las relaciones de mando, autoridad y responsabilidad funcional dentro del Instituto, clasificando a las Categorías (cargos) en dos regímenes diferenciados: Jerárquico y No Jerárquico.\n1.\tMédico/Legal: Incluye el personal que realiza tareas relacionadas con la auditoria médica, así como aquellos profesional vinculados con el ámbito legal y judicial que desempeñen funciones en la Dirección Asesoría Legal.[SG4.1]\n2.\tProfesional: Incluye al personal que desempeña funciones específicas basadas en conocimientos académicos avanzados adquiridos a través de carreras de nivel superior.\n3.\tTécnico: Está integrado por personal con formación técnica específica, generalmente adquirida mediante carreras de nivel terciario o técnico profesional.\n4.\tAdministrativo: Incluye al personal encargado de realizar tareas de gestión y soporte administrativo que garantizan el correcto funcionamiento de la institución.\n5.\tServicios: Este agrupamiento reúne al personal encargado de realizar actividades relacionadas con el mantenimiento, limpieza, seguridad y logística.\n6.\tHotelero: Comprende al personal que desempeña funciones de manera exclusiva en los hoteles o complejos turísticos pertenecientes al ISSyS, en virtud de la naturaleza atípica, comercial y de servicio continuo de dichas actividades. Este agrupamiento se regirá por las disposiciones especiales contenidas en el Título VI del presente Estatuto.","tipo":"articulo","articuloId":null},"new_1780499942821":{"id":"new_1780499942821","titulo":"TITULO I: DISPOSICIONES GENERALES","capitulo":"CAPÍTULO III - DEFINICIONES BÁSICAS","nombre":"RANGOS","texto":"Los Rangos constituyen los distintos grados promocionales progresivos que definen la carrera administrativa horizontal del Agente, dentro de su respectivo Agrupamiento. El Rango se asocia intrínseca y personalmente al AGENTE de Planta Permanente, y su acceso (promoción) se rige por la acreditación de la idoneidad, formación, evaluación satisfactoria de desempeño y la antigüedad en el servicio. La progresión en los Rangos es el mecanismo estatutario fundamental para asegurar al agente un incremento progresivo en la retribución (Sueldo Básico), reafirmando el derecho a la carrera profesional y el desarrollo en el empleo público, independientemente de la Categoría (Jerárquica o No Jerárquica) del Cargo que ocupe. Los rangos se organizan de manera progresiva, comenzando por el Rango Inicial, seguido por los Rangos A, B, C, D, F, G, H, I, y así sucesivamente hasta alcanzar el Rango L, que constituye el rango más alto dentro de cada agrupamiento.","tipo":"articulo","articuloId":null},"new_1780500143135":{"id":"new_1780500143135","titulo":"TITULO I: DISPOSICIONES GENERALES","capitulo":"CAPÍTULO III - DEFINICIONES BÁSICAS","nombre":"ESTRUCTURA.","texto":"El presente Estatuto Escalafón Reglamentario se estructura en títulos y capítulos que abarcan las disposiciones generales aplicables a todos los trabajadores, así como secciones específicas para ciertos agrupamientos del personal que, por la naturaleza de sus funciones, requiere condiciones particulares. El Título V contiene las disposiciones particulares del Agrupamiento Hotelero, incluyendo: funciones específicas, condiciones laborales especiales y criterios de aplicación adaptados a sus actividades","tipo":"articulo","articuloId":null},"new_1780574453554":{"id":"new_1780574453554","titulo":"TITULO II: RELACIONES LABORABLES","capitulo":"CAPÍTULO I: CONDICIONES PARA EL INGRESO","nombre":"INCOMPATIBILIDADES","texto":"El ejercicio de funciones en el Instituto de Seguridad Social y Seguros es incompatible con cualquier otro empleo en los ámbitos público nacional, provincial o municipal, así como con actividades privadas que generen conflicto de intereses, exceptuándose únicamente el ejercicio docente cuando no exista superposición horaria, no afecte el desempeño institucional y sea debidamente comunicado a la autoridad competente, debiendo en todos los casos priorizarse el cumplimiento de las obligaciones en el ISSyS.","tipo":"articulo","articuloId":null},"new_1780575647977":{"id":"new_1780575647977","titulo":"TITULO II: RELACIONES LABORABLES","capitulo":"CAPÍTULO II. CARRERA ADMINISTRATIVA","nombre":"CARRERA ADMINISTRATIVA","texto":"La carrera administrativa constituye el proceso de progreso del personal mediante los métodos de promoción y ascenso dentro de los agrupamientos, rangos y categorías establecidos. El Instituto garantiza los derechos de permanencia y progresión basándose en la idoneidad y el desempeño. Este derecho se ejerce sobre la estructura escalafonaria y no sobre funciones específicas, salvo aquellas que sean inherentes al cargo.","tipo":"articulo","articuloId":null},"new_1780582658883":{"id":"new_1780582658883","titulo":"TITULO II: RELACIONES LABORABLES","capitulo":"CAPÍTULO II. CARRERA ADMINISTRATIVA","nombre":"LUGAR DE TRABAJO","texto":"Constituye lugar de trabajo todo espacio físico asignado por el Instituto de Seguridad Social y Seguros de la Provincia del Chubut para el desempeño regular de las funciones de sus agentes, incluyendo sedes administrativas, dependencias operativas y cualquier otro ámbito expresamente autorizado por la autoridad competente para la ejecución de tareas institucionales.","tipo":"articulo","articuloId":null}},"artMeta":{"a1":{"titulo":"TITULO I: DISPOSICIONES GENERALES","capitulo":"CAPÍTULO I - OBJETO Y ÁMBITOS DE APLICACIÓN","nombre":"PERSONAL EXCLUIDO","texto":"Quedan fuera del alcance de las previsiones de este Estatuto:\n- Presidente\n- Vocales\n- Gerente General\n- Las personas contratadas bajo cualquier modalidad del derecho privado o administrativo, para realizar tareas extraordinarias o ajenas al giro normal de la administración, las cuales se rigen exclusivamente por las previsiones de sus respectivos contratos, cuando su retribución no esté imputada a partidas de personal."},"a2":{"titulo":"TITULO I: DISPOSICIONES GENERALES","capitulo":"CAPÍTULO III - DEFINICIONES BÁSICAS","nombre":"PLANTAS","texto":"Las plantas son los regímenes de estabilidad que agrupan a los agentes del Instituto según su tipo de vínculo laboral:\n- Planta Permanente: Se integra por el personal que posee una relación laboral por tiempo indeterminado y cuya estabilidad se rige por las condiciones y plazos de adquisición establecidos en el Artículo 19º del presente Estatuto.\n\n- Planta Temporaria: Comprende al personal sujeto a una relación contractual directa con el Instituto, establecida mediante un acto administrativo de contratación por un período determinado, para la ejecución de funciones de carácter transitorio, eventual o estacional, o que requieren especialización técnica o profesional. Este personal carece de estabilidad laboral y está excluido de los derechos de carrera administrativa, promoción y ascenso.\n\n- Planta Política: Comprende al personal cuyo vínculo laboral se funda en la confianza institucional y discrecional de las autoridades superiores del Instituto. Desempeña funciones de gestión, asesoramiento o apoyo directo a la administración. Este personal está sujeto a la remoción discrecional de la autoridad que lo designa y, en consecuencia, carece del derecho a la estabilidad laboral y está excluido de la carrera administrativa, promoción y ascenso.","articuloId":null},"a3":{"titulo":"TITULO I: DISPOSICIONES GENERALES","capitulo":"CAPÍTULO III - DEFINICIONES BÁSICAS","nombre":"AGRUPAMIENTOS","texto":"Los agrupamientos integran al personal que ejerce funciones afines según su formación académica y laboral. Se clasifican en:\n- Médico/Legal: Incluye el personal que realiza tareas relacionadas con la auditoria médica, así como aquellos profesional vinculados con el ámbito legal y judicial que desempeñen funciones en la Dirección Asesoría Legal.\n\n- Profesional: Incluye al personal que desempeña funciones específicas basadas en conocimientos académicos avanzados adquiridos a través de carreras de nivel superior.\n\n- Técnico: Está integrado por personal con formación técnica específica, generalmente adquirida mediante carreras de nivel terciario o técnico profesional.\n\n- Administrativo: Incluye al personal encargado de realizar tareas de gestión y soporte administrativo que garantizan el correcto funcionamiento de la institución.\n\n- Servicios: Este agrupamiento reúne al personal encargado de realizar actividades relacionadas con el mantenimiento, limpieza, seguridad y logística.\n\n- Hotelero: Comprende al personal que desempeña funciones de manera exclusiva en los hoteles o complejos turísticos pertenecientes al ISSyS, en virtud de la naturaleza atípica, comercial y de servicio continuo de dichas actividades. Este agrupamiento se regirá por las disposiciones especiales contenidas en el Título VI del presente Estatuto.","articuloId":null},"a4":{"titulo":"TITULO I: DISPOSICIONES GENERALES","capitulo":"CAPÍTULO III - DEFINICIONES BÁSICAS","nombre":"CATEGORÍAS","texto":"Las categorías son los sucesivos grados concursables en los que se clasifican los cargos. Las categorías vigentes son las siguientes:\n- J-I\n- J-II\n- J-III\n- J-IV\n- J-V\n- J-VI\n- J-VII\n- C-V\n- C-IV\n- C-III\n- C-II","articuloId":null},"a5":{"titulo":"TITULO I: DISPOSICIONES GENERALES","capitulo":"CAPÍTULO III - DEFINICIONES BÁSICAS","nombre":"PERSONAL ADSCRIPTO","texto":"Se considera personal adscripto a aquel agente proveniente de otra jurisdicción u organismo del sector público (nacional, provincial o municipal) que preste servicios de manera temporal en el ISSyS. Dicho personal continuará rigiéndose por el convenio colectivo de trabajo o estatuto, régimen de estabilidad y demás derechos propios de su organismo de origen y, a los efectos del presente Estatuto Escalafón Reglamentario (EER), no generará derechos de permanencia, carrera administrativa, promoción ni ascenso dentro del ISSyS. Estará obligado a cumplir con las obligaciones, prohibiciones, y la jornada laboral establecidos en el TÍTULO III del presente Estatuto.","articuloId":null},"a_vig":{"titulo":"TITULO I: DISPOSICIONES GENERALES","capitulo":"CAPÍTULO II - VIGENCIA Y REVISIÓN DEL EER","nombre":"VIGENCIA","texto":"El presente Estatuto tiene vigencia por un plazo de DOS (2) años, contados a partir de su entrada en vigor. Sin embargo, si no se renueva expresamente al vencimiento de dicho plazo, mantendrá su plena vigencia por ultraactividad.","articuloId":null},"a_rev":{"titulo":"TITULO I: DISPOSICIONES GENERALES","capitulo":"CAPÍTULO II - VIGENCIA Y REVISIÓN DEL EER","nombre":"REVISIÓN","texto":"La reforma del presente Estatuto requerirá una Comisión especial, compuesta por representantes del Directorio y de las asociaciones sindicales que representan a los trabajadores del Instituto.","articuloId":null},"a6":{"titulo":"TITULO II: RELACIONES LABORABLES","capitulo":"CAPÍTULO I: CONDICIONES PARA EL INGRESO","nombre":"INGRESO","texto":"El ingreso al ISSyS se realizará previa acreditación de idoneidad, cumplimiento de los requisitos establecidos y aprobación del proceso de selección conforme a la reglamentación\nEl ingreso de personal sin la aplicación de los sistemas de selección establecidos de conformidad con los principios convenidos en el presente EER no reviste en ningún caso carácter de permanente ni genera derecho a la incorporación al correspondiente régimen de estabilidad.","articuloId":null},"a7":{"titulo":"TITULO II: RELACIONES LABORABLES","capitulo":"CAPÍTULO I: CONDICIONES PARA EL INGRESO","nombre":"REQUISITOS","texto":"Los postulantes deben cumplimentar como condición sin excepción los siguientes requisitos:\n- Ser argentino/a nativo/a o por opción. En caso de haber nacido en el extranjero estar en ejercicio de la ciudadanía según lo previsto por el Artículo 5º de la Ley N.º 14.354;\n- Haber cumplido dieciocho (18) años como mínimo y ser menor de cuarenta y cinco (45) años, excepto que el postulante acredite tener la capacidad de completar los TREINTA (30) años de servicios computables requeridos para la Jubilación Ordinaria (Artículo 31º, Ley XVIII- Nº 32) antes de alcanzar la edad mínima exigible para el acceso a dicho beneficio jubilatorio\n- Poseer estudios secundarios completos;\n- Acreditar haber cumplido con los ciclos de enseñanza requeridos para el ingreso de cada agrupamiento;\n- Residir en las localidades en que ejercerán los cargos o en un radio que no exceda los ochenta (80) kilómetros de las mismas, haciéndolo dentro de la circunscripción respectiva, o tomar el compromiso por escrito al momento de concursar el cargo, a mudar su residencia a una localidad distante que no exceda los ochenta (80) kilómetros del lugar en el que desempeñará sus funciones, quedando a cargo del concursante los costos de traslado, bajo apercibimiento de declararse nula su designación si así no lo hiciere.","articuloId":null},"a8":{"titulo":"TITULO II: RELACIONES LABORABLES","capitulo":"CAPÍTULO I: CONDICIONES PARA EL INGRESO","nombre":"INHABILIDADES","texto":"- Quienes tienen inhabilitación judicial para ejercer cargos públicos;\n\nSin perjuicio de lo establecido en el Artículo 11º, no pueden ingresar al Instituto de Seguridad Social y Seguros:\n- Quienes han sido exonerados o cesanteados por mal desempeño en la Administración Pública nacional, provincial o municipal, salvo que hayan sido rehabilitados;\n- Quienes incurren en las incompatibilidades establecidas en el Artículo 15º del presente Estatuto;\n- Quienes se encuentren incluidos en el Registro de Alimentantes Morosos.","articuloId":null},"a9":{"titulo":"TITULO II: RELACIONES LABORABLES","capitulo":"CAPÍTULO I: CONDICIONES PARA EL INGRESO","nombre":"REQUISITOS PARA LA INSCRIPCIÓN AL CONCURSO","texto":"Para formalizar la inscripción en los procesos de selección, los postulantes deberán presentar con carácter de declaración jurada la siguiente\n- Copia Certificada de Documento Nacional de Identidad (DNI) y Constancia de CUIL.\n- Currículum Vitae actualizado y firmado.\n- Copias certificadas de los títulos (Secundario, Terciario y/o Universitario) y sus respectivos analíticos que acrediten el cumplimiento del perfil requerido.\n- Certificado de Antecedentes Penales (RAP) emitido por el Poder Judicial de la Provincia del Chubut (Ley V Nº 64)\n- Certificado del Registro Nacional de Reincidencia.\n- Certificado de Libre Deuda del Registro de Alimentantes Morosos (RAM), conforme Ley XIII Nº 12.\nLa sola presentación de esta documentación no garantiza la admisión al concurso, la cual quedará supeditada a verificación obre la veracidad y el cumplimiento de los requerimientos del puesto.","articuloId":null},"a10":{"titulo":"TITULO II: RELACIONES LABORABLES","capitulo":"CAPÍTULO I: CONDICIONES PARA EL INGRESO","nombre":"REQUISITOS PARA LA DESIGNACIÓN","texto":"Una vez finalizado el proceso de selección y previo al dictado del acto administrativo de designación, el postulante seleccionado deberá cumplimentar de forma obligatoria los siguientes requisitos de orden prestacional y previsional:\n- Constancia de Caja de Ahorro en el Banco del Chubut S.A.\n- Certificado de aptitud psicofísica emitido por el Contralor Médico del ISSyS (Art. 14º inc. k, Ley XVIII- Nº 32).\n- Declaración Jurada de Incompatibilidad de Cargos, en cumplimiento del Art. 67º de la Constitución de la Provincia del Chubut y Art. 20º de la Ley I Nº 231 de Ética Pública.\n- Declaración Jurada sobre condición de beneficiario de jubilación, pensión o retiro (Nacional, Provincial o Municipal), conforme Art. 14º inc. j) de la Ley XVIII Nº 32.\n- Constancia de pago de la Cuota de Ingreso al sistema previsional (Art. 14 inc. i de la Ley XVIII Nº 32).\n- Certificación de servicios prestados en organismos públicos o privados.\n- Declaración Jurada de cargas de familia, adjuntando la documentación civil que acredite el vínculo (DNI de convivientes, Actas de Matrimonio, Nacimiento o Certificados de Convivencia).\nToda la documentación presentada estará sujeta a verificación de autenticidad. El falseamiento de cualquier dato u omisión de información será causal de exclusión automática del proceso de selección o de revocación del acto de designación por vicio en la causa.\n\n- Proceso de selección para el ingreso","articuloId":null},"a11":{"titulo":"TITULO II: RELACIONES LABORABLES","capitulo":"CAPÍTULO I: CONDICIONES PARA EL INGRESO","nombre":"PRIORIDAD POR ENLACE FAMILIAR","texto":"En caso de fallecimiento de un agente que se encontrare en actividad en la Planta Permanente, el Instituto reconocerá un derecho de prioridad para el ingreso al cónyuge supérstite, conviviente supérstite o a uno de sus hijos o hijas, conforme al orden de prelación que establezca la reglamentación.\nPara el ejercicio de este derecho, los beneficiarios deberán cumplir indefectiblemente con los siguientes requisitos:\n\n- Idoneidad: Aprobar el proceso de selección y los exámenes de idoneidad técnica previstos para el cargo.\n\n- Mérito: En caso de igualdad de puntaje en el orden de mérito con otros postulantes externos, la prioridad será otorgada al familiar directo del agente fallecido.\n\n- Requisitos Generales: Cumplir con la totalidad de los requisitos de inscripción e ingreso establecidos en los Artículos 16º y 17º de este Estatuto.\n\n- Limitación de Beneficios: No ser beneficiario de pensión derivada del fallecimiento del agente, ni poseer otro cargo público o beneficio previsional de cualquier naturaleza.\n\n- Rango de Ingreso: La designación se efectuará exclusivamente en el Rango Inicial del Agrupamiento para el cual haya acreditado idoneidad. Plazo de solicitud (ej. 1 año)\n\nPrioridad por enlace familiar","articuloId":null},"a12":{"titulo":"TITULO II: RELACIONES LABORABLES","capitulo":"CAPÍTULO I: CONDICIONES PARA EL INGRESO","nombre":"PERIODO DE PRUEBA Y ESTABILIDAD","texto":"Toda designación en la Planta Permanente del Instituto tendrá carácter condicional durante los primeros DOCE (12) meses de servicio efectivo, conforme al principio de idoneidad establecido en el Artículo 16º de la Constitución Nacional y el Artículo 47º de la Constitución de la Provincia del Chubut.\nDurante este lapso, el agente deberá acreditar su aptitud técnica y moral para el desempeño del cargo. La estabilidad definitiva prevista en el Artículo 14 bis de la Constitución Nacional se adquirirá automáticamente una vez cumplido el plazo de doce (12) meses, salvo que la autoridad competente, mediante resolución fundada y previa evaluación de desempeño desfavorable, disponga la revocación de la designación antes del vencimiento de dicho período.\n\nPeríodo de prueba","articuloId":null},"a13":{"titulo":"TITULO II: RELACIONES LABORABLES","capitulo":"CAPÍTULO II. CARRERA ADMINISTRATIVA","nombre":"TRASLADO","texto":"El agente que goce de estabilidad en la Planta Permanente podrá ser trasladado de su lugar de trabajo a un cargo vacante de igual categoría y con similares requisitos de idoneidad.\n•\tTemporalidad: Para solicitar o disponer un traslado, se requerirá con carácter general un mínimo de tres (3) años de desempeño efectivo en el lugar de trabajo actual, salvo las excepciones previstas en la reglamentación.\n•\tTraslado a solicitud del agente: Podrá fundamentarse en razones de salud, integración familiar o motivos personales. En caso de razones de salud del agente o su grupo familiar, será obligatoria la intervención del Contralor Médico del Instituto.\n•\tProtección de la Unidad Familiar: El personal no podrá ser trasladado contra su voluntad cuando la medida produzca el desmembramiento del núcleo familiar o altere gravemente sus condiciones de vida de forma injustificada.\n•\tPerspectiva de Género y Protección Integral: Se garantizará el traslado inmediato y prioritario de las agentes víctimas de violencia (conforme Ley I Nº 635), priorizando su seguridad y la de su grupo familiar por sobre los requisitos de antigüedad o vacante previa.\n•\tTraslado por Razones de Servicio: Los traslados dispuestos por el Instituto deberán ser fundados por la Gerencia General, garantizando el consentimiento del agente si la medida implica cambio de residencia, salvo situaciones de emergencia operativa debidamente justificadas.","articuloId":null}},"customTitulos":[],"customCapitulos":{},"capAssoc":{"REGLAMENTACIÓN\nREGLAMENTACIÓN DEL PROCESO DE SELECCIÓN PARA EL INGRESO":"a6"},"order":["new_1780496663988","a1","a_vig","a_rev","a2","a3","new_1780499942821","a4","new_1780499897743","a5","new_1780500143135","a6","a7","new_1780574453554","a8","a9","a10","a11","a12","new_1780575647977","new_1780582658883","a13","a14","a15","a16","a17","a18","a19","a20","a21","a22","a23","a24","a25","a26","a27","a28","a29","a30","a31","a32","a33","a34","a35","a36","a37","a38","a39","a40","a41","a42","a43","a44","a45","a46","a47","a48","a49","a50","a51","a52","a53","a54","a55","a56","a57","a58","a59","a60","a61","a62","a63","a64","a65","a66","a67","a68","a69","a70","a71","a72","a73","a74","a75","a76","a77","a78","a79","a80","a81","a82","a83","a84","a85","a86","a87","a88","a89","a90","a91","a92","a93","a94","a95","a96","a97","a98","a99","a100","a101","a102","a103","a104","a105","a106","a107","a108","a109","a110","a111","a112","a113","a114","a115","a116","a117","a118","a119","a120","a121","a122","a123","a124","a125","a126","a127","a128","a129","a130","a131","a132","a133","a134","a135","a136","a137","a138","a139","ri01","ri02","ri03","ri04","ri05","ri06","ri07","ri08","ri09","ri10","ri11","ri12","ri13","ri14"]};/*__GH_STATE_END__*/
+/*__GH_STATE_START__*/const SAVED_STATE = {"texts":{"a6":"El ingreso al ISSyS se realizará previa acreditación de idoneidad, cumplimiento de los [[a7:requisitos]] establecidos y aprobación del proceso de selección conforme a la reglamentación\nEl ingreso de personal sin la aplicación de los sistemas de selección establecidos de conformidad con los principios convenidos en el presente EER no reviste en ningún caso carácter de permanente ni genera derecho a la incorporación al correspondiente régimen de estabilidad.","a3":"Los agrupamientos integran al personal que ejerce funciones afines según su formación académica y laboral. Se clasifican en:\n- Médico/Legal: Incluye el personal que realiza tareas relacionadas con la auditoria médica, así como aquellos profesional vinculados con el ámbito legal y judicial que desempeñen funciones en la Dirección Asesoría Legal.\n- Profesional: Incluye al personal que desempeña funciones específicas basadas en conocimientos académicos avanzados adquiridos a través de carreras de nivel superior.\n- Técnico: Está integrado por personal con formación técnica específica, generalmente adquirida mediante carreras de nivel terciario o técnico profesional.\n- Administrativo: Incluye al personal encargado de realizar tareas de gestión y soporte administrativo que garantizan el correcto funcionamiento de la institución.\n- Servicios: Este agrupamiento reúne al personal encargado de realizar actividades relacionadas con el mantenimiento, limpieza, seguridad y logística.\n- Hotelero: Comprende al personal que desempeña funciones de manera exclusiva en los hoteles o complejos turísticos pertenecientes al ISSyS, en virtud de la naturaleza atípica, comercial y de servicio continuo de dichas actividades. Este agrupamiento se regirá por las disposiciones especiales contenidas en el Título VI del presente Estatuto.","a8":"\nSin perjuicio de lo establecido en los [[a7:requisitos para el ingreso]], no pueden ingresar al Instituto de Seguridad Social y Seguros:- Quienes tienen inhabilitación judicial para ejercer cargos públicos;\n- Quienes han sido exonerados o cesanteados por mal desempeño en la Administración Pública nacional, provincial o municipal, salvo que hayan sido rehabilitados;\n- Quienes incurren en las [[new_1780574453554:incompatibilidades]] establecidas  del presente Estatuto;\n- Quienes se encuentren incluidos en el Registro de Alimentantes Morosos.","a23":"a) Licencia Anual Reglamentaria\nb) Licencia Por Enfermedad\nc) Licencias Por Examen\nd) Licencia Por Actividades Culturales\ne) Licencia Por Actividades Deportivas\nf) Licencia Por Atención De Familiar Enfermo\ng) Licencia Por Fallecimiento De Familiar\nh) Licencia Por Matrimonio\ni) Licencia Por Matrimonio De Hijo/A.\nj) Licencia Por Maternidad\nk) Licencia Por Paternidad\nl) Licencia Por Adopción\nll) Licencia Por Asuntos Particulares\nm) Licencia Extraordinaria Sin Goce De Haberes\nn) Licencia Por Desempeño en Cargo Político y/o Gremial\no) Donación De Sangre\np) Licencia Larga Evolución Por Enfermedad Profesional\nq) Licencia Por Violencia De Genero\nr) Asueto Y Feriado Nacional, Provincial Y Municipal"},"comments":{},"flags":{"a6":"approved","new_1780496663988":"approved"},"newArticles":{"new_1780499897743":{"tipo":"articulo","texto":"Los Niveles constituyen la estructura organizacional que determina las relaciones de mando, autoridad y responsabilidad funcional dentro del Instituto, clasificando a las Categorías (cargos) en dos regímenes diferenciados: Jerárquico y No Jerárquico.\n1.\tMédico/Legal: Incluye el personal que realiza tareas relacionadas con la auditoria médica, así como aquellos profesional vinculados con el ámbito legal y judicial que desempeñen funciones en la Dirección Asesoría Legal.[SG4.1]\n2.\tProfesional: Incluye al personal que desempeña funciones específicas basadas en conocimientos académicos avanzados adquiridos a través de carreras de nivel superior.\n3.\tTécnico: Está integrado por personal con formación técnica específica, generalmente adquirida mediante carreras de nivel terciario o técnico profesional.\n4.\tAdministrativo: Incluye al personal encargado de realizar tareas de gestión y soporte administrativo que garantizan el correcto funcionamiento de la institución.\n5.\tServicios: Este agrupamiento reúne al personal encargado de realizar actividades relacionadas con el mantenimiento, limpieza, seguridad y logística.\n6.\tHotelero: Comprende al personal que desempeña funciones de manera exclusiva en los hoteles o complejos turísticos pertenecientes al ISSyS, en virtud de la naturaleza atípica, comercial y de servicio continuo de dichas actividades. Este agrupamiento se regirá por las disposiciones especiales contenidas en el Título VI del presente Estatuto.","id":"new_1780499897743","nombre":"NIVELES","titulo":"TITULO I: DISPOSICIONES GENERALES","articuloId":null,"capitulo":"CAPÍTULO III - DEFINICIONES BÁSICAS"},"new_1780496663988":{"nombre":"PERSONAL COMPRENDIDO","texto":"El presente Estatuto Escalafón Reglamentario (EER) se aplica a toda persona que presta servicios remunerados en el Instituto de Seguridad Social y Seguros (ISSyS) de la Provincia del Chubut.","id":"new_1780496663988","capitulo":"CAPÍTULO I - OBJETO Y ÁMBITOS DE APLICACIÓN","titulo":"TITULO I: DISPOSICIONES GENERALES"},"new_1780575647977":{"articuloId":null,"capitulo":"CAPÍTULO II. CARRERA ADMINISTRATIVA","titulo":"TITULO II: RELACIONES LABORABLES","nombre":"CARRERA ADMINISTRATIVA","tipo":"articulo","texto":"La carrera administrativa constituye el proceso de progreso del personal mediante los métodos de promoción y ascenso dentro de los agrupamientos, rangos y categorías establecidos. El Instituto garantiza los derechos de permanencia y progresión basándose en la idoneidad y el desempeño. Este derecho se ejerce sobre la estructura escalafonaria y no sobre funciones específicas, salvo aquellas que sean inherentes al cargo.","id":"new_1780575647977"},"new_1780500143135":{"titulo":"TITULO I: DISPOSICIONES GENERALES","articuloId":null,"capitulo":"CAPÍTULO III - DEFINICIONES BÁSICAS","tipo":"articulo","id":"new_1780500143135","texto":"El presente Estatuto Escalafón Reglamentario se estructura en títulos y capítulos que abarcan las disposiciones generales aplicables a todos los trabajadores, así como secciones específicas para ciertos agrupamientos del personal que, por la naturaleza de sus funciones, requiere condiciones particulares. El Título V contiene las disposiciones particulares del Agrupamiento Hotelero, incluyendo: funciones específicas, condiciones laborales especiales y criterios de aplicación adaptados a sus actividades","nombre":"ESTRUCTURA."},"new_1780574453554":{"titulo":"TITULO II: RELACIONES LABORABLES","articuloId":null,"capitulo":"CAPÍTULO I: CONDICIONES PARA EL INGRESO","nombre":"INCOMPATIBILIDADES","id":"new_1780574453554","texto":"El ejercicio de funciones en el Instituto de Seguridad Social y Seguros es incompatible con cualquier otro empleo en los ámbitos público nacional, provincial o municipal, así como con actividades privadas que generen conflicto de intereses, exceptuándose únicamente el ejercicio docente cuando no exista superposición horaria, no afecte el desempeño institucional y sea debidamente comunicado a la autoridad competente, debiendo en todos los casos priorizarse el cumplimiento de las obligaciones en el ISSyS.","tipo":"articulo"},"new_1780499942821":{"tipo":"articulo","id":"new_1780499942821","texto":"Los Rangos constituyen los distintos grados promocionales progresivos que definen la carrera administrativa horizontal del Agente, dentro de su respectivo Agrupamiento. El Rango se asocia intrínseca y personalmente al AGENTE de Planta Permanente, y su acceso (promoción) se rige por la acreditación de la idoneidad, formación, evaluación satisfactoria de desempeño y la antigüedad en el servicio. La progresión en los Rangos es el mecanismo estatutario fundamental para asegurar al agente un incremento progresivo en la retribución (Sueldo Básico), reafirmando el derecho a la carrera profesional y el desarrollo en el empleo público, independientemente de la Categoría (Jerárquica o No Jerárquica) del Cargo que ocupe. Los rangos se organizan de manera progresiva, comenzando por el Rango Inicial, seguido por los Rangos A, B, C, D, F, G, H, I, y así sucesivamente hasta alcanzar el Rango L, que constituye el rango más alto dentro de cada agrupamiento.","nombre":"RANGOS","capitulo":"CAPÍTULO III - DEFINICIONES BÁSICAS","titulo":"TITULO I: DISPOSICIONES GENERALES","articuloId":null},"new_1780582658883":{"articuloId":null,"capitulo":"CAPÍTULO II. CARRERA ADMINISTRATIVA","titulo":"TITULO II: RELACIONES LABORABLES","nombre":"LUGAR DE TRABAJO","texto":"Constituye lugar de trabajo todo espacio físico asignado por el Instituto de Seguridad Social y Seguros de la Provincia del Chubut para el desempeño regular de las funciones de sus agentes, incluyendo sedes administrativas, dependencias operativas y cualquier otro ámbito expresamente autorizado por la autoridad competente para la ejecución de tareas institucionales.","id":"new_1780582658883","tipo":"articulo"}},"artMeta":{"a18":{"articuloId":null,"capitulo":"CAPÍTULO I - GENERALIDADES","titulo":"TÍTULO III: DERECHOS Y OBLIGACIONES DEL PERSONAL","texto":"Los agentes que se incorporen a la Planta Permanente del Instituto de Seguridad Social y Seguros, una vez cumplimentados los requisitos de ingreso y el período de prueba, gozarán de los siguientes derechos:\n1.\tDe la Estabilidad y Carrera:\na.\tEstabilidad: Derecho a conservar el cargo, el rango y la localidad de revista, una vez obtenida la confirmación según el Artículo 19º de este Estatuto.\nb.\tCarrera Administrativa: Derecho a la promoción y ascenso, basados en la idoneidad y el mérito, conforme a los mecanismos de evaluación previstos.\nc.\tReincorporación: Derecho a ser reintegrado al servicio activo en los casos previstos por la normativa vigente o por revocación de medidas administrativas.\nd.\tCapacitación: Acceso a programas de formación, actualización y perfeccionamiento gestionados o administrados por el Instituto para el desarrollo profesional.\n2.\tDe la Retribución y Beneficios Económicos:\na.\tJusta Retribución: Percibir el haber correspondiente a su categoría y rango, Sueldo Anual Complementario, asignaciones familiares y bonificaciones vigentes.\nb.\tCompensaciones: Derecho al cobro de horas extraordinarias, suplementos por servicios especiales y adicionales definidos por la normativa técnica.\nc.\tRégimen Previsional: Acceso a los beneficios de jubilación y seguridad social de acuerdo con la Ley XVIII Nº 32.\n3.\tDe las Condiciones de Trabajo y Bienestar:\na.\tSeguridad e Higiene: Prestación de servicios en ambientes saludables, contando con los elementos de protección personal (EPP) y medidas de medicina del trabajo adecuadas a su función.\nb.\tAsistencia Social: Cobertura sanitaria y social para el agente y sus derechohabientes.\nc.\tEspacios de Bienestar: Acceso a áreas de refrigerio y descanso dentro de las dependencias donde se desempeñen las funciones, provistas por el Instituto.\nd.\tAsueto Institucional: Goce de asueto administrativo el día 20 de noviembre en conmemoración de la \"Creación del ISSyS\". Si resultare inhábil, se trasladará al primer día hábil posterior.\n4.\tDe las Libertades y Garantías Jurídicas:\na.\tDebido Proceso: Derecho a un régimen disciplinario objetivo que garantice el derecho de defensa y la interposición de recursos administrativos.\nb.\tSumario Previo: Garantía de sumario administrativo para toda sanción que implique una suspensión mayor a diez (10) días.\nc.\tLibertad de Conciencia y Asociación: Derecho a la libre agremiación, asociación y plena libertad de pensamiento, religión y opinión política, siempre que su ejercicio no interfiera con la naturaleza del servicio.\nd.\tDerechos Políticos: Derecho a postularse a cargos electivos conforme a las Constituciones Nacional, Provincial y Cartas Orgánicas Municipales.\ne.\tInformación Pública: Derecho de acceso a la información pública institucional bajo los principios de transparencia.\n5.\tEgreso:\na.\tRenuncia: Derecho a concluir la relación de empleo mediante la renuncia. El acto administrativo de aceptación podrá ser diferido o supeditado a la inexistencia o finalización de procesos sumarios en curso, conforme lo determine la reglamentación.","nombre":"DERECHOS"},"a17":{"titulo":"TITULO II: RELACIONES LABORABLES","capitulo":"CAPÍTULO II. CARRERA ADMINISTRATIVA","articuloId":null,"nombre":"REAGRUPAMIENTO","texto":"Se entiende por reagrupamiento el pase de un agente de un agrupamiento a otro distinto\n1.\tEl reagrupamiento podrá ser solicitado por el agente cuando acredite haber obtenido un título habilitante o formación académica superior relacionada con las funciones del agrupamiento al que aspira.\n2.\tEl cambio de agrupamiento no será automático por la sola presentación del título. El agente deberá someterse a las instancias de evaluación de conocimientos técnicos y aptitudes que fije la reglamentación para garantizar su competencia en el nuevo escalafón.\n3.\tEl reagrupamiento se producirá en la categoría de revista inicial del agrupamiento al que se aspira, o en la categoría que determine la reglamentación conforme a la equivalencia de méritos."},"a3":{"titulo":"TITULO I: DISPOSICIONES GENERALES","articuloId":null,"capitulo":"CAPÍTULO III - DEFINICIONES BÁSICAS","texto":"Los agrupamientos integran al personal que ejerce funciones afines según su formación académica y laboral. Se clasifican en:\n- Médico/Legal: Incluye el personal que realiza tareas relacionadas con la auditoria médica, así como aquellos profesional vinculados con el ámbito legal y judicial que desempeñen funciones en la Dirección Asesoría Legal.\n\n- Profesional: Incluye al personal que desempeña funciones específicas basadas en conocimientos académicos avanzados adquiridos a través de carreras de nivel superior.\n\n- Técnico: Está integrado por personal con formación técnica específica, generalmente adquirida mediante carreras de nivel terciario o técnico profesional.\n\n- Administrativo: Incluye al personal encargado de realizar tareas de gestión y soporte administrativo que garantizan el correcto funcionamiento de la institución.\n\n- Servicios: Este agrupamiento reúne al personal encargado de realizar actividades relacionadas con el mantenimiento, limpieza, seguridad y logística.\n\n- Hotelero: Comprende al personal que desempeña funciones de manera exclusiva en los hoteles o complejos turísticos pertenecientes al ISSyS, en virtud de la naturaleza atípica, comercial y de servicio continuo de dichas actividades. Este agrupamiento se regirá por las disposiciones especiales contenidas en el Título VI del presente Estatuto.","nombre":"AGRUPAMIENTOS"},"a7":{"capitulo":"CAPÍTULO I: CONDICIONES PARA EL INGRESO","titulo":"TITULO II: RELACIONES LABORABLES","articuloId":null,"nombre":"REQUISITOS","texto":"Los postulantes deben cumplimentar como condición sin excepción los siguientes requisitos:\n- Ser argentino/a nativo/a o por opción. En caso de haber nacido en el extranjero estar en ejercicio de la ciudadanía según lo previsto por el Artículo 5º de la Ley N.º 14.354;\n- Haber cumplido dieciocho (18) años como mínimo y ser menor de cuarenta y cinco (45) años, excepto que el postulante acredite tener la capacidad de completar los TREINTA (30) años de servicios computables requeridos para la Jubilación Ordinaria (Artículo 31º, Ley XVIII- Nº 32) antes de alcanzar la edad mínima exigible para el acceso a dicho beneficio jubilatorio\n- Poseer estudios secundarios completos;\n- Acreditar haber cumplido con los ciclos de enseñanza requeridos para el ingreso de cada agrupamiento;\n- Residir en las localidades en que ejercerán los cargos o en un radio que no exceda los ochenta (80) kilómetros de las mismas, haciéndolo dentro de la circunscripción respectiva, o tomar el compromiso por escrito al momento de concursar el cargo, a mudar su residencia a una localidad distante que no exceda los ochenta (80) kilómetros del lugar en el que desempeñará sus funciones, quedando a cargo del concursante los costos de traslado, bajo apercibimiento de declararse nula su designación si así no lo hiciere."},"a12":{"nombre":"PERIODO DE PRUEBA Y ESTABILIDAD","texto":"Toda designación en la Planta Permanente del Instituto tendrá carácter condicional durante los primeros DOCE (12) meses de servicio efectivo, conforme al principio de idoneidad establecido en el Artículo 16º de la Constitución Nacional y el Artículo 47º de la Constitución de la Provincia del Chubut.\nDurante este lapso, el agente deberá acreditar su aptitud técnica y moral para el desempeño del cargo. La estabilidad definitiva prevista en el Artículo 14 bis de la Constitución Nacional se adquirirá automáticamente una vez cumplido el plazo de doce (12) meses, salvo que la autoridad competente, mediante resolución fundada y previa evaluación de desempeño desfavorable, disponga la revocación de la designación antes del vencimiento de dicho período.\n\nPeríodo de prueba","articuloId":null,"titulo":"TITULO II: RELACIONES LABORABLES","capitulo":"CAPÍTULO I: CONDICIONES PARA EL INGRESO"},"a2":{"capitulo":"CAPÍTULO III - DEFINICIONES BÁSICAS","titulo":"TITULO I: DISPOSICIONES GENERALES","articuloId":null,"texto":"Las plantas son los regímenes de estabilidad que agrupan a los agentes del Instituto según su tipo de vínculo laboral:\n- Planta Permanente: Se integra por el personal que posee una relación laboral por tiempo indeterminado y cuya estabilidad se rige por las condiciones y plazos de adquisición establecidos en el Artículo 19º del presente Estatuto.\n\n- Planta Temporaria: Comprende al personal sujeto a una relación contractual directa con el Instituto, establecida mediante un acto administrativo de contratación por un período determinado, para la ejecución de funciones de carácter transitorio, eventual o estacional, o que requieren especialización técnica o profesional. Este personal carece de estabilidad laboral y está excluido de los derechos de carrera administrativa, promoción y ascenso.\n\n- Planta Política: Comprende al personal cuyo vínculo laboral se funda en la confianza institucional y discrecional de las autoridades superiores del Instituto. Desempeña funciones de gestión, asesoramiento o apoyo directo a la administración. Este personal está sujeto a la remoción discrecional de la autoridad que lo designa y, en consecuencia, carece del derecho a la estabilidad laboral y está excluido de la carrera administrativa, promoción y ascenso.","nombre":"PLANTAS"},"a16":{"texto":"El ascenso consiste en la cobertura de cargos vacantes de mayor nivel jerárquico dentro de la estructura orgánica del Instituto. Representa la progresión vertical del agente en la carrera administrativa.\n1.\tMecanismo de Selección: El ascenso se producirá exclusivamente mediante concurso de antecedentes y oposición, garantizando la igualdad de oportunidades, la transparencia y la idoneidad.\n2.\tCarácter de la Convocatoria: Los concursos para ascensos serán inicialmente de carácter interno, destinados al personal de Planta Permanente. En caso de declararse desierto, el Instituto podrá disponer un llamado externo.\n3.\tIdoneidad: La reglamentación establecerá los requisitos de formación, antigüedad y evaluación técnica necesarios para cada nivel jerárquico.","nombre":"ASCENSO","capitulo":"CAPÍTULO II. CARRERA ADMINISTRATIVA","articuloId":null,"titulo":"TITULO II: RELACIONES LABORABLES"},"a4":{"nombre":"CATEGORÍAS","texto":"Las categorías son los sucesivos grados concursables en los que se clasifican los cargos. Las categorías vigentes son las siguientes:\n- J-I\n- J-II\n- J-III\n- J-IV\n- J-V\n- J-VI\n- J-VII\n- C-V\n- C-IV\n- C-III\n- C-II","articuloId":null,"capitulo":"CAPÍTULO III - DEFINICIONES BÁSICAS","titulo":"TITULO I: DISPOSICIONES GENERALES"},"a6":{"texto":"El ingreso al ISSyS se realizará previa acreditación de idoneidad, cumplimiento de los requisitos establecidos y aprobación del proceso de selección conforme a la reglamentación\nEl ingreso de personal sin la aplicación de los sistemas de selección establecidos de conformidad con los principios convenidos en el presente EER no reviste en ningún caso carácter de permanente ni genera derecho a la incorporación al correspondiente régimen de estabilidad.","nombre":"INGRESO","articuloId":null,"titulo":"TITULO II: RELACIONES LABORABLES","capitulo":"CAPÍTULO I: CONDICIONES PARA EL INGRESO"},"a14":{"titulo":"TITULO II: RELACIONES LABORABLES","capitulo":"CAPÍTULO II. CARRERA ADMINISTRATIVA","articuloId":null,"nombre":"REASIGNACION DE FUNCIONES","texto":"Se entiende por reasignación de funciones el acto administrativo mediante el cual un agente es reubicado en un puesto o tarea diferente dentro de la misma sede o localidad de su asiento habitual.\n1.\tCondiciones: La reasignación debe efectuarse dentro de la misma categoría y agrupamiento de revista del agente, respetando su nivel remunerativo.\n2.\tFundamento: Será dispuesta por la autoridad competente en virtud de necesidades del servicio, razones organizativas o para optimizar la eficiencia administrativa.\n3.\tLímite: La reasignación no podrá ser utilizada como sanción disciplinaria encubierta ni implicar un menoscabo moral o una alteración sustancial de la naturaleza de las tareas que definen el agrupamiento del agente."},"a15":{"nombre":"PROMOCIÓN","texto":"La promoción consiste en el progreso horizontal del agente dentro de su agrupamiento mediante el acceso a rangos superiores. Es un derecho basado en la idoneidad, el desempeño y la capacitación continua.\n1.\tRequisitos: Para acceder a la promoción, el agente deberá acreditar la antigüedad mínima en el rango que fije la reglamentación, poseer legajo disciplinario hábil y aprobar las instancias de evaluación de idoneidad.\n2.\tExcepción por Transitoriedad: Para el primer proceso de promoción tras la vigencia de este Estatuto, se aplicará el régimen especial de antigüedad previsto en las Disposiciones Transitorias.\n3.\tSuficiencia Presupuestaria: El otorgamiento de promociones estará sujeto a la disponibilidad financiera del Instituto. Quienes aprueben la evaluación y no accedan por falta de cupo, mantendrán prioridad para el ejercicio siguiente sin necesidad de nueva evaluación.","articuloId":null,"capitulo":"CAPÍTULO II. CARRERA ADMINISTRATIVA","titulo":"TITULO II: RELACIONES LABORABLES"},"a_vig":{"capitulo":"CAPÍTULO II - VIGENCIA Y REVISIÓN DEL EER","titulo":"TITULO I: DISPOSICIONES GENERALES","articuloId":null,"texto":"El presente Estatuto tiene vigencia por un plazo de DOS (2) años, contados a partir de su entrada en vigor. Sin embargo, si no se renueva expresamente al vencimiento de dicho plazo, mantendrá su plena vigencia por ultraactividad.","nombre":"VIGENCIA"},"a13":{"capitulo":"CAPÍTULO II. CARRERA ADMINISTRATIVA","titulo":"TITULO II: RELACIONES LABORABLES","articuloId":null,"texto":"El agente que goce de estabilidad en la Planta Permanente podrá ser trasladado de su lugar de trabajo a un cargo vacante de igual categoría y con similares requisitos de idoneidad.\n•\tTemporalidad: Para solicitar o disponer un traslado, se requerirá con carácter general un mínimo de tres (3) años de desempeño efectivo en el lugar de trabajo actual, salvo las excepciones previstas en la reglamentación.\n•\tTraslado a solicitud del agente: Podrá fundamentarse en razones de salud, integración familiar o motivos personales. En caso de razones de salud del agente o su grupo familiar, será obligatoria la intervención del Contralor Médico del Instituto.\n•\tProtección de la Unidad Familiar: El personal no podrá ser trasladado contra su voluntad cuando la medida produzca el desmembramiento del núcleo familiar o altere gravemente sus condiciones de vida de forma injustificada.\n•\tPerspectiva de Género y Protección Integral: Se garantizará el traslado inmediato y prioritario de las agentes víctimas de violencia (conforme Ley I Nº 635), priorizando su seguridad y la de su grupo familiar por sobre los requisitos de antigüedad o vacante previa.\n•\tTraslado por Razones de Servicio: Los traslados dispuestos por el Instituto deberán ser fundados por la Gerencia General, garantizando el consentimiento del agente si la medida implica cambio de residencia, salvo situaciones de emergencia operativa debidamente justificadas.","nombre":"TRASLADO"},"a11":{"nombre":"PRIORIDAD POR ENLACE FAMILIAR","texto":"En caso de fallecimiento de un agente que se encontrare en actividad en la Planta Permanente, el Instituto reconocerá un derecho de prioridad para el ingreso al cónyuge supérstite, conviviente supérstite o a uno de sus hijos o hijas, conforme al orden de prelación que establezca la reglamentación.\nPara el ejercicio de este derecho, los beneficiarios deberán cumplir indefectiblemente con los siguientes requisitos:\n\n- Idoneidad: Aprobar el proceso de selección y los exámenes de idoneidad técnica previstos para el cargo.\n\n- Mérito: En caso de igualdad de puntaje en el orden de mérito con otros postulantes externos, la prioridad será otorgada al familiar directo del agente fallecido.\n\n- Requisitos Generales: Cumplir con la totalidad de los requisitos de inscripción e ingreso establecidos en los Artículos 16º y 17º de este Estatuto.\n\n- Limitación de Beneficios: No ser beneficiario de pensión derivada del fallecimiento del agente, ni poseer otro cargo público o beneficio previsional de cualquier naturaleza.\n\n- Rango de Ingreso: La designación se efectuará exclusivamente en el Rango Inicial del Agrupamiento para el cual haya acreditado idoneidad. Plazo de solicitud (ej. 1 año)\n\nPrioridad por enlace familiar","capitulo":"CAPÍTULO I: CONDICIONES PARA EL INGRESO","titulo":"TITULO II: RELACIONES LABORABLES","articuloId":null},"a_rev":{"nombre":"REVISIÓN","texto":"La reforma del presente Estatuto requerirá una Comisión especial, compuesta por representantes del Directorio y de las asociaciones sindicales que representan a los trabajadores del Instituto.","articuloId":null,"capitulo":"CAPÍTULO II - VIGENCIA Y REVISIÓN DEL EER","titulo":"TITULO I: DISPOSICIONES GENERALES"},"a9":{"texto":"Para formalizar la inscripción en los procesos de selección, los postulantes deberán presentar con carácter de declaración jurada la siguiente\n- Copia Certificada de Documento Nacional de Identidad (DNI) y Constancia de CUIL.\n- Currículum Vitae actualizado y firmado.\n- Copias certificadas de los títulos (Secundario, Terciario y/o Universitario) y sus respectivos analíticos que acrediten el cumplimiento del perfil requerido.\n- Certificado de Antecedentes Penales (RAP) emitido por el Poder Judicial de la Provincia del Chubut (Ley V Nº 64)\n- Certificado del Registro Nacional de Reincidencia.\n- Certificado de Libre Deuda del Registro de Alimentantes Morosos (RAM), conforme Ley XIII Nº 12.\nLa sola presentación de esta documentación no garantiza la admisión al concurso, la cual quedará supeditada a verificación obre la veracidad y el cumplimiento de los requerimientos del puesto.","nombre":"REQUISITOS PARA LA INSCRIPCIÓN AL CONCURSO","titulo":"TITULO II: RELACIONES LABORABLES","capitulo":"CAPÍTULO I: CONDICIONES PARA EL INGRESO","articuloId":null},"a8":{"nombre":"INHABILIDADES","texto":"- Quienes tienen inhabilitación judicial para ejercer cargos públicos;\n\nSin perjuicio de lo establecido en el Artículo 11º, no pueden ingresar al Instituto de Seguridad Social y Seguros:\n- Quienes han sido exonerados o cesanteados por mal desempeño en la Administración Pública nacional, provincial o municipal, salvo que hayan sido rehabilitados;\n- Quienes incurren en las incompatibilidades establecidas en el Artículo 15º del presente Estatuto;\n- Quienes se encuentren incluidos en el Registro de Alimentantes Morosos.","capitulo":"CAPÍTULO I: CONDICIONES PARA EL INGRESO","articuloId":null,"titulo":"TITULO II: RELACIONES LABORABLES"},"a5":{"titulo":"TITULO I: DISPOSICIONES GENERALES","articuloId":null,"capitulo":"CAPÍTULO III - DEFINICIONES BÁSICAS","nombre":"PERSONAL ADSCRIPTO","texto":"Se considera personal adscripto a aquel agente proveniente de otra jurisdicción u organismo del sector público (nacional, provincial o municipal) que preste servicios de manera temporal en el ISSyS. Dicho personal continuará rigiéndose por el convenio colectivo de trabajo o estatuto, régimen de estabilidad y demás derechos propios de su organismo de origen y, a los efectos del presente Estatuto Escalafón Reglamentario (EER), no generará derechos de permanencia, carrera administrativa, promoción ni ascenso dentro del ISSyS. Estará obligado a cumplir con las obligaciones, prohibiciones, y la jornada laboral establecidos en el TÍTULO III del presente Estatuto."},"a10":{"capitulo":"CAPÍTULO I: CONDICIONES PARA EL INGRESO","articuloId":null,"titulo":"TITULO II: RELACIONES LABORABLES","texto":"Una vez finalizado el proceso de selección y previo al dictado del acto administrativo de designación, el postulante seleccionado deberá cumplimentar de forma obligatoria los siguientes requisitos de orden prestacional y previsional:\n- Constancia de Caja de Ahorro en el Banco del Chubut S.A.\n- Certificado de aptitud psicofísica emitido por el Contralor Médico del ISSyS (Art. 14º inc. k, Ley XVIII- Nº 32).\n- Declaración Jurada de Incompatibilidad de Cargos, en cumplimiento del Art. 67º de la Constitución de la Provincia del Chubut y Art. 20º de la Ley I Nº 231 de Ética Pública.\n- Declaración Jurada sobre condición de beneficiario de jubilación, pensión o retiro (Nacional, Provincial o Municipal), conforme Art. 14º inc. j) de la Ley XVIII Nº 32.\n- Constancia de pago de la Cuota de Ingreso al sistema previsional (Art. 14 inc. i de la Ley XVIII Nº 32).\n- Certificación de servicios prestados en organismos públicos o privados.\n- Declaración Jurada de cargas de familia, adjuntando la documentación civil que acredite el vínculo (DNI de convivientes, Actas de Matrimonio, Nacimiento o Certificados de Convivencia).\nToda la documentación presentada estará sujeta a verificación de autenticidad. El falseamiento de cualquier dato u omisión de información será causal de exclusión automática del proceso de selección o de revocación del acto de designación por vicio en la causa.\n\n- Proceso de selección para el ingreso","nombre":"REQUISITOS PARA LA DESIGNACIÓN"},"a1":{"texto":"Quedan fuera del alcance de las previsiones de este Estatuto:\n- Presidente\n- Vocales\n- Gerente General\n- Las personas contratadas bajo cualquier modalidad del derecho privado o administrativo, para realizar tareas extraordinarias o ajenas al giro normal de la administración, las cuales se rigen exclusivamente por las previsiones de sus respectivos contratos, cuando su retribución no esté imputada a partidas de personal.","capitulo":"CAPÍTULO I - OBJETO Y ÁMBITOS DE APLICACIÓN","titulo":"TITULO I: DISPOSICIONES GENERALES","nombre":"PERSONAL EXCLUIDO"}},"customTitulos":[],"customCapitulos":{},"capAssoc":{"REGLAMENTACIÓN\nREGLAMENTACIÓN DEL PROCESO DE SELECCIÓN PARA EL INGRESO":"a6"},"incisos":{"a23":[{"id":"1780612086554","nombre":"LICENCIA ANUAL REGLAMENTARIA","texto":"El agente tiene derecho a un descanso anual remunerado por año vencido. La duración de la licencia se rinde por días hábiles, según la antigüedad acreditada al 31 de diciembre del año de devengamiento:\n\n- 1 año: 14 días hábiles.\n\n- 2 a 4 años: 18 días hábiles.\n\n- 5 a 6 años: 22 días hábiles.\n\n- 7 a 10 años: 24 días hábiles.\n\n- 11 a 15 años: 26 días hábiles.\n\n- 16 a 20 años: 28 días hábiles.\n\n- 21 a 25 años: 30 días hábiles.\n\n- 26 a 30 años: 32 días hábiles.\n\n- Más de 30 años: 35 días hábiles.\n\nPara acceder a este beneficio, los agentes deben acreditar al menos seis (6) meses de actividad al 31 de diciembre del año de devengamiento, otorgándose en caso contrario el proporcional al tiempo trabajado.\n\nLa licencia deberá ser usufructuada entre el 15 de diciembre del año de devengamiento y el 30 de diciembre del año siguiente, admitiéndose su fraccionamiento en hasta tres (3) períodos con un mínimo de cinco (5) días por cada uno. Aquellas licencias o fracciones no utilizadas al vencimiento de dicho plazo caducarán de pleno derecho, excepto cuando el usufructo hubiera sido interrumpido por razones imperiosas de servicio o suspendido por enfermedad (propia o de familiar), accidente laboral, fallecimiento de familiares directos, maternidad, paternidad o adopción..\n\nNo se admitirá la compensación económica de la licencia, salvo en los casos de extinción de la relación laboral, donde el agente tendrá derecho al cobro de hasta un máximo de dos (2) períodos completos anteriores y el proporcional en curso, liquidados a la remuneración vigente al momento del cese.\n\nPara determinar la duración del beneficio, se reconocerá la antigüedad previa en entidades públicas y privadas debidamente acreditada."},{"id":"1780614167068","nombre":"LICENCIA POR ENFERMEDAD","texto":"Se entiende por Licencia por Enfermedad el derecho del agente a ausentarse temporalmente de su puesto de trabajo debido a una afección de salud que le impida el cumplimiento de sus funciones. El goce de esta licencia se divide según su duración y complejidad en:\n\n- Corta Evolución: Se otorgarán hasta treinta (30) días corridos por año calendario, continuos o alternados. Los primeros veinte (20) días se liquidarán con goce íntegro de haberes y los diez (10) días restantes al cincuenta por ciento (50%)."}]},"order":["new_1780496663988","a1","a_vig","a_rev","a2","a3","new_1780499942821","a4","new_1780499897743","a5","new_1780500143135","a6","a7","new_1780574453554","a8","a9","a10","a11","a12","new_1780575647977","new_1780582658883","a13","a14","a15","a16","a17","a19","a18","a20","a21","a22","a23","a24","a25","a26","a27","a28","a29","a30","a31","a32","a33","a34","a35","a36","a37","a38","a39","a40","a41","a42","a43","a44","a45","a46","a47","a48","a49","a50","a51","a52","a53","a54","a55","a56","a57","a58","a59","a60","a61","a62","a63","a64","a65","a66","a67","a68","a69","a70","a71","a72","a73","a74","a75","a76","a77","a78","a79","a80","a81","a82","a83","a84","a85","a86","a87","a88","a89","a90","a91","a92","a93","a94","a95","a96","a97","a98","a99","a100","a101","a102","a103","a104","a105","a106","a107","a108","a109","a110","a111","a112","a113","a114","a115","a116","a117","a118","a119","a120","a121","a122","a123","a124","a125","a126","a127","a128","a129","a130","a131","a132","a133","a134","a135","a136","a137","a138","a139","ri01","ri02","ri03","ri04","ri05","ri06","ri07","ri08","ri09","ri10","ri11","ri12","ri13","ri14"]};/*__GH_STATE_END__*/
+/*__GH_VER_START__*/const CURRENT_VERSION = "2.001";/*__GH_VER_END__*/
 
 const state = {
   texts: {},      // artId -> modified text
@@ -336,9 +559,11 @@ const state = {
   customTitulos: [],   // extra secciones agregadas por el usuario
   customCapitulos: {}, // titulo -> [cap1, cap2, ...]
   capAssoc: {},        // "titulo\ncapitulo" -> articuloId del estatuto que reglamenta
+  incisos: {},         // artId -> [{id, texto}]
   newArtTipo: 'articulo',
   order: [],
-  editingArtId: null
+  editingArtId: null,
+  kpiFilter: null
 };
 
 // Load from localStorage if available, fallback to SAVED_STATE (embedded from GitHub)
@@ -354,6 +579,7 @@ function loadState(){
       Object.assign(state.artMeta, p.artMeta||{});
       Object.assign(state.customCapitulos, p.customCapitulos||{});
       Object.assign(state.capAssoc, p.capAssoc||{});
+      Object.assign(state.incisos, p.incisos||{});
       // Default associations for built-in reglamentos
       const capKey = 'REGLAMENTACIÓN\nREGLAMENTACIÓN DEL PROCESO DE SELECCIÓN PARA EL INGRESO';
       if(!state.capAssoc[capKey]) state.capAssoc[capKey] = 'a6';
@@ -394,20 +620,40 @@ function loadState(){
   }catch(e){}
 }
 
+function buildStateSnapshot(){
+  return {
+    texts: state.texts,
+    comments: state.comments,
+    flags: state.flags,
+    newArticles: state.newArticles,
+    artMeta: state.artMeta,
+    customTitulos: state.customTitulos,
+    customCapitulos: state.customCapitulos,
+    capAssoc: state.capAssoc,
+    incisos: state.incisos,
+    order: RAW_DATA.map(a=>a.id)
+  };
+}
+
+let _autoSaveTimer = null;
+function scheduleAutoSave(){
+  clearTimeout(_autoSaveTimer);
+  _autoSaveTimer = setTimeout(async ()=>{
+    if(!window._fbDb || !window._fbDoc) return;
+    try{
+      const ts = Date.now();
+      const st = { ...buildStateSnapshot(), version: CURRENT_VERSION, _ts: ts, _savedAt: new Date().toLocaleString('es-AR') };
+      await window._fbSetDoc(window._fbDoc(window._fbDb,'eerEditor','state'), st);
+      localStorage.setItem('eerEditorState', JSON.stringify(st));
+    }catch(e){ console.warn('auto-save Firebase:', e.message); }
+  }, 2000);
+}
+
 function saveState(){
   try{
-    localStorage.setItem('eerEditorState', JSON.stringify({
-      texts: state.texts,
-      comments: state.comments,
-      flags: state.flags,
-      newArticles: state.newArticles,
-      artMeta: state.artMeta,
-      customTitulos: state.customTitulos,
-      customCapitulos: state.customCapitulos,
-      capAssoc: state.capAssoc,
-      order: RAW_DATA.map(a=>a.id)
-    }));
+    localStorage.setItem('eerEditorState', JSON.stringify(buildStateSnapshot()));
   }catch(e){}
+  scheduleAutoSave();
 }
 
 // Build tree structure
@@ -453,7 +699,8 @@ function getFlag(id){
 function renderTree(){
   const root = document.getElementById('treeRoot');
   const q = state.searchQ.toLowerCase().trim();
-  
+  const kf = state.kpiFilter;
+
   if(!tree.size){root.innerHTML='<div class="no-results">No hay datos</div>';return;}
   
   // Rebuild per-type numbering maps (also used by renderEditPanel)
@@ -467,7 +714,7 @@ function renderTree(){
 
   for(const [titulo, caps] of tree){
     const secId = 'sec_'+secIdx++;
-    const isOpen = expandedSections.has(secId) || q;
+    const isOpen = expandedSections.has(secId) || q || kf !== null;
     
     let capsHtml = '';
     let capIdx = 0;
@@ -478,7 +725,7 @@ function renderTree(){
       const capId = secId+'_cap_'+capIdx++;
       const isFirstCap = capIdx === 1;
       const isLastCap = capIdx === capList.length;
-      const capOpen = expandedCaps.has(capId) || q;
+      const capOpen = expandedCaps.has(capId) || q || kf !== null;
       
       let artHtml = '';
       let capArtCount = 0;
@@ -492,17 +739,20 @@ function renderTree(){
         const matchCap = !q || cap.toLowerCase().includes(q);
         
         if(q && !matchName && !matchText && !matchTit && !matchCap) continue;
+        if(kf !== null){
+          const artFlagVal = getFlag(art.id) || 'none';
+          if(artFlagVal !== kf) continue;
+        }
         
         capArtCount++;
-        const mod = isModified(art.id);
         const hasCom = hasComments(art.id);
         const flag = getFlag(art.id);
         const active = state.activeId === art.id;
-        
+        const flagClass = flag ? ` flag-${flag}` : '';
+        const artIco = flag ? flagSvg(flag, 15) : (art.tipo==='reglamento'?'📋':'📄');
+
         let pill = '';
-        if(mod) pill = '<span class="art-pill pill-mod">✎ Mod.</span>';
-        else if(hasCom) pill = '<span class="art-pill" style="background:#e8f0fe;color:#2c5fbd;border:1.5px solid #a8c0f0">💬</span>';
-        if(flag==='review') pill += '<span class="art-pill" style="background:#fdecea;color:#c0392b;border:1.5px solid #f0a8a8;margin-left:2px">⚑</span>';
+        if(hasCom) pill = '<span class="art-pill" style="background:#e8f0fe;color:#2c5fbd;border:1.5px solid #a8c0f0">💬</span>';
         
         // Extract short name and type-specific number
         const isRegl = art.tipo === 'reglamento';
@@ -511,9 +761,16 @@ function renderTree(){
         const shortName = lbl.replace(/\*+/g,'').replace(/\.\./g,'').trim();
         const displayName = q ? highlight(shortName, q) : esc(shortName);
 
+        const artIncisos = state.incisos[art.id] || [];
+        const incisosTreeHtml = artIncisos.map((inc, ii) =>
+          `<div class="inciso-node" onclick="selectArtToInciso('${art.id}',${ii})">
+            <span class="inciso-node-letra">${letraInciso(ii)})</span>
+            <span class="inciso-node-nombre">${inc.nombre ? esc(inc.nombre) : '<span style="color:var(--muted);font-style:italic">sin nombre</span>'}</span>
+          </div>`
+        ).join('');
         artHtml += `<div class="art-node">
-          <div class="art-card${active?' active':''}${mod?' modified':''}" data-id="${art.id}" onclick="selectArt('${art.id}')">
-            <span class="art-ico">${isRegl?'📋':(mod?'✎':'📄')}</span>
+          <div class="art-card${active?' active':''}${flagClass}" data-id="${art.id}" onclick="selectArt('${art.id}')">
+            <span class="art-ico">${artIco}</span>
             <span class="art-num">${numLabel}</span>
             <span class="art-label">${displayName}</span>
             ${pill}
@@ -522,6 +779,7 @@ function renderTree(){
               <button class="art-card-btn art-card-btn-del" onclick="event.stopPropagation();confirmDeleteArticle('${art.id}')">✕<span class="btn-lbl"> Eliminar</span></button>
             </span>
           </div>
+          ${incisosTreeHtml}
         </div>`;
       }
       
@@ -540,8 +798,6 @@ function renderTree(){
         <div class="cap-header" onclick="toggleCap('${capId}')">
           <div class="cap-tgl${capOpen?' open':''}" id="ctgl_${capId}">▶</div>
           <div class="cap-label">${q?highlight(shortCap,q):esc(shortCap)}</div>
-          ${capAssocTag}
-          <span style="font-size:9px;color:var(--muted);font-weight:600">${capArtCount}</span>
           <span class="hdr-cap-acts">
             ${!isFirstCap?`<button class="hdr-sec-btn" onclick="event.stopPropagation();moveCapUp('${capT}','${capC}')">▲<span class="btn-lbl"> Subir</span></button>`:''}
             ${!isLastCap?`<button class="hdr-sec-btn" onclick="event.stopPropagation();moveCapDown('${capT}','${capC}')">▼<span class="btn-lbl"> Bajar</span></button>`:''}
@@ -549,6 +805,8 @@ function renderTree(){
             <button class="hdr-sec-btn hdr-sec-btn-edit" onclick="event.stopPropagation();editCapitulo('${capT}','${capC}')">✎<span class="btn-lbl"> Editar</span></button>
             <button class="hdr-sec-btn hdr-sec-btn-del" onclick="event.stopPropagation();deleteCapitulo('${capT}','${capC}')">✕<span class="btn-lbl"> Eliminar</span></button>
           </span>
+          ${capAssocTag}
+          <span class="cap-count">${capArtCount}</span>
         </div>
         <div class="cap-body${capOpen?'':' collapsed'}" id="cbody_${capId}">${artHtml}</div>
       </div>`;
@@ -563,19 +821,19 @@ function renderTree(){
       <div class="section-header" onclick="toggleSec('${secId}')">
         <div class="section-tgl${isOpen?' open':''}" id="stgl_${secId}">▶</div>
         <div class="section-label">${q?highlight(shortTit,q):esc(shortTit)}</div>
-        <span class="section-count">${secArtCount}</span>
         <span class="hdr-sec-acts">
           ${titList.indexOf(titulo)>0?`<button class="hdr-sec-btn" onclick="event.stopPropagation();moveTituloUp('${titE}')">▲<span class="btn-lbl"> Subir</span></button>`:''}
           ${titList.indexOf(titulo)<titList.length-1?`<button class="hdr-sec-btn" onclick="event.stopPropagation();moveTituloDown('${titE}')">▼<span class="btn-lbl"> Bajar</span></button>`:''}
           <button class="hdr-sec-btn hdr-sec-btn-edit" onclick="event.stopPropagation();editTitulo('${titE}')">✎<span class="btn-lbl"> Editar</span></button>
           <button class="hdr-sec-btn hdr-sec-btn-del" onclick="event.stopPropagation();deleteTitulo('${titE}')">✕<span class="btn-lbl"> Eliminar</span></button>
         </span>
+        <span class="section-count">${secArtCount}</span>
       </div>
       <div class="section-body${isOpen?'':' collapsed'}" id="sbody_${secId}">${capsHtml}</div>
     </div>`;
   }
   
-  if(!html) html = '<div class="no-results">Sin resultados para "'+esc(state.searchQ)+'"</div>';
+  if(!html) html = '<div class="no-results">Sin resultados</div>';
   root.innerHTML = html;
   updateStats();
 }
@@ -636,12 +894,57 @@ function clearSearch(){
 }
 
 // SELECT ARTICLE
+function expandToArt(id){
+  let secIdx = 0;
+  for(const [, caps] of tree){
+    const secId = 'sec_' + secIdx++;
+    let capIdx = 0;
+    for(const [, arts] of caps){
+      const capId = secId + '_cap_' + capIdx++;
+      if(arts.find(a => a.id === id)){
+        expandedSections.add(secId);
+        expandedCaps.add(capId);
+        return;
+      }
+    }
+  }
+}
+
 function selectArt(id){
   state.activeId = id;
+  const inp = document.getElementById('searchInput');
+  if(inp && inp.value){
+    inp.value = '';
+    inp.nextElementSibling.classList.remove('visible');
+    state.searchQ = '';
+    expandToArt(id);
+  }
   renderTree();
   renderEditPanel(id);
-  // Scroll edit panel to top
   document.getElementById('editPnl').scrollTop = 0;
+  setTimeout(()=>{
+    const el = document.querySelector(`.art-card[data-id="${id}"]`);
+    if(el) el.scrollIntoView({block:'center', behavior:'smooth'});
+  }, 60);
+}
+
+function selectArtToInciso(artId, incisoIdx){
+  selectArt(artId);
+  setTimeout(()=>{
+    const el = document.getElementById('incisoItem_'+artId+'_'+incisoIdx);
+    const pnl = document.getElementById('editPnl');
+    const hdr = document.getElementById('epHeader');
+    if(el && pnl){
+      // Traverse offsetParents to get el's true offset relative to pnl
+      let top = 0, node = el;
+      while(node && node !== pnl){ top += node.offsetTop; node = node.offsetParent; }
+      const headerH = hdr ? hdr.offsetHeight : 0;
+      pnl.scrollTo({ top: top - headerH - 12, behavior: 'smooth' });
+      el.style.outline = '2.5px solid var(--navy2)';
+      el.style.borderRadius = '8px';
+      setTimeout(()=>{ el.style.outline = ''; }, 1400);
+    }
+  }, 80);
 }
 
 function renderEditPanel(id){
@@ -669,52 +972,65 @@ function renderEditPanel(id){
   const typeIdx = typeList.indexOf(art);
   const artNumDisplay = (isRegl ? 'Regl. ' : 'Art. ') + (typeIdx + 1);
 
-  // Association info
-  let assocHtml = '';
+  // Association info — rendered as buttons in the header actions row
+  let assocBtns = '';
   if(isRegl){
-    // Chapter-level association: find capAssoc for this article's capitulo
     const ck = art.titulo+'\n'+art.capitulo;
     const linkedId = state.capAssoc[ck];
     const linked = linkedId ? RAW_DATA.find(a=>a.id===linkedId) : null;
     if(linked){
       const lNum = mainNumMap.get(linked.id);
-      assocHtml = `<div class="ep-assoc">📄 Reglamenta: Art. ${lNum} — ${esc(linked.nombre.replace(/[*]+/g,'').trim())} <button class="ep-btn ep-btn-nav" onclick="selectArt('${linked.id}')">◀<span class="btn-lbl"> Ver artículo</span></button></div>`;
+      assocBtns = `<button class="ep-btn ep-btn-regl" onclick="selectArt('${linked.id}')">${epIcon('file')}<span class="btn-lbl"> Reglamenta Art. ${lNum}</span></button>`;
     } else {
-      assocHtml = `<div class="ep-assoc" style="color:var(--muted)">📄 Sin artículo asociado — <button class="ep-btn ep-btn-nav" onclick="openCapAssocModal('${esc(art.titulo)}','${esc(art.capitulo)}')">🔗 Asociar</button></div>`;
-    }
-  } else {
-    // Find all reglamento chapters associated with this statute article
-    const assocCaps = Object.entries(state.capAssoc).filter(([k,v])=>v===id);
-    if(assocCaps.length){
-      const btns = assocCaps.map(([k])=>{
-        const [t,c] = k.split('\n');
-        const firstReglArt = RAW_DATA.find(a=>a.titulo===t&&a.capitulo===c&&a.tipo==='reglamento');
-        const shortC = c.replace(/REGLAMENTACIÓN\s*/i,'').replace(/REGLAMENTACION\s*/i,'').trim()||c;
-        return firstReglArt ? `<button class="ep-btn ep-btn-nav" onclick="selectArt('${firstReglArt.id}')">📋 ${esc(shortC)} ▶</button>` : '';
-      }).filter(Boolean).join(' ');
-      assocHtml = `<div class="ep-assoc">📋 Reglamento: ${btns}</div>`;
-    } else {
-      assocHtml = `<div class="ep-assoc" style="color:var(--muted)">📋 Sin reglamento asociado</div>`;
+      assocBtns = `<button class="ep-btn ep-btn-regl" onclick="openCapAssocModal('${esc(art.titulo)}','${esc(art.capitulo)}')">${epIcon('link')}<span class="btn-lbl"> Asociar artículo</span></button>`;
     }
   }
+  // For main articles: once linked to a reglamento, show a compact icon-only reference
+  // button (header-button style) instead of the "Vincular reglamento" pill.
+  let reglRefBtns = '';
+  if(!isRegl){
+    const assocCaps = Object.entries(state.capAssoc).filter(([k,v])=>v===id);
+    reglRefBtns = assocCaps.map(([k])=>{
+      const [t,c] = k.split('\n');
+      const firstReglArt = RAW_DATA.find(a=>a.titulo===t&&a.capitulo===c&&a.tipo==='reglamento');
+      const shortC = c.replace(/REGLAMENTACIÓN\s*/i,'').replace(/REGLAMENTACION\s*/i,'').trim()||c;
+      return firstReglArt ? `<button class="ep-icon-btn" data-tooltip="Reglamento: ${esc(shortC)}" onclick="selectArt('${firstReglArt.id}')">${epIcon('file')}</button>` : '';
+    }).filter(Boolean).join('');
+  }
+  const hasReglLink = reglRefBtns !== '';
+
+  // Button to link this article to its corresponding reglamento chapter — only shown
+  // for main articles that don't yet have one (it disappears once linked).
+  const reglLinkBtn = (isRegl || hasReglLink) ? '' :
+    `<button class="ep-btn" onclick="openArtReglAssocModal('${id}')">${epIcon('scroll')}<span class="btn-lbl"> Vincular reglamento</span></button>`;
 
   // Header
-  const flagBadge = flag ? `<span class="flag-badge flag-${flag}">${flag==='pending'?'⏳ Pendiente':flag==='approved'?'✅ Aprobado':'⚑ Para revisión'}</span>` : '';
+  const flagBadge = `<span id="flagBadge_${id}">${flagSvg(flag, 18)}</span>`;
 
   document.getElementById('epHeader').innerHTML = `
     <div class="ep-breadcrumb">
       <span>${esc(art.titulo)}</span>
       ${art.capitulo?'<span class="ep-bread-sep">›</span><span>'+esc(art.capitulo)+'</span>':''}
     </div>
-    <div class="ep-title"><span style="color:var(--navy2);font-size:13px;font-weight:700">${artNumDisplay}</span> · ${esc(art.nombre.replace(/[*]+/g,'').trim())}</div>
-    ${flagBadge}
-    <div class="ep-actions" style="margin-top:${flagBadge?'8px':'0'}">
-      <button class="ep-btn ep-btn-save" onclick="saveArt('${id}')">💾<span class="btn-lbl"> Guardar</span></button>
-      <button class="ep-btn ep-btn-flag" onclick="cycleFlag('${id}')">⚑<span class="btn-lbl"> Marcar</span></button>
-      ${idx>0?`<button class="ep-btn ep-btn-move" onclick="moveArtUp('${id}')">▲<span class="btn-lbl"> Subir</span></button>`:''}
-      ${idx<RAW_DATA.length-1?`<button class="ep-btn ep-btn-move" onclick="moveArtDown('${id}')">▼<span class="btn-lbl"> Bajar</span></button>`:''}
-      ${prevId?`<button class="ep-btn ep-btn-nav" onclick="selectArt('${prevId}')">◀<span class="btn-lbl"> Anterior</span></button>`:''}
-      ${nextId?`<button class="ep-btn ep-btn-nav" onclick="selectArt('${nextId}')">▶<span class="btn-lbl"> Siguiente</span></button>`:''}
+    <div class="ep-title"><span style="color:var(--navy2);font-size:13px;font-weight:700">${artNumDisplay}</span> · ${esc(art.nombre.replace(/[*]+/g,'').trim())} ${flagBadge}</div>
+    <div class="ep-actions" style="margin-top:8px">
+      <button class="ep-btn ep-btn-save" id="saveBtn_${id}" disabled onclick="saveArt('${id}')">${epIcon('save')}<span class="btn-lbl"> Guardar</span></button>
+      <button class="ep-btn ep-btn-ref" id="refBtn_${id}" disabled onclick="openRefPicker('${id}')" title="Seleccioná texto en el editor para vincularlo a otro artículo o reglamento">${epIcon('link')}<span class="btn-lbl"> Referenciar</span></button>
+      <div class="flag-dropdown" id="flagDropdown_${id}">
+        <button class="ep-btn ep-btn-flag" onclick="toggleFlagDropdown('${id}')">${epIcon('flag')}<span class="btn-lbl"> Marcar ▾</span></button>
+        <div class="flag-menu" id="flagMenu_${id}">
+          <button class="flag-menu-item${!flag?' active-flag':''}" onclick="setFlag('${id}',null)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> Sin marca</button>
+          <button class="flag-menu-item${flag==='pending'?' active-flag':''}" onclick="setFlag('${id}','pending')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4a017" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Pendiente</button>
+          <button class="flag-menu-item${flag==='review'?' active-flag':''}" onclick="setFlag('${id}','review')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c0392b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Para revisión</button>
+          <button class="flag-menu-item${flag==='approved'?' active-flag':''}" onclick="setFlag('${id}','approved')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7a3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Aprobado</button>
+        </div>
+      </div>
+      <button class="ep-btn ep-btn-pres" onclick="openSlideshow('${id}')">${epIcon('play')}<span class="btn-lbl"> Presentar</span></button>
+      ${prevId?`<button class="ep-btn ep-btn-nav" onclick="selectArt('${prevId}')">${epIcon('prev')}<span class="btn-lbl"> Anterior</span></button>`:''}
+      ${nextId?`<button class="ep-btn ep-btn-nav" onclick="selectArt('${nextId}')">${epIcon('next')}<span class="btn-lbl"> Siguiente</span></button>`:''}
+      ${reglLinkBtn}
+      ${assocBtns}
+      ${reglRefBtns}
     </div>
   `;
   
@@ -728,28 +1044,39 @@ function renderEditPanel(id){
     for(const c of [...activeComments,...resolvedComments]){
       commHtml += `<div class="comment-item${c.resolved?' resolved':''}">
         <div class="comment-meta">
-          <span class="comment-author">👤 ${esc(c.author)}</span>
+          <span class="comment-avatar" title="${esc(c.author)}">${c.author.trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?'}</span>
+          <span class="comment-author">${esc(c.author)}</span>
           <span class="comment-date">${esc(c.date)}</span>
           <span class="comment-type type-${c.type}">${c.type==='obs'?'Observación':c.type==='prop'?'Propuesta':'Duda'}</span>
           ${c.resolved?'<span style="font-size:9px;color:var(--muted)">✓ Resuelto</span>':''}
         </div>
         <div class="comment-text">${esc(c.text)}</div>
-        ${!c.resolved?`<div class="comment-actions">
-          <button class="comment-btn cbtn-resolve" onclick="resolveComment('${id}','${c.id}')">✓ Resolver</button>
+        <div class="comment-actions">
+          ${c.resolved
+            ? `<button class="comment-btn cbtn-resolve" onclick="reopenComment('${id}','${c.id}')">↺ Reabrir</button>`
+            : `<button class="comment-btn cbtn-resolve" onclick="resolveComment('${id}','${c.id}')">✓ Resolver</button>`}
           <button class="comment-btn cbtn-del" onclick="deleteComment('${id}','${c.id}')">✕ Eliminar</button>
-        </div>`:''}
+        </div>
       </div>`;
     }
     commHtml += '</div>';
   }
   
   document.getElementById('epBody').innerHTML = `
-    <div class="ep-sec">📝 Texto del artículo ${mod?'<span style="color:var(--accent);font-size:10px;font-weight:700">(modificado)</span>':''}</div>
-    <textarea class="ep-textarea${mod?' modified':''}" id="artTextarea_${id}" rows="14">${esc(txt)}</textarea>
+    <div class="ep-sec">Texto del artículo</div>
+    <div class="ep-editor" id="artEditor_${id}" contenteditable="true" spellcheck="false" oninput="checkDirty('${id}')" onmouseup="checkRefBtn('${id}')" onkeyup="checkRefBtn('${id}')"></div>
 
-    ${assocHtml}
+    <div class="ep-sec" style="margin-top:18px">Incisos</div>
+    <div id="incisoList_${id}" class="inciso-list"></div>
+    <div class="inciso-add-box">
+      <input class="inciso-add-ta" id="incisoAddNombre_${id}" placeholder="Nombre del inciso (ej: Definición de cargo)…" style="min-height:unset;padding:7px 10px;margin-bottom:7px">
+      <textarea class="inciso-add-ta" id="incisoAddTa_${id}" placeholder="Texto del nuevo inciso…"></textarea>
+      <div style="display:flex;justify-content:flex-end;margin-top:7px">
+        <button class="add-comment-submit" onclick="addInciso('${id}')">➕ Agregar inciso</button>
+      </div>
+    </div>
 
-    <div class="ep-sec" style="margin-top:18px">💬 Comentarios y observaciones</div>
+    <div class="ep-sec" style="margin-top:18px">Comentarios y observaciones</div>
     ${commHtml}
     <div class="add-comment-box">
       <div class="add-comment-row">
@@ -758,7 +1085,7 @@ function renderEditPanel(id){
           <option value="prop">Propuesta</option>
           <option value="duda">Duda</option>
         </select>
-        <input type="text" class="add-comment-sel" id="comAuthor_${id}" placeholder="Autor" value="Lic. Galdame" style="flex:1">
+        <span class="comment-avatar" style="width:28px;height:28px;font-size:11px" title="${esc(currentUserProfile?.name || currentUser?.email || 'Usuario')}">${(currentUserProfile?.name||currentUser?.email||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?'}</span>
       </div>
       <textarea class="add-comment-ta" id="comText_${id}" placeholder="Escribir comentario…"></textarea>
       <div style="display:flex;justify-content:flex-end;margin-top:7px">
@@ -768,28 +1095,105 @@ function renderEditPanel(id){
   `;
   
   // Live update modified state on textarea change
-  const ta = document.getElementById('artTextarea_'+id);
-  if(ta){
-    ta.addEventListener('input', ()=>{
-      const orig = RAW_DATA.find(a=>a.id===id).texto;
-      const isMod = ta.value !== orig;
-      ta.classList.toggle('modified', isMod);
-    });
+  const editor = document.getElementById('artEditor_'+id);
+  if(editor){
+    editor.innerHTML = parseToEditor(txt);
   }
+  renderIncisos(id);
+}
+
+// ── INCISOS ──────────────────────────────────────────────────────────────────
+
+const LETRAS = 'abcdefghijklmnopqrstuvwxyz';
+function letraInciso(i){ return LETRAS[i] || (i+1)+''; }
+
+function renderIncisos(artId){
+  const container = document.getElementById('incisoList_'+artId);
+  if(!container) return;
+  const lista = state.incisos[artId] || [];
+  if(!lista.length){ container.innerHTML = ''; return; }
+  container.innerHTML = lista.map((inc, i) => `
+    <div class="inciso-item" id="incisoItem_${artId}_${i}">
+      <div class="inciso-letra">${letraInciso(i)})</div>
+      <div style="flex:1">
+        ${inc.nombre ? `<div class="inciso-nombre">${esc(inc.nombre)}</div>` : ''}
+        <div class="inciso-texto" id="incisoTexto_${artId}_${i}" style="white-space:pre-wrap">${esc(inc.texto)}</div>
+      </div>
+      <div class="inciso-actions">
+        <button class="inciso-btn inciso-btn-edit" onclick="startEditInciso('${artId}',${i})">✎</button>
+        <button class="inciso-btn inciso-btn-del" onclick="deleteInciso('${artId}',${i})">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addInciso(artId){
+  const ta = document.getElementById('incisoAddTa_'+artId);
+  const ni = document.getElementById('incisoAddNombre_'+artId);
+  if(!ta) return;
+  const txt = ta.value.trim();
+  if(!txt) return;
+  const nombre = ni ? ni.value.trim() : '';
+  if(!state.incisos[artId]) state.incisos[artId] = [];
+  state.incisos[artId].push({ id: Date.now()+'', nombre, texto: txt });
+  ta.value = '';
+  if(ni) ni.value = '';
+  saveState();
+  renderIncisos(artId);
+  renderTree();
+}
+
+function deleteInciso(artId, idx){
+  if(!state.incisos[artId]) return;
+  state.incisos[artId].splice(idx, 1);
+  saveState();
+  renderIncisos(artId);
+  renderTree();
+}
+
+function startEditInciso(artId, idx){
+  const item = document.getElementById('incisoItem_'+artId+'_'+idx);
+  if(!item) return;
+  const inc = (state.incisos[artId]||[])[idx];
+  if(!inc) return;
+  const bodyDiv = item.querySelector('div[style*="flex:1"]') || item;
+  bodyDiv.innerHTML = `
+    <input class="inciso-edit-ta" id="incisoEditNombre_${artId}_${idx}" value="${esc(inc.nombre||'')}" placeholder="Nombre del inciso…" style="min-height:unset;padding:5px 8px;margin-bottom:5px">
+    <textarea class="inciso-edit-ta" id="incisoEditTa_${artId}_${idx}" style="min-height:80px">${esc(inc.texto)}</textarea>`;
+  item.querySelector('.inciso-actions').innerHTML =
+    `<button class="inciso-btn inciso-btn-ok" onclick="saveEditInciso('${artId}',${idx})">✓</button>
+     <button class="inciso-btn inciso-btn-del" onclick="renderIncisos('${artId}')">✕</button>`;
+  document.getElementById('incisoEditNombre_'+artId+'_'+idx).focus();
+}
+
+function saveEditInciso(artId, idx){
+  const ta     = document.getElementById('incisoEditTa_'+artId+'_'+idx);
+  const ni     = document.getElementById('incisoEditNombre_'+artId+'_'+idx);
+  if(!ta) return;
+  const txt = ta.value.trim();
+  if(!txt) return;
+  state.incisos[artId][idx].texto  = txt;
+  state.incisos[artId][idx].nombre = ni ? ni.value.trim() : '';
+  saveState();
+  renderIncisos(artId);
+  renderTree();
 }
 
 function saveArt(id){
-  const ta = document.getElementById('artTextarea_'+id);
-  if(!ta) return;
+  const editor = document.getElementById('artEditor_'+id);
+  if(!editor) return;
+  const txt = serializeEditor(editor);
   const orig = RAW_DATA.find(a=>a.id===id).texto;
-  if(ta.value === orig){
+  if(txt === orig){
     delete state.texts[id];
   } else {
-    state.texts[id] = ta.value;
+    state.texts[id] = txt;
   }
   saveState();
+  editor.classList.remove('dirty');
+  const btn = document.getElementById('saveBtn_'+id);
+  if(btn) btn.disabled = true;
   renderTree();
-  renderEditPanel(id);
   showToast('✅ Artículo guardado');
 }
 
@@ -797,26 +1201,70 @@ function resetArt(id){
   if(!confirm('¿Restaurar el texto original de este artículo?')) return;
   delete state.texts[id];
   saveState();
+  const editor = document.getElementById('artEditor_'+id);
+  if(editor){
+    const orig = RAW_DATA.find(a=>a.id===id)?.texto || '';
+    editor.innerHTML = parseToEditor(orig);
+    editor.classList.remove('dirty');
+    const btn = document.getElementById('saveBtn_'+id);
+    if(btn) btn.disabled = true;
+  }
   renderTree();
-  renderEditPanel(id);
   showToast('↺ Texto restaurado');
 }
 
-function cycleFlag(id){
-  const flags = [null, 'pending', 'review', 'approved'];
-  const curr = state.flags[id] || null;
-  const nextIdx = (flags.indexOf(curr)+1) % flags.length;
-  if(flags[nextIdx] === null) delete state.flags[id];
-  else state.flags[id] = flags[nextIdx];
+function epIcon(name, sz){
+  sz = sz || 16;
+  const paths = {
+    save:   '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>',
+    link:   '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+    flag:   '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>',
+    play:   '<polygon points="6 3 20 12 6 21 6 3"/>',
+    prev:   '<polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/>',
+    next:   '<polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/>',
+    scroll: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
+    file:   '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>'
+  };
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths[name]||''}</svg>`;
+}
+
+function flagSvg(flag, sz){
+  sz = sz || 16;
+  if(flag==='pending')  return `<svg width="${sz}" height="${sz}" viewBox="0 0 24 24" fill="none" stroke="#d4a017" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+  if(flag==='review')   return `<svg width="${sz}" height="${sz}" viewBox="0 0 24 24" fill="none" stroke="#c0392b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+  if(flag==='approved') return `<svg width="${sz}" height="${sz}" viewBox="0 0 24 24" fill="none" stroke="#1a7a3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+  return '';
+}
+
+function toggleFlagDropdown(id){
+  const menu = document.getElementById('flagMenu_'+id);
+  if(!menu) return;
+  const open = menu.style.display === 'block';
+  document.querySelectorAll('.flag-menu').forEach(m => m.style.display = 'none');
+  if(!open) menu.style.display = 'block';
+}
+
+function setFlag(id, flag){
+  if(flag === null) delete state.flags[id];
+  else state.flags[id] = flag;
   saveState();
   renderTree();
-  renderEditPanel(id);
   updateStats();
+  // Update badge in panel without re-rendering the whole panel
+  const badge = document.getElementById('flagBadge_'+id);
+  if(badge) badge.innerHTML = flagSvg(flag, 18);
+  document.querySelectorAll('.flag-menu').forEach(m => m.style.display = 'none');
 }
+
+document.addEventListener('click', e => {
+  if(!e.target.closest('.flag-dropdown')) {
+    document.querySelectorAll('.flag-menu').forEach(m => m.style.display = 'none');
+  }
+});
 
 function addComment(id){
   const type = document.getElementById('comType_'+id).value;
-  const author = document.getElementById('comAuthor_'+id).value.trim() || 'Anónimo';
+  const author = currentUserProfile?.name || currentUser?.email || 'Anónimo';
   const text = document.getElementById('comText_'+id).value.trim();
   if(!text) return;
   
@@ -836,6 +1284,14 @@ function addComment(id){
 function resolveComment(artId, comId){
   const c = (state.comments[artId]||[]).find(x=>x.id===comId);
   if(c) c.resolved = true;
+  saveState();
+  renderEditPanel(artId);
+  updateStats();
+}
+
+function reopenComment(artId, comId){
+  const c = (state.comments[artId]||[]).find(x=>x.id===comId);
+  if(c) c.resolved = false;
   saveState();
   renderEditPanel(artId);
   updateStats();
@@ -976,12 +1432,30 @@ function submitAddArticle(){
 function toggleNuevoDropdown(e){
   e.stopPropagation();
   const m = document.getElementById('nuevoDropdownMenu');
-  m.style.display = m.style.display === 'block' ? 'none' : 'block';
+  const isOpen = m.style.display === 'block';
+  closeAllDropdowns();
+  if(!isOpen) m.style.display = 'block';
 }
 function closeNuevo(){
   document.getElementById('nuevoDropdownMenu').style.display = 'none';
 }
-document.addEventListener('click', ()=>closeNuevo());
+function toggleUserDropdown(e){
+  e.stopPropagation();
+  const m = document.getElementById('userDropdownMenu');
+  const isOpen = m.style.display === 'block';
+  closeAllDropdowns();
+  if(!isOpen) m.style.display = 'block';
+}
+function closeUserDropdown(){
+  document.getElementById('userDropdownMenu').style.display = 'none';
+}
+function closeAllDropdowns(){
+  document.getElementById('nuevoDropdownMenu').style.display = 'none';
+  document.getElementById('userDropdownMenu').style.display = 'none';
+  const fm = document.getElementById('flagMenu');
+  if(fm) fm.style.display = 'none';
+}
+document.addEventListener('click', ()=>closeAllDropdowns());
 
 // MODAL SIMPLE (Título / Capítulo)
 let _simpleSubmitFn = null;
@@ -1013,6 +1487,35 @@ function openCapAssocModal(titulo, cap){
     renderTree();
     if(state.activeId) renderEditPanel(state.activeId);
     showToast(artId ? '🔗 Asociación guardada' : '🔗 Asociación eliminada');
+  };
+  document.getElementById('simpleModal').style.display='flex';
+}
+
+function openArtReglAssocModal(artId){
+  const chapters = [...new Set(RAW_DATA.filter(a=>a.tipo==='reglamento').map(a=>a.titulo+'\n'+a.capitulo))];
+  const currentCk = Object.entries(state.capAssoc).find(([,v])=>v===artId)?.[0] || '';
+  const currentIdx = chapters.indexOf(currentCk);
+  document.getElementById('simpleModalTitle').textContent = '📜 Vincular reglamento';
+  document.getElementById('simpleModalContent').innerHTML = `
+    <div class="modal-field">
+      <div class="modal-label">Capítulo de la reglamentación que corresponde a este artículo</div>
+      <select id="smi1" class="modal-input">
+        <option value="-1">— Sin vincular —</option>
+        ${chapters.map((ck,i)=>{
+          const shortC = ck.split('\n')[1].replace(/REGLAMENTACIÓN\s*/i,'').replace(/REGLAMENTACION\s*/i,'').trim()||ck.split('\n')[1];
+          return `<option value="${i}"${i===currentIdx?' selected':''}>${esc(shortC)}</option>`;
+        }).join('')}
+      </select>
+    </div>`;
+  _simpleSubmitFn = function(){
+    const idx = parseInt(document.getElementById('smi1').value, 10);
+    if(currentCk) delete state.capAssoc[currentCk];
+    if(idx >= 0) state.capAssoc[chapters[idx]] = artId;
+    saveState();
+    document.getElementById('simpleModal').style.display='none';
+    renderTree();
+    if(state.activeId) renderEditPanel(state.activeId);
+    showToast(idx >= 0 ? '📜 Reglamento vinculado' : '📜 Vínculo eliminado');
   };
   document.getElementById('simpleModal').style.display='flex';
 }
@@ -1234,15 +1737,33 @@ function confirmDeleteArticle(id){
   showToast('🗑 Artículo eliminado');
 }
 
+function filterByKpi(filter){
+  const deactivating = state.kpiFilter === filter;
+  state.kpiFilter = deactivating ? null : filter;
+  if(deactivating){
+    expandedSections.clear();
+    expandedCaps.clear();
+  }
+  const ids = ['kpiCardNone','kpiCardPending','kpiCardReview','kpiCardApproved'];
+  const vals = ['none','pending','review','approved'];
+  ids.forEach((id,i) => {
+    const el = document.getElementById(id);
+    if(el) el.classList.toggle('kpi-active', state.kpiFilter === vals[i]);
+  });
+  renderTree();
+}
+
 function updateStats(){
   const total = RAW_DATA.length;
-  const modCount = Object.keys(state.texts).filter(id=>isModified(id)).length;
-  const comCount = Object.keys(state.comments).filter(id=>(state.comments[id]||[]).some(c=>!c.resolved)).length;
-  const flagCount = Object.keys(state.flags).filter(id=>state.flags[id]).length;
-  document.getElementById('statTotal').textContent = total;
-  document.getElementById('statMod').textContent = modCount;
-  document.getElementById('statCom').textContent = comCount;
-  document.getElementById('statFlag').textContent = flagCount;
+  const pending  = Object.values(state.flags).filter(f=>f==='pending').length;
+  const review   = Object.values(state.flags).filter(f=>f==='review').length;
+  const approved = Object.values(state.flags).filter(f=>f==='approved').length;
+  const none = total - pending - review - approved;
+  document.getElementById('kpiTotal').textContent   = total;
+  document.getElementById('kpiNone').textContent    = none;
+  document.getElementById('kpiPending').textContent = pending;
+  document.getElementById('kpiReview').textContent  = review;
+  document.getElementById('kpiApproved').textContent= approved;
 }
 
 // EXPORT
@@ -1278,28 +1799,233 @@ function exportChanges(){
 
 // PRINT
 function printDoc(){
-  const mods = RAW_DATA.filter(a=>isModified(a.id)||state.comments[a.id]?.length);
-  let html = '<div class="pr-title">EER — ISSyS · Chubut</div>';
-  html += '<div class="pr-sub">Versión de trabajo — '+new Date().toLocaleDateString('es-AR')+'</div>';
-  
-  const toPrint = mods.length ? mods : RAW_DATA;
-  
+  const toPrint = RAW_DATA;
+
+  let body = '<div class="pr-title">EER — ISSyS · Chubut</div>';
+  body += '<div class="pr-sub">Versión de trabajo — '+esc(new Date().toLocaleDateString('es-AR'))+'</div>';
+
   for(const art of toPrint){
     const prNum = RAW_DATA.indexOf(art) + 1;
     const prName = art.nombre.replace(/^Art[íi]culo\s+\d+[°º]?\s*[-–—]?\s*/i,'').replace(/[*]+/g,'').trim();
-    html += '<div class="pr-art-name">Artículo '+prNum+'° — '+prName+'</div>';
-    html += '<div class="pr-art-text">'+esc(getArtText(art.id))+'</div>';
+    body += '<div class="pr-art-name">Artículo '+prNum+'° — '+esc(prName)+'</div>';
+    body += '<div class="pr-art-text">'+esc(getArtText(art.id))+'</div>';
     const coms = state.comments[art.id]||[];
     for(const c of coms){
       if(c.resolved) continue;
-      html += `<div class="pr-comment">[${c.type.toUpperCase()}] ${c.author} (${c.date}): ${esc(c.text)}</div>`;
+      body += `<div class="pr-comment">[${esc(c.type.toUpperCase())}] ${esc(c.author)} (${esc(c.date)}): ${esc(c.text)}</div>`;
     }
   }
-  
-  document.getElementById('printArea').innerHTML = html;
-  document.body.classList.add('printing');
-  window.print();
-  document.body.classList.remove('printing');
+
+  // Open in a separate window so Paged.js can paginate the content per the
+  // required page setup (Oficio/Legal size, margins, justified Times New Roman,
+  // continuous centered page numbers) without affecting the live editor.
+  const win = window.open('', '_blank');
+  if(!win){ showToast('⚠️ Habilitá las ventanas emergentes para imprimir'); return; }
+  win.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>EER — ISSyS</title><style>
+@page{
+  size: 8.5in 13in;
+  margin: 4cm 2cm 2cm 4cm;
+  @bottom-center{ content: counter(page); font-family:'Times New Roman',Times,serif; font-size:11pt; }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:'Times New Roman',Times,serif;font-size:12pt;line-height:1.5;color:#000}
+.pr-title{font-size:16pt;font-weight:700;text-align:center;margin-bottom:6pt}
+.pr-sub{font-size:11pt;text-align:center;color:#333;margin-bottom:24pt}
+.pr-art-name{font-size:12pt;font-weight:700;text-align:left;margin-top:18pt;margin-bottom:6pt}
+.pr-art-text{text-align:justify;white-space:pre-wrap;margin-bottom:6pt}
+.pr-comment{margin-top:6pt;padding:6pt 8pt;border:1pt solid #ccc;background:#f9f9f9;font-size:10pt;text-align:left}
+.pj-print-bar{position:fixed;top:14px;right:14px;z-index:9999}
+.pj-print-btn{padding:10px 18px;background:#1a5276;color:#fff;border:none;border-radius:8px;font-family:Arial,sans-serif;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+@media print{ .pj-print-bar{display:none!important} }
+</style></head><body>
+<div class="pj-print-bar"><button class="pj-print-btn" id="pjPrintBtn" disabled onclick="window.focus();window.print()">Generando vista previa…</button></div>
+${body}
+<script>
+  (function(){
+    var btn = document.getElementById('pjPrintBtn');
+    var CDNS = [
+      'https://cdn.jsdelivr.net/npm/pagedjs/dist/paged.polyfill.js',
+      'https://unpkg.com/pagedjs/dist/paged.polyfill.js'
+    ];
+    var ready = false;
+    function enable(label){
+      if(ready) return;
+      ready = true;
+      btn.disabled = false;
+      btn.textContent = label;
+    }
+    function watchPagination(){
+      var lastCount = -1, stable = 0;
+      var iv = setInterval(function(){
+        var pages = document.querySelectorAll('.pagedjs_pages .pagedjs_page').length;
+        if(pages > 0 && pages === lastCount){
+          stable++;
+          if(stable >= 3){ clearInterval(iv); enable('Imprimir / Guardar como PDF'); }
+        }else{
+          stable = 0;
+          lastCount = pages;
+        }
+      }, 250);
+    }
+    function loadFrom(i){
+      if(i >= CDNS.length){
+        // Paged.js no pudo cargar (problema de red): habilitar igual,
+        // el navegador paginará con el @page CSS nativo.
+        enable('Imprimir / Guardar como PDF (sin Paged.js)');
+        return;
+      }
+      var s = document.createElement('script');
+      s.src = CDNS[i];
+      s.onload = watchPagination;
+      s.onerror = function(){ loadFrom(i+1); };
+      document.body.appendChild(s);
+    }
+    loadFrom(0);
+    // Red de seguridad: si nada habilita el botón en 15s, habilitarlo igual.
+    setTimeout(function(){ enable('Imprimir / Guardar como PDF (sin Paged.js)'); }, 15000);
+  })();
+<\/script>
+<\/body><\/html>`);
+  win.document.close();
+}
+
+// INLINE REFERENCES
+let _refArtId = null, _savedRange = null;
+
+function refChipHtml(artId, displayText){
+  const art = RAW_DATA.find(a => a.id === artId);
+  if(!art) return esc(displayText);
+  const num = (art.tipo==='reglamento' ? reglNumMap : mainNumMap).get(artId);
+  const prefix = art.tipo==='reglamento' ? 'Regl.' : 'Art.';
+  return `<span class="ref-chip" data-ref="${artId}" contenteditable="false"><span class="ref-chip-text">${esc(displayText)}</span><span class="ref-chip-num" onclick="event.stopPropagation();selectArt('${artId}')"> (${prefix} N° ${num})</span><span class="ref-chip-del" onclick="event.stopPropagation();removeRefChip(this)" title="Quitar referencia">✕</span></span>`;
+}
+
+function removeRefChip(btn){
+  const chip = btn.closest('.ref-chip');
+  const editor = chip && chip.closest('.ep-editor');
+  if(!chip || !editor) return;
+  const textEl = chip.querySelector('.ref-chip-text');
+  chip.replaceWith(document.createTextNode(textEl ? textEl.textContent : ''));
+  checkDirty(editor.id.replace('artEditor_',''));
+}
+
+function parseToEditor(raw){
+  const refReg = /\[\[([^\]:]+):([^\]]+)\]\]/g;
+  let html = '', last = 0, m;
+  while((m = refReg.exec(raw)) !== null){
+    html += esc(raw.slice(last, m.index)).replace(/\n/g,'<br>');
+    html += refChipHtml(m[1], m[2]);
+    last = m.index + m[0].length;
+  }
+  html += esc(raw.slice(last)).replace(/\n/g,'<br>');
+  return html;
+}
+
+function serializeEditor(el){
+  let result = '';
+  function walk(node){
+    if(node.nodeType === Node.TEXT_NODE){
+      result += node.textContent;
+    } else if(node.nodeType === Node.ELEMENT_NODE){
+      if(node.dataset && node.dataset.ref){
+        const txt = node.querySelector('.ref-chip-text');
+        result += `[[${node.dataset.ref}:${txt ? txt.textContent : ''}]]`;
+      } else if(node.tagName === 'BR'){
+        result += '\n';
+      } else if((node.tagName === 'DIV' || node.tagName === 'P') && node !== el){
+        result += '\n';
+        Array.from(node.childNodes).forEach(walk);
+      } else {
+        Array.from(node.childNodes).forEach(walk);
+      }
+    }
+  }
+  Array.from(el.childNodes).forEach(walk);
+  return result.replace(/\n+$/, '');
+}
+
+function checkDirty(id){
+  const editor = document.getElementById('artEditor_'+id);
+  if(!editor) return;
+  const current = serializeEditor(editor);
+  const saved = getArtText(id);
+  const dirty = current !== saved;
+  editor.classList.toggle('dirty', dirty);
+  const btn = document.getElementById('saveBtn_'+id);
+  if(btn) btn.disabled = !dirty;
+}
+
+function checkRefBtn(id){
+  const sel = window.getSelection();
+  const hasText = sel && sel.rangeCount > 0 && sel.toString().trim().length > 0;
+  const btn = document.getElementById('refBtn_'+id);
+  if(btn) btn.disabled = !hasText;
+}
+
+function openRefPicker(artId){
+  const sel = window.getSelection();
+  if(!sel || sel.rangeCount === 0 || !sel.toString().trim()){
+    showToast('Primero seleccioná texto en el editor');
+    return;
+  }
+  _refArtId = artId;
+  _savedRange = sel.getRangeAt(0).cloneRange();
+  document.getElementById('refPickerSelText').textContent = sel.toString().trim();
+  document.getElementById('refPickerSearch').value = '';
+  filterRefPicker('');
+  document.getElementById('refPickerModal').style.display = 'flex';
+  setTimeout(()=>document.getElementById('refPickerSearch').focus(), 50);
+}
+
+function closeRefPicker(){
+  document.getElementById('refPickerModal').style.display = 'none';
+}
+
+function filterRefPicker(q){
+  const lq = q.toLowerCase();
+  const list = document.getElementById('refPickerList');
+  const items = RAW_DATA.filter(a => {
+    if(a.id === _refArtId) return false;
+    if(!lq) return true;
+    return a.nombre.toLowerCase().includes(lq) ||
+           (a.capitulo||'').toLowerCase().includes(lq) ||
+           (a.titulo||'').toLowerCase().includes(lq);
+  }).slice(0, 80);
+  if(!items.length){
+    list.innerHTML = '<div style="padding:12px 14px;color:var(--muted);font-size:13px">Sin resultados</div>';
+    return;
+  }
+  list.innerHTML = items.map(a => {
+    const num = (a.tipo==='reglamento' ? reglNumMap : mainNumMap).get(a.id);
+    const prefix = a.tipo==='reglamento' ? 'Regl.' : 'Art.';
+    const name = a.nombre.replace(/\*+/g,'').trim();
+    return `<div class="ref-picker-item" onclick="insertRef('${a.id}')">
+      <span class="ref-picker-num">${prefix} ${num}</span>
+      <div><div class="ref-picker-name">${esc(name)}</div><div class="ref-picker-loc">${esc(a.titulo)}${a.capitulo?' › '+esc(a.capitulo):''}</div></div>
+    </div>`;
+  }).join('');
+}
+
+function insertRef(targetArtId){
+  if(!_savedRange || !_refArtId) return;
+  const selText = _savedRange.toString().trim();
+  if(!selText) return;
+  const chip = document.createElement('span');
+  chip.innerHTML = refChipHtml(targetArtId, selText);
+  const chipEl = chip.firstChild;
+  _savedRange.deleteContents();
+  _savedRange.insertNode(chipEl);
+  const sel = window.getSelection();
+  const range = document.createRange();
+  range.setStartAfter(chipEl);
+  range.collapse(true);
+  sel.removeAllRanges();
+  sel.addRange(range);
+  closeRefPicker();
+  checkDirty(_refArtId);
+  _savedRange = null;
+  const btn = document.getElementById('refBtn_'+_refArtId);
+  if(btn) btn.disabled = true;
 }
 
 // GITHUB SAVE
@@ -1311,10 +2037,10 @@ async function saveToGitHub(){
     localStorage.setItem('ghToken', token);
   }
   const btn = document.getElementById('ghBtn');
-  const orig = btn.textContent;
-  btn.textContent = '⏳ Subiendo...';
+  const orig = btn.innerHTML;
+  btn.innerHTML = '<svg class="spin-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 2a10 10 0 1 0 10 10"/></svg>';
   btn.disabled = true;
-  const owner = 'sago2107-bot', repo = 'issys', branch = 'main', path = 'git/estatuto_editor.html';
+  const owner = 'sago2107-bot', repo = 'issys', branch = 'main', path = 'public/estatuto_editor.html';
   try{
     const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`,{
       headers:{'Authorization':`token ${token}`,'Accept':'application/vnd.github.v3+json'}
@@ -1326,11 +2052,21 @@ async function saveToGitHub(){
       texts:state.texts, comments:state.comments, flags:state.flags,
       newArticles:state.newArticles, artMeta:state.artMeta,
       customTitulos:state.customTitulos, customCapitulos:state.customCapitulos,
-      capAssoc:state.capAssoc, order:RAW_DATA.map(a=>a.id)
+      capAssoc:state.capAssoc, incisos:state.incisos, order:RAW_DATA.map(a=>a.id)
     };
-    const newHtml = html.replace(
+    // Increment version
+    const verMatch = html.match(/\/\*__GH_VER_START__\*\/const CURRENT_VERSION = "([^"]+)";\/\*__GH_VER_END__\*\//);
+    const curVer = verMatch ? verMatch[1] : '1.000';
+    const parts = curVer.split('.');
+    const newVer = parts[0] + '.' + String(parseInt(parts[1] || 0) + 1).padStart(3, '0');
+
+    let newHtml = html.replace(
       /\/\*__GH_STATE_START__\*\/[\s\S]*?\/\*__GH_STATE_END__\*\//,
       `/*__GH_STATE_START__*/const SAVED_STATE = ${JSON.stringify(st)};/*__GH_STATE_END__*/`
+    );
+    newHtml = newHtml.replace(
+      /\/\*__GH_VER_START__\*\/[\s\S]*?\/\*__GH_VER_END__\*\//,
+      `/*__GH_VER_START__*/const CURRENT_VERSION = "${newVer}";/*__GH_VER_END__*/`
     );
     if(newHtml === html) throw new Error('No se encontró el marcador SAVED_STATE en el archivo');
     const encoded = btoa(unescape(encodeURIComponent(newHtml)));
@@ -1346,7 +2082,9 @@ async function saveToGitHub(){
       const err = await pushRes.json();
       throw new Error(err.message || pushRes.status);
     }
-    showToast('✅ Guardado en GitHub correctamente');
+    document.getElementById('versionDisplay').textContent = 'Versión ' + newVer;
+    showToast('✅ Guardado en GitHub · Versión ' + newVer);
+    await saveToFirebase();
   }catch(e){
     if(e.message.includes('401') || e.message.includes('Bad credentials')){
       localStorage.removeItem('ghToken');
@@ -1356,7 +2094,7 @@ async function saveToGitHub(){
     }
     console.error(e);
   } finally {
-    btn.textContent = orig;
+    btn.innerHTML = orig;
     btn.disabled = false;
   }
 }
@@ -1375,6 +2113,207 @@ function showToast(msg){
   t.style.opacity = '1';
   clearTimeout(toastTimer);
   toastTimer = setTimeout(()=>t.style.opacity='0', 2200);
+}
+
+
+// ─────────────────────────────────────────────
+// FIREBASE — Guardar y cargar estado en Firestore
+// ─────────────────────────────────────────────
+
+async function saveToFirebase() {
+  if (!window._fbDb) {
+    showToast('⚠️ Firebase no inicializado — revisá la apiKey en el HTML');
+    return;
+  }
+  const btn = document.getElementById('fbBtn');
+  const origHtml = btn ? btn.innerHTML : null;
+  if (btn) { btn.innerHTML = '<svg class="spin-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 2a10 10 0 1 0 10 10"/></svg>'; btn.disabled = true; }
+
+  try {
+    const ts = Date.now();
+    const st = {
+      texts: state.texts,
+      comments: state.comments,
+      flags: state.flags,
+      newArticles: state.newArticles,
+      artMeta: state.artMeta,
+      customTitulos: state.customTitulos,
+      customCapitulos: state.customCapitulos,
+      capAssoc: state.capAssoc,
+      incisos: state.incisos,
+      order: RAW_DATA.map(a => a.id),
+      version: CURRENT_VERSION,
+      _ts: ts,
+      _savedAt: new Date().toLocaleString('es-AR')
+    };
+
+    await window._fbSetDoc(
+      window._fbDoc(window._fbDb, 'eerEditor', 'state'),
+      st
+    );
+
+    // También actualizar localStorage con el mismo timestamp
+    localStorage.setItem('eerEditorState', JSON.stringify(st));
+
+    showToast('☁️ Guardado en Firebase · ' + new Date().toLocaleTimeString('es-AR'));
+  } catch(e) {
+    showToast('❌ Firebase: ' + e.message);
+    console.error('saveToFirebase error:', e);
+  } finally {
+    if (btn) { btn.innerHTML = origHtml; btn.disabled = false; }
+  }
+}
+
+async function loadFromFirebase() {
+  if (!window._fbDb) {
+    showToast('⚠️ Firebase no inicializado');
+    return;
+  }
+  try {
+    const snap = await window._fbGetDoc(
+      window._fbDoc(window._fbDb, 'eerEditor', 'state')
+    );
+    if (!snap.exists()) {
+      showToast('ℹ️ No hay estado guardado en Firebase aún');
+      return;
+    }
+    const p = snap.data();
+    localStorage.setItem('eerEditorState', JSON.stringify(p));
+    showToast('☁️ Estado cargado desde Firebase — recargando…');
+    setTimeout(() => location.reload(), 900);
+  } catch(e) {
+    showToast('❌ Firebase load: ' + e.message);
+    console.error('loadFromFirebase error:', e);
+  }
+}
+
+// ── SLIDESHOW ────────────────────────────────────────────────────────────────
+
+let _ssId = null;
+
+function openSlideshow(id){
+  _ssId = id;
+  renderSlide(id);
+  document.getElementById('slideshowOverlay').style.display = 'flex';
+  document.addEventListener('keydown', _ssKeyHandler);
+}
+
+function closeSlideshow(){
+  document.getElementById('slideshowOverlay').style.display = 'none';
+  document.removeEventListener('keydown', _ssKeyHandler);
+}
+
+function _ssKeyHandler(e){
+  if(e.key==='Escape') closeSlideshow();
+  else if(e.key==='ArrowRight'||e.key==='ArrowDown') slideshowNav(1);
+  else if(e.key==='ArrowLeft'||e.key==='ArrowUp') slideshowNav(-1);
+}
+
+function slideshowNav(dir){
+  const idx = RAW_DATA.findIndex(a=>a.id===_ssId);
+  const next = idx + dir;
+  if(next >= 0 && next < RAW_DATA.length){
+    _ssId = RAW_DATA[next].id;
+    renderSlide(_ssId);
+  }
+}
+
+function parseForSlideshow(raw){
+  const refReg = /\[\[([^\]:]+):([^\]]+)\]\]/g;
+  let html = '', last = 0, m;
+  while((m = refReg.exec(raw)) !== null){
+    html += esc(raw.slice(last, m.index)).replace(/\n/g,'<br>');
+    const artId = m[1], displayText = m[2];
+    const art = RAW_DATA.find(a=>a.id===artId);
+    if(art){
+      const num = (art.tipo==='reglamento' ? reglNumMap : mainNumMap).get(artId);
+      const prefix = art.tipo==='reglamento' ? 'Regl.' : 'Art.';
+      html += `${esc(displayText)} <span class="ss-ref-chip" onclick="_ssId='${artId}';renderSlide('${artId}')">(${prefix} ${num})</span>`;
+    } else {
+      html += esc(m[0]);
+    }
+    last = m.index + m[0].length;
+  }
+  html += esc(raw.slice(last)).replace(/\n/g,'<br>');
+  return html;
+}
+
+function renderSlide(id){
+  const art = RAW_DATA.find(a=>a.id===id);
+  if(!art) return;
+  const isRegl = art.tipo==='reglamento';
+  const typeList = isRegl ? RAW_DATA.filter(a=>a.tipo==='reglamento') : RAW_DATA.filter(a=>a.tipo!=='reglamento');
+  const artNumDisplay = (isRegl?'Regl. ':'Art. ') + (typeList.indexOf(art)+1);
+  const idx = RAW_DATA.indexOf(art);
+  const txt = getArtText(id);
+  const nombre = art.nombre.replace(/[*]+/g,'').trim();
+
+  // Left panel — context (titulo / capitulo) above number
+  const hasTit = !!art.titulo, hasCap = !!art.capitulo;
+  document.getElementById('ssCtxTituloLabel').style.display = hasTit ? '' : 'none';
+  document.getElementById('ssCtxTitulo').textContent = art.titulo || '';
+  document.getElementById('ssCtxCapituloLabel').style.display = hasCap ? '' : 'none';
+  document.getElementById('ssCtxCapitulo').textContent = art.capitulo || '';
+  document.getElementById('ssNum').textContent = artNumDisplay;
+  document.getElementById('ssTitle').textContent = nombre;
+
+  // Article status badge
+  const flag = state.flags[id];
+  const statusInfo = {
+    pending:  {label:'Pendiente',     cls:'ss-status-pending'},
+    review:   {label:'Para revisión', cls:'ss-status-review'},
+    approved: {label:'Aprobado',      cls:'ss-status-approved'}
+  }[flag] || {label:'Sin marca', cls:'ss-status-none'};
+  const statusEl = document.getElementById('ssStatus');
+  statusEl.className = 'ss-status ' + statusInfo.cls;
+  statusEl.innerHTML = flagSvg(flag, 15) + `<span>${statusInfo.label}</span>`;
+
+  // References
+  let refsHtml = '';
+  if(isRegl){
+    const linkedId = state.capAssoc[art.titulo+'\n'+art.capitulo];
+    const linked = linkedId ? RAW_DATA.find(a=>a.id===linkedId) : null;
+    if(linked) refsHtml = `<button class="ss-ref-btn" onclick="_ssId='${linked.id}';renderSlide('${linked.id}')">📄 Reglamenta Art. ${mainNumMap.get(linked.id)}</button>`;
+  } else {
+    Object.entries(state.capAssoc).filter(([,v])=>v===id).forEach(([k])=>{
+      const [t,c] = k.split('\n');
+      const fr = RAW_DATA.find(a=>a.titulo===t&&a.capitulo===c&&a.tipo==='reglamento');
+      const shortC = c.replace(/REGLAMENTACIÓN\s*/i,'').trim()||c;
+      if(fr) refsHtml += `<button class="ss-ref-btn" onclick="_ssId='${fr.id}';renderSlide('${fr.id}')">📋 ${esc(shortC)}</button>`;
+    });
+  }
+  document.getElementById('ssRefs').innerHTML = refsHtml;
+
+  // Right panel — text (con referencias clicables)
+  document.getElementById('ssText').innerHTML = parseForSlideshow(txt);
+
+  // Right panel — incisos
+  const incisos = state.incisos[id]||[];
+  const incisosEl = document.getElementById('ssIncisos');
+  if(incisos.length){
+    incisosEl.style.display = '';
+    incisosEl.innerHTML = incisos.map((inc,i)=>`
+      <div class="ss-inciso-row">
+        <span class="ss-inciso-letra">${letraInciso(i)})</span>
+        <div>
+          ${inc.nombre?`<div class="ss-inciso-nombre">${esc(inc.nombre)}</div>`:''}
+          <div class="ss-inciso-txt">${parseForSlideshow(inc.texto)}</div>
+        </div>
+      </div>`).join('');
+  } else {
+    incisosEl.style.display = 'none';
+    incisosEl.innerHTML = '';
+  }
+
+  // Footer
+  document.getElementById('ssProgress').textContent = (idx+1)+' / '+RAW_DATA.length;
+  document.getElementById('ssCounter').textContent = artNumDisplay+' — '+nombre;
+  document.getElementById('ssPrev').disabled = idx===0;
+  document.getElementById('ssNext').disabled = idx===RAW_DATA.length-1;
+
+  // Scroll right panel to top
+  const right = document.querySelector('.ss-right');
+  if(right) right.scrollTop = 0;
 }
 
 // RESIZE HANDLE
@@ -1404,6 +2343,332 @@ loadState();
 tree = buildTree(RAW_DATA);
 renderTree();
 updateStats();
+document.getElementById('versionDisplay').textContent = 'Versión ' + CURRENT_VERSION;
+
+// ─────────────────────────────────────────────
+// AUTH
+// ─────────────────────────────────────────────
+let currentUser = null;
+let currentUserProfile = null;
+
+const ROLE_LABELS = { admin:'Admin', editor:'Editor', revisor:'Revisor', lector:'Lector' };
+const ROLE_CLASS  = { admin:'role-admin', editor:'role-editor', revisor:'role-revisor', lector:'role-lector' };
+
+function canEdit()    { return currentUserProfile && ['admin','editor'].includes(currentUserProfile.role); }
+function canComment() { return currentUserProfile && ['admin','editor','revisor'].includes(currentUserProfile.role); }
+function canFlag()    { return currentUserProfile && ['admin','editor','revisor'].includes(currentUserProfile.role); }
+function canSave()    { return currentUserProfile && ['admin','editor'].includes(currentUserProfile.role); }
+function isAdmin()    { return currentUserProfile?.role === 'admin'; }
+
+function initAuth(){
+  window._fbOnAuthChanged(async user => {
+    if(user){
+      currentUser = user;
+      try{
+        const snap = await window._fbGetDoc(window._fbDoc(window._fbDb,'users',user.uid));
+        if(snap.exists()){
+          currentUserProfile = snap.data();
+        } else {
+          // Si no existe el documento del usuario, verificar si hay otros usuarios
+          const usersSnap = await window._fbFirestore.getDocs(
+            window._fbFirestore.collection(window._fbDb,'users')
+          );
+          const role = usersSnap.empty ? 'admin' : 'lector';
+          currentUserProfile = { email:user.email, name:user.email, role, active:true, createdAt:Date.now() };
+          await window._fbSetDoc(window._fbDoc(window._fbDb,'users',user.uid), currentUserProfile);
+        }
+      }catch(e){
+        console.error('Error cargando perfil:', e);
+        currentUserProfile = { email:user.email, name:user.email, role:'lector', active:true };
+      }
+      if(currentUserProfile.active === false){
+        showToast('❌ Tu cuenta está desactivada');
+        await doSignOut();
+        return;
+      }
+      document.getElementById('authOverlay').style.display = 'none';
+      updateUserMenu();
+      applyRoleUI();
+    } else {
+      currentUser = null;
+      currentUserProfile = null;
+      document.getElementById('authOverlay').style.display = 'flex';
+    }
+  });
+}
+
+async function doSignIn(){
+  const email = document.getElementById('authEmail').value.trim();
+  const pass  = document.getElementById('authPassword').value;
+  const btn   = document.getElementById('authBtn');
+  const err   = document.getElementById('authError');
+  if(!email || !pass){ showAuthError('Completá email y contraseña'); return; }
+  btn.disabled = true; btn.textContent = 'Iniciando…';
+  err.classList.remove('visible');
+  try{
+    await window._fbSignIn(email, pass);
+  }catch(e){
+    const msgs = {
+      'auth/user-not-found':'Usuario no encontrado',
+      'auth/wrong-password':'Contraseña incorrecta',
+      'auth/invalid-email':'Email inválido',
+      'auth/too-many-requests':'Demasiados intentos. Esperá unos minutos.',
+      'auth/invalid-credential':'Email o contraseña incorrectos'
+    };
+    showAuthError(msgs[e.code] || e.message);
+  }finally{
+    btn.disabled = false; btn.textContent = 'Iniciar sesión';
+  }
+}
+
+function showAuthError(msg){
+  const e = document.getElementById('authError');
+  e.textContent = msg; e.classList.add('visible');
+}
+
+async function doSignOut(){
+  try{ await window._fbSignOut(); closeAllDropdowns(); }
+  catch(e){ showToast('❌ Error al cerrar sesión'); }
+}
+
+function updateUserMenu(){
+  if(!currentUserProfile) return;
+  const p = currentUserProfile;
+  document.getElementById('userMenuName').textContent  = p.name || p.email;
+  document.getElementById('userMenuEmail').textContent = p.email;
+  const roleEl = document.getElementById('userMenuRole');
+  roleEl.textContent = ROLE_LABELS[p.role] || p.role;
+  roleEl.className = 'role-badge ' + (ROLE_CLASS[p.role] || '');
+  document.getElementById('btnUserMgmt').style.display = isAdmin() ? 'flex' : 'none';
+  // Iniciales: primeras letras de cada palabra del nombre
+  const words = (p.name || p.email).trim().split(/\s+/);
+  const initials = words.length >= 2
+    ? (words[0][0] + words[words.length - 1][0]).toUpperCase()
+    : words[0].substring(0, 2).toUpperCase();
+  document.getElementById('userInitials').textContent = initials;
+}
+
+function applyRoleUI(){
+  const ghBtn = document.getElementById('ghBtn');
+  if(ghBtn) ghBtn.style.display = canSave() ? '' : 'none';
+  const nd = document.getElementById('nuevoDropdown');
+  if(nd) nd.style.display = canEdit() ? '' : 'none';
+}
+
+// ─── GESTIÓN DE USUARIOS (Admin) ───
+async function openUserMgmt(){
+  if(!isAdmin()) return;
+  document.getElementById('userMgmtModal').style.display = 'flex';
+  await loadUserList();
+}
+function closeUserMgmt(){
+  document.getElementById('userMgmtModal').style.display = 'none';
+}
+async function loadUserList(){
+  const tbody = document.getElementById('userMgmtList');
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:14px">Cargando…</td></tr>';
+  try{
+    const snap = await window._fbFirestore.getDocs(
+      window._fbFirestore.collection(window._fbDb,'users')
+    );
+    if(snap.empty){ tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:14px">Sin usuarios registrados</td></tr>'; return; }
+    tbody.innerHTML = '';
+    snap.forEach(docSnap=>{
+      const u = docSnap.data(), uid = docSnap.id;
+      const isSelf = currentUser && uid === currentUser.uid;
+      const isActive = u.active !== false;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="font-weight:600">${escHtml(u.name||'')}</td>
+        <td style="color:var(--muted);font-size:12px">${escHtml(u.email||'')}</td>
+        <td>
+          <select onchange="changeUserRole('${uid}',this.value)" ${isSelf?'disabled':''} style="font-size:12px;padding:3px 7px;border:1.5px solid var(--border);border-radius:5px">
+            ${['admin','editor','revisor','lector'].map(r=>`<option value="${r}"${u.role===r?' selected':''}>${ROLE_LABELS[r]}</option>`).join('')}
+          </select>
+        </td>
+        <td><span style="font-size:11px;font-weight:700;color:${isActive?'var(--green)':'var(--red)'}">${isActive?'Activo':'Inactivo'}</span></td>
+        <td>${!isSelf?`<button class="art-card-btn ${isActive?'art-card-btn-del':'art-card-btn-edit'}" onclick="toggleUserActive('${uid}',${isActive})">${isActive?'Desactivar':'Activar'}</button>`:''}</td>`;
+      tbody.appendChild(tr);
+    });
+  }catch(e){
+    tbody.innerHTML=`<tr><td colspan="5" style="color:var(--red);padding:14px">Error: ${e.message}</td></tr>`;
+  }
+}
+async function changeUserRole(uid, role){
+  try{
+    await window._fbSetDoc(window._fbDoc(window._fbDb,'users',uid),{role},{merge:true});
+    showToast('✅ Rol actualizado');
+  }catch(e){ showToast('❌ '+e.message); }
+}
+async function toggleUserActive(uid, currentlyActive){
+  try{
+    await window._fbSetDoc(window._fbDoc(window._fbDb,'users',uid),{active:!currentlyActive},{merge:true});
+    await loadUserList();
+    showToast('✅ Usuario '+(currentlyActive?'desactivado':'activado'));
+  }catch(e){ showToast('❌ '+e.message); }
+}
+async function createUser(){
+  const name  = document.getElementById('newUserName').value.trim();
+  const email = document.getElementById('newUserEmail').value.trim();
+  const pass  = document.getElementById('newUserPass').value;
+  const role  = document.getElementById('newUserRole').value;
+  const errEl = document.getElementById('createUserError');
+  const btn   = document.getElementById('createUserBtn');
+  errEl.style.display = 'none';
+  if(!name||!email||!pass){ showCreateUserErr('Completá todos los campos'); return; }
+  if(pass.length < 6){ showCreateUserErr('La contraseña debe tener al menos 6 caracteres'); return; }
+  btn.disabled = true; btn.textContent = 'Creando…';
+  try{
+    const apiKey = 'AIzaSyCEYxLYrmWLFqapZ2_XEIkat3XpqmH5ZHY';
+    const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email, password:pass, returnSecureToken:false})
+    });
+    const data = await res.json();
+    if(data.error) throw new Error({
+      'EMAIL_EXISTS':'Ya existe un usuario con ese email',
+      'INVALID_EMAIL':'Email inválido',
+      'WEAK_PASSWORD':'Contraseña muy corta (mínimo 6 caracteres)'
+    }[data.error.message] || data.error.message);
+    await window._fbSetDoc(window._fbDoc(window._fbDb,'users',data.localId),{
+      email, name, role, active:true, createdAt:Date.now(), createdBy:currentUser.uid
+    });
+    document.getElementById('newUserName').value  = '';
+    document.getElementById('newUserEmail').value = '';
+    document.getElementById('newUserPass').value  = '';
+    await loadUserList();
+    showToast('✅ Usuario creado: '+name);
+  }catch(e){ showCreateUserErr(e.message); }
+  finally{ btn.disabled=false; btn.textContent='Crear'; }
+}
+function showCreateUserErr(msg){
+  const e = document.getElementById('createUserError');
+  e.textContent = msg; e.style.display = 'block';
+}
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// Inicializar auth — solo una vez
+let _authInited = false;
+function tryInitAuth(){ if(!_authInited && window._fbOnAuthChanged){ _authInited=true; initAuth(); } }
+document.addEventListener('DOMContentLoaded', tryInitAuth);
+window.addEventListener('load', tryInitAuth);
 </script>
+
+<!-- SLIDESHOW OVERLAY -->
+<div id="slideshowOverlay" class="ss-overlay" style="display:none">
+  <div class="ss-hdr">
+    <div class="ss-hdr-left">
+      <img src="logo128x128_blanco.png" class="ss-hdr-logo" alt="ISSyS">
+      <div>
+        <div class="ss-hdr-title">Estatuto Escalafón Reglamentario</div>
+        <div class="ss-hdr-sub">Instituto de Seguridad Social y Seguros</div>
+      </div>
+    </div>
+    <div class="ss-hdr-right">
+      <span id="ssProgress" class="ss-progress"></span>
+      <button class="ss-close" onclick="closeSlideshow()">✕</button>
+    </div>
+  </div>
+  <div class="ss-main">
+    <div class="ss-left">
+      <div id="ssCtxTituloLabel" class="ss-ctx-label" style="display:none">Sección</div>
+      <div id="ssCtxTitulo" class="ss-ctx-titulo"></div>
+      <div id="ssCtxCapituloLabel" class="ss-ctx-label" style="display:none">Capítulo</div>
+      <div id="ssCtxCapitulo" class="ss-ctx-capitulo"></div>
+      <div class="ss-divider"></div>
+      <div class="ss-num-row">
+        <div id="ssNum" class="ss-num"></div>
+        <span id="ssStatus" class="ss-status"></span>
+      </div>
+      <div id="ssTitle" class="ss-title"></div>
+      <div id="ssRefs" class="ss-refs"></div>
+    </div>
+    <div class="ss-right">
+      <div id="ssText" class="ss-text-body"></div>
+      <div id="ssIncisos" class="ss-incisos" style="display:none"></div>
+    </div>
+  </div>
+  <div class="ss-footer">
+    <button id="ssPrev" class="ss-nav-btn" onclick="slideshowNav(-1)">◀ Anterior</button>
+    <span id="ssCounter" class="ss-counter"></span>
+    <button id="ssNext" class="ss-nav-btn" onclick="slideshowNav(1)">Siguiente ▶</button>
+  </div>
+</div>
+
+<!-- AUTH OVERLAY — bloquea la app hasta que el usuario inicie sesión -->
+<div id="authOverlay" class="auth-overlay">
+  <div class="auth-box">
+    <div class="auth-header">
+      <img src="logo128x128_blanco.png" alt="ISSyS">
+      <div class="auth-title">Estatuto Escalafon Reglamentario</div>
+      <div class="auth-sub">Iniciá sesión para continuar</div>
+    </div>
+    <div class="auth-body">
+      <div class="auth-error" id="authError"></div>
+      <div class="auth-field">
+        <div class="auth-label">Email</div>
+        <input id="authEmail" class="auth-input" type="email" placeholder="usuario@ejemplo.com" autocomplete="username">
+      </div>
+      <div class="auth-field">
+        <div class="auth-label">Contraseña</div>
+        <input id="authPassword" class="auth-input" type="password" placeholder="••••••••" autocomplete="current-password"
+          onkeydown="if(event.key==='Enter') doSignIn()">
+      </div>
+      <button class="auth-btn" id="authBtn" onclick="doSignIn()">Iniciar sesión</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Gestión de usuarios (solo Admin) -->
+<div id="userMgmtModal" class="modal-overlay" style="display:none">
+  <div class="modal-box" style="width:640px;max-width:97vw">
+    <div class="modal-title">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 1 0-7.75"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Gestión de usuarios
+    </div>
+    <div style="max-height:260px;overflow-y:auto;border:1.5px solid var(--border);border-radius:8px">
+      <table class="umgmt-table">
+        <thead><tr>
+          <th>Nombre</th><th>Email</th><th>Rol</th><th>Estado</th><th></th>
+        </tr></thead>
+        <tbody id="userMgmtList">
+          <tr><td colspan="5" style="text-align:center;color:var(--muted);padding:14px">Cargando…</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="umgmt-add">
+      <div class="umgmt-add-title">➕ Nuevo usuario</div>
+      <div class="umgmt-row">
+        <input id="newUserName"  class="umgmt-input" placeholder="Nombre completo" style="flex:1;min-width:130px">
+        <input id="newUserEmail" class="umgmt-input" placeholder="Email" type="email" style="flex:1;min-width:160px">
+        <input id="newUserPass"  class="umgmt-input" placeholder="Contraseña" type="password" style="min-width:120px">
+        <select id="newUserRole" class="umgmt-sel">
+          <option value="lector">Lector</option>
+          <option value="revisor">Revisor</option>
+          <option value="editor" selected>Editor</option>
+          <option value="admin">Admin</option>
+        </select>
+        <button class="add-comment-submit" id="createUserBtn" onclick="createUser()">Crear</button>
+      </div>
+      <div id="createUserError" style="color:var(--red);font-size:12px;margin-top:8px;display:none"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="closeUserMgmt()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Picker de referencia inline -->
+<div id="refPickerModal" class="modal-overlay" style="display:none">
+  <div class="modal-box" style="width:480px">
+    <div class="modal-title">🔗 Asociar referencia a artículo</div>
+    <div style="margin-bottom:12px;font-size:12px;color:var(--muted)">Texto seleccionado: "<strong id="refPickerSelText" style="color:var(--text)"></strong>"</div>
+    <input type="text" id="refPickerSearch" class="modal-input" placeholder="Buscar artículo por nombre o ubicación…" oninput="filterRefPicker(this.value)" autocomplete="off">
+    <div id="refPickerList" class="ref-picker-list"></div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="closeRefPicker()">Cancelar</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

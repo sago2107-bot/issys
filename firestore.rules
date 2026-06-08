@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Editor EER — estado del editor (artículos, comentarios, flags)
+    match /eerEditor/{document=**} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Perfiles de usuario — cada usuario puede leer su propio doc
+    // Solo admins pueden escribir en cualquier doc de usuarios
+    match /users/{uid} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && (
+        request.auth.uid == uid ||
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
+      );
+    }
+  }
+}

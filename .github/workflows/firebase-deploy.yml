@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'git/issys-eer/public/**'
+      - 'public/**'
 
 jobs:
   deploy:
@@ -19,4 +19,3 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ISSYS_EER }}
           projectId: issys-eer
           channelId: live
-          entryPoint: ./git/issys-eer
