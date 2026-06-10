@@ -667,7 +667,8 @@ function scheduleAutoSave(){
 
 function saveState(){
   try{
-    localStorage.setItem('eerEditorState', JSON.stringify(buildStateSnapshot()));
+    const st = { ...buildStateSnapshot(), version: CURRENT_VERSION, _ts: Date.now(), _savedAt: new Date().toLocaleString('es-AR') };
+    localStorage.setItem('eerEditorState', JSON.stringify(st));
   }catch(e){}
   scheduleAutoSave();
 }
