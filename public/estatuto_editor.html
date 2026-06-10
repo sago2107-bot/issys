@@ -15,6 +15,7 @@
   --red:#c0392b;--red-bg:#fdecea;--red-bd:#f0a8a8;
   --blue-bg:#e8f0fe;--blue:#2c5fbd;--blue-bd:#a8c0f0;
   --warn:#d4a017;--warn-bg:#fef9e7;--warn-bd:#f7dc6f;
+  --purple:#7d3c98;--purple-bg:#f4ecf7;--purple-bd:#d2b4de;
   --pnl-w:760px;
 }
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
@@ -199,6 +200,7 @@ button:hover .btn-lbl{display:inline}
 .type-obs{background:#e8f0fe;color:var(--blue);border:1px solid var(--blue-bd)}
 .type-prop{background:#e8f9ee;color:var(--green);border:1px solid var(--green-bd)}
 .type-duda{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-bd)}
+.type-ref{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-bd)}
 .comment-text{font-size:13px;line-height:1.6;color:var(--text)}
 .comment-actions{display:flex;gap:5px;margin-top:6px}
 .comment-btn{font-size:10.5px;padding:2px 8px;border-radius:5px;border:1.5px solid;cursor:pointer;font-weight:600}
@@ -1064,7 +1066,7 @@ function renderEditPanel(id){
           <span class="comment-avatar" title="${esc(c.author)}">${c.author.trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?'}</span>
           <span class="comment-author">${esc(c.author)}</span>
           <span class="comment-date">${esc(c.date)}</span>
-          <span class="comment-type type-${c.type}">${c.type==='obs'?'Observación':c.type==='prop'?'Propuesta':'Duda'}</span>
+          <span class="comment-type type-${c.type}">${c.type==='obs'?'Observación':c.type==='prop'?'Propuesta':c.type==='ref'?'Referencia':'Duda'}</span>
           ${c.resolved?'<span style="font-size:9px;color:var(--muted)">✓ Resuelto</span>':''}
         </div>
         <div class="comment-text">${esc(c.text)}</div>
@@ -1101,6 +1103,7 @@ function renderEditPanel(id){
           <option value="obs">Observación</option>
           <option value="prop">Propuesta</option>
           <option value="duda">Duda</option>
+          <option value="ref">Referencia</option>
         </select>
         <span class="comment-avatar" style="width:28px;height:28px;font-size:11px" title="${esc(currentUserProfile?.name || currentUser?.email || 'Usuario')}">${(currentUserProfile?.name||currentUser?.email||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?'}</span>
       </div>
