@@ -16,7 +16,7 @@
   --blue-bg:#e8f0fe;--blue:#2c5fbd;--blue-bd:#a8c0f0;
   --warn:#d4a017;--warn-bg:#fef9e7;--warn-bd:#f7dc6f;
   --purple:#7d3c98;--purple-bg:#f4ecf7;--purple-bd:#d2b4de;
-  --pnl-w:760px;
+  --pnl-w:960px;
 }
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 
@@ -84,6 +84,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .art-card-btns{display:flex;gap:3px;margin-left:4px;flex-shrink:0;opacity:0;transition:opacity .15s}
 .art-node:hover .art-card-btns,.art-card.active .art-card-btns{opacity:1}
 .art-card-btn{font-size:10px;padding:2px 6px;border-radius:4px;border:1.5px solid;cursor:pointer;font-weight:700;line-height:1.4;background:transparent;white-space:nowrap}
+.art-card-btn-move{color:#2e8b3d;border-color:#a8d8b0}.art-card-btn-move:hover{background:#e8f8ec}
 .art-card-btn-edit{color:#2c5fbd;border-color:#a8c0f0}.art-card-btn-edit:hover{background:#e8f0fe}
 .art-card-btn-del{color:#c0392b;border-color:#f0a8a8}.art-card-btn-del:hover{background:#fdecea}
 /* Icon-only buttons: text hidden, shown on hover */
@@ -276,6 +277,7 @@ button:hover .btn-lbl{display:inline}
 .ep-editor{width:100%;min-height:260px;font-family:inherit;font-size:16px;line-height:1.7;color:var(--text);border:1.5px solid var(--border);border-radius:8px;padding:12px 14px;outline:none;transition:border-color .15s;background:#fafcff;white-space:pre-wrap;word-break:break-word;overflow-wrap:break-word;cursor:text}
 .ep-editor:focus{border-color:var(--navy2);background:#fff}
 .ep-editor.dirty{border-color:var(--accent);background:var(--warn-bg)}
+.ep-editor ol li::marker{font-weight:700}
 
 /* FORMAT TOOLBAR */
 .fmt-toolbar{position:fixed;z-index:9999;display:none;align-items:center;gap:2px;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:5px 7px;box-shadow:0 6px 24px rgba(0,0,0,.18);pointer-events:auto}
@@ -794,6 +796,8 @@ function renderTree(){
             <span class="art-label">${displayName}</span>
             ${pill}
             <span class="art-card-btns">
+              ${arts.indexOf(art)>0?`<button class="art-card-btn art-card-btn-move" onclick="event.stopPropagation();moveArtUp('${art.id}')">▲<span class="btn-lbl"> Subir</span></button>`:''}
+              ${arts.indexOf(art)<arts.length-1?`<button class="art-card-btn art-card-btn-move" onclick="event.stopPropagation();moveArtDown('${art.id}')">▼<span class="btn-lbl"> Bajar</span></button>`:''}
               <button class="art-card-btn art-card-btn-edit" onclick="event.stopPropagation();openEditArticleModal('${art.id}')">✎<span class="btn-lbl"> Modificar</span></button>
               <button class="art-card-btn art-card-btn-del" onclick="event.stopPropagation();confirmDeleteArticle('${art.id}')">✕<span class="btn-lbl"> Eliminar</span></button>
             </span>
@@ -2433,7 +2437,7 @@ function renderSlide(id){
   document.addEventListener('mousemove', e=>{
     if(!dragging) return;
     const delta = startX - e.clientX;
-    const newW = Math.min(900, Math.max(340, startW + delta));
+    const newW = Math.min(1200, Math.max(340, startW + delta));
     editPnl.style.width = newW+'px';
   });
   document.addEventListener('mouseup', ()=>{
@@ -2818,6 +2822,7 @@ window.addEventListener('load', tryInitAuth);
   <button class="fmt-btn" id="fmtBoldBtn" title="Negrita" onmousedown="event.preventDefault();applyFmt('bold')"><b>B</b></button>
   <div class="fmt-sep"></div>
   <button class="fmt-btn" title="Lista con viñetas" onmousedown="event.preventDefault();applyFmt('bullet')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"/></svg></button>
+  <button class="fmt-btn" title="Lista numerada" onmousedown="event.preventDefault();applyFmt('number')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="20" y2="6"/><line x1="10" y1="12" x2="20" y2="12"/><line x1="10" y1="18" x2="20" y2="18"/><text x="2" y="9" font-size="8" fill="currentColor" stroke="none" font-family="sans-serif">1</text><text x="2" y="15" font-size="8" fill="currentColor" stroke="none" font-family="sans-serif">2</text><text x="2" y="21" font-size="8" fill="currentColor" stroke="none" font-family="sans-serif">3</text></svg></button>
 </div>
 
 <script>
@@ -2860,21 +2865,21 @@ window.addEventListener('load', tryInitAuth);
       document.execCommand('bold', false, null);
       updateBoldState();
       if(window.checkDirty && _fmtEditorId) checkDirty(_fmtEditorId);
-    } else if(type === 'bullet'){
+    } else if(type === 'bullet' || type === 'number'){
       const editorId = _fmtEditorId;
       const range = sel.getRangeAt(0);
       const text = sel.toString();
       if(!text.trim()) return;
       const lines = text.split('\n').filter(l => l.trim());
-      const ul = document.createElement('ul');
-      ul.style.cssText = 'margin:4px 0 4px 20px;padding:0';
+      const list = document.createElement(type === 'bullet' ? 'ul' : 'ol');
+      list.style.cssText = 'margin:4px 0 4px 20px;padding:0';
       lines.forEach(line => {
         const li = document.createElement('li');
         li.textContent = line.trim();
-        ul.appendChild(li);
+        list.appendChild(li);
       });
       range.deleteContents();
-      range.insertNode(ul);
+      range.insertNode(list);
       sel.removeAllRanges();
       hideFmtToolbar();
       if(window.checkDirty && editorId) checkDirty(editorId);
