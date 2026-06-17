@@ -212,7 +212,7 @@ button:hover .btn-lbl{display:inline}
 .ss-inciso-row{display:flex;gap:16px;margin-bottom:24px}
 .ss-inciso-letra{font-family:var(--font-mono);font-weight:700;color:var(--accent);font-size:24px;min-width:30px;flex-shrink:0;padding-top:4px}
 .ss-inciso-nombre{font-family:var(--font-sans);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.4);margin-bottom:6px}
-.ss-inciso-txt{font-family:var(--font-serif);font-size:26px;font-weight:400;line-height:1.8;color:rgba(255,255,255,.78);white-space:pre-wrap}
+.ss-inciso-txt{font-family:var(--font-serif);font-size:26px;font-weight:400;line-height:1.8;color:rgba(255,255,255,.78)}
 .ss-footer{display:flex;align-items:center;justify-content:space-between;padding:14px 56px;flex-shrink:0;border-top:1px solid rgba(255,255,255,.06);background:rgba(0,0,0,.18);position:relative;z-index:1}
 .ss-nav-btn{display:flex;align-items:center;gap:8px;padding:10px 24px;background:linear-gradient(135deg,#4a9a6a 0%,#59B57E 100%);border:1px solid rgba(89,181,126,.4);border-radius:8px;color:#fff;font-size:13px;font-weight:400;cursor:pointer;transition:all .15s;font-family:var(--font-sans)}
 .ss-nav-btn:hover:not(:disabled){background:linear-gradient(135deg,#59B57E 0%,#6ac58e 100%);border-color:rgba(89,181,126,.7)}
@@ -243,6 +243,8 @@ button:hover .btn-lbl{display:inline}
 .comment-btn{font-size:10px;padding:2px 9px;border-radius:5px;border:1px solid;cursor:pointer;font-weight:600;transition:background .12s;font-family:var(--font-sans)}
 .cbtn-resolve{background:var(--green-bg);color:var(--green);border-color:var(--green-bd)}
 .cbtn-del{background:var(--red-bg);color:var(--red);border-color:var(--red-bd)}
+.cbtn-edit{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-bd)}
+.cbtn-ok{background:var(--green-bg);color:var(--green);border-color:var(--green-bd)}
 
 .add-comment-box{border:1.5px dashed #C6C6C6;border-radius:8px;padding:12px 14px;background:#f0f2f8}
 .add-comment-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
@@ -369,18 +371,20 @@ button:hover .btn-lbl{display:inline}
 /* INCISOS */
 .inciso-list{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
 .inciso-item{display:flex;align-items:flex-start;gap:10px;padding:10px 13px;border:1px solid var(--border);border-radius:8px;background:#ffffff}
-.inciso-letra{font-family:var(--font-mono);font-weight:700;color:var(--navy2);font-size:12px;min-width:22px;padding-top:2px}
-.inciso-texto{flex:1;font-family:var(--font-serif);font-size:15px;line-height:1.75;color:var(--text);word-break:break-word}
+.inciso-letra{font-family:var(--font-mono);font-weight:700;color:var(--navy2);font-size:16px;min-width:26px;padding-top:1px}
+.inciso-texto{flex:1;font-family:var(--font-serif);font-size:16px;line-height:1.75;color:var(--text);word-break:break-word}
 .inciso-actions{display:flex;gap:4px;flex-shrink:0}
 .inciso-btn{font-size:10px;padding:2px 8px;border-radius:4px;border:1px solid;cursor:pointer;font-weight:600;line-height:1.4;background:transparent;transition:background .12s;font-family:var(--font-sans)}
 .inciso-btn-edit{color:var(--blue);border-color:#a0aacc}.inciso-btn-edit:hover{background:var(--blue-bg)}
 .inciso-btn-del{color:var(--red);border-color:#e8a8a0}.inciso-btn-del:hover{background:var(--red-bg)}
 .inciso-btn-ok{color:var(--green);border-color:#9dd8b6}.inciso-btn-ok:hover{background:var(--green-bg)}
 .inciso-edit-ta{width:100%;font-family:var(--font-serif);font-size:14px;line-height:1.65;border:1.5px solid var(--navy2);border-radius:6px;padding:6px 10px;outline:none;resize:vertical;min-height:60px}
+.inciso-edit-editor{width:100%;font-family:var(--font-serif);font-size:16px;line-height:1.75;border:1.5px solid var(--navy2);border-radius:6px;padding:10px 12px;outline:none;min-height:120px;background:#fff;white-space:pre-wrap;word-break:break-word;overflow-wrap:break-word;cursor:text;box-sizing:border-box}
+.inciso-edit-editor:focus{border-color:var(--issys-verde);box-shadow:0 0 0 3px rgba(89,181,126,.15)}
 .inciso-add-box{border:1.5px dashed #C6C6C6;border-radius:8px;padding:12px 14px;background:#f0f2f8;margin-top:6px}
 .inciso-add-ta{width:100%;font-family:var(--font-serif);font-size:14px;line-height:1.65;border:1px solid var(--border);border-radius:6px;padding:8px 12px;outline:none;resize:vertical;min-height:60px;background:#fff;box-sizing:border-box}
 .inciso-add-ta:focus{border-color:var(--navy2);box-shadow:0 0 0 3px rgba(70,87,160,.08)}
-.inciso-nombre{font-size:10px;font-weight:700;color:var(--navy2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px;font-family:var(--font-sans)}
+.inciso-nombre{font-size:16px;font-weight:600;color:var(--navy2);margin-bottom:3px;font-family:var(--font-serif)}
 .inciso-node{display:flex;align-items:center;gap:6px;padding:3px 8px 3px 28px;cursor:pointer;border-radius:5px;transition:background .12s}
 .inciso-node:hover{background:rgba(70,87,160,.05)}
 .inciso-node-letra{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--navy2);min-width:18px}
@@ -1108,7 +1112,7 @@ function renderEditPanel(id){
     commHtml += '<div class="comment-list">';
     for(const c of comments){
       const isOwner = isAdmin() || c.author === currentAuthor;
-      commHtml += `<div class="comment-item">
+      commHtml += `<div class="comment-item" data-com-id="${c.id}">
         <div class="comment-meta">
           <span class="comment-avatar" title="${esc(c.author)}">${c.author.trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?'}</span>
           <span class="comment-author">${esc(c.author)}</span>
@@ -1117,6 +1121,7 @@ function renderEditPanel(id){
         </div>
         <div class="comment-text">${esc(c.text)}</div>
         ${isOwner?`<div class="comment-actions">
+          <button class="comment-btn cbtn-edit" onclick="editComment('${id}','${c.id}')">✎ Editar</button>
           <button class="comment-btn cbtn-del" onclick="deleteComment('${id}','${c.id}')">✕ Eliminar</button>
         </div>`:''}
       </div>`;
@@ -1181,7 +1186,7 @@ function renderIncisos(artId){
       <div class="inciso-letra">${letraInciso(i)})</div>
       <div style="flex:1">
         ${inc.nombre ? `<div class="inciso-nombre">${esc(inc.nombre)}</div>` : ''}
-        <div class="inciso-texto" id="incisoTexto_${artId}_${i}" style="white-space:pre-wrap">${esc(inc.texto)}</div>
+        <div class="inciso-texto" id="incisoTexto_${artId}_${i}">${inc.html ? inc.html : esc(inc.texto).replace(/\n/g,'<br>')}</div>
       </div>
       <div class="inciso-actions">
         <button class="inciso-btn inciso-btn-edit" onclick="startEditInciso('${artId}',${i})">✎</button>
@@ -1221,9 +1226,12 @@ function startEditInciso(artId, idx){
   const inc = (state.incisos[artId]||[])[idx];
   if(!inc) return;
   const bodyDiv = item.querySelector('div[style*="flex:1"]') || item;
+  const initHtml = inc.html || parseToEditor(inc.texto);
   bodyDiv.innerHTML = `
     <input class="inciso-edit-ta" id="incisoEditNombre_${artId}_${idx}" value="${esc(inc.nombre||'')}" placeholder="Nombre del inciso…" style="min-height:unset;padding:5px 8px;margin-bottom:5px">
-    <textarea class="inciso-edit-ta" id="incisoEditTa_${artId}_${idx}" style="min-height:80px">${esc(inc.texto)}</textarea>`;
+    <div class="ep-editor inciso-edit-editor" id="incisoEditEditor_${artId}_${idx}" contenteditable="true" spellcheck="false" onmouseup="checkIncisoFmt('incisoEditEditor_${artId}_${idx}')" onkeyup="checkIncisoFmt('incisoEditEditor_${artId}_${idx}')"></div>`;
+  const editorEl = document.getElementById('incisoEditEditor_'+artId+'_'+idx);
+  if(editorEl) editorEl.innerHTML = initHtml;
   item.querySelector('.inciso-actions').innerHTML =
     `<button class="inciso-btn inciso-btn-ok" onclick="saveEditInciso('${artId}',${idx})">✓</button>
      <button class="inciso-btn inciso-btn-del" onclick="renderIncisos('${artId}')">✕</button>`;
@@ -1231,12 +1239,14 @@ function startEditInciso(artId, idx){
 }
 
 function saveEditInciso(artId, idx){
-  const ta     = document.getElementById('incisoEditTa_'+artId+'_'+idx);
+  const edDiv  = document.getElementById('incisoEditEditor_'+artId+'_'+idx);
   const ni     = document.getElementById('incisoEditNombre_'+artId+'_'+idx);
-  if(!ta) return;
-  const txt = ta.value.trim();
+  if(!edDiv) return;
+  const html = edDiv.innerHTML;
+  const txt  = serializeEditor(edDiv).trim();
   if(!txt) return;
   state.incisos[artId][idx].texto  = txt;
+  state.incisos[artId][idx].html   = html;
   state.incisos[artId][idx].nombre = ni ? ni.value.trim() : '';
   saveState();
   renderIncisos(artId);
@@ -1366,6 +1376,31 @@ function reopenComment(artId, comId){
   saveState();
   renderEditPanel(artId);
   updateStats();
+}
+
+function editComment(artId, comId){
+  const item = document.querySelector(`[data-com-id="${comId}"]`);
+  if(!item) return;
+  const c = (state.comments[artId]||[]).find(x=>x.id===comId);
+  if(!c) return;
+  item.querySelector('.comment-text').innerHTML =
+    `<textarea id="comEditTa_${comId}" style="width:100%;font-family:var(--font-serif);font-size:13px;line-height:1.65;border:1.5px solid var(--navy2);border-radius:6px;padding:6px 10px;outline:none;resize:vertical;min-height:64px;box-sizing:border-box">${esc(c.text)}</textarea>`;
+  item.querySelector('.comment-actions').innerHTML =
+    `<button class="comment-btn cbtn-ok" onclick="saveEditComment('${artId}','${comId}')">✓ Guardar</button>
+     <button class="comment-btn cbtn-del" onclick="renderEditPanel('${artId}')">✕ Cancelar</button>`;
+  document.getElementById('comEditTa_'+comId).focus();
+}
+
+function saveEditComment(artId, comId){
+  const ta = document.getElementById('comEditTa_'+comId);
+  if(!ta) return;
+  const txt = ta.value.trim();
+  if(!txt) return;
+  const c = (state.comments[artId]||[]).find(x=>x.id===comId);
+  if(!c) return;
+  c.text = txt;
+  saveState();
+  renderEditPanel(artId);
 }
 
 function deleteComment(artId, comId){
@@ -2469,7 +2504,7 @@ function renderSlide(id){
         <span class="ss-inciso-letra">${letraInciso(i)})</span>
         <div>
           ${inc.nombre?`<div class="ss-inciso-nombre">${esc(inc.nombre)}</div>`:''}
-          <div class="ss-inciso-txt">${parseForSlideshow(inc.texto)}</div>
+          <div class="ss-inciso-txt">${inc.html ? htmlToSlideshow(inc.html) : parseForSlideshow(inc.texto)}</div>
         </div>
       </div>`).join('');
   } else {
@@ -2921,18 +2956,20 @@ window.addEventListener('load', tryInitAuth);
   }
 
   window.applyFmt = function(type){
-    const editor = _fmtEditorId ? document.getElementById('artEditor_' + _fmtEditorId) : null;
+    const editor = _fmtEditorId ? document.getElementById(_fmtEditorId) : null;
     if(!editor) return;
     editor.focus();
     const sel = window.getSelection();
     if(!sel || sel.rangeCount === 0) return;
+    const _artId = _fmtEditorId && _fmtEditorId.startsWith('artEditor_') ? _fmtEditorId.slice('artEditor_'.length) : null;
 
     if(type === 'bold'){
       document.execCommand('bold', false, null);
       updateBoldState();
-      if(window.checkDirty && _fmtEditorId) checkDirty(_fmtEditorId);
+      if(window.checkDirty && _artId) checkDirty(_artId);
     } else if(type === 'bullet' || type === 'number'){
       const editorId = _fmtEditorId;
+      const artIdLocal = _artId;
       const range = sel.getRangeAt(0);
       const text = sel.toString();
       if(!text.trim()) return;
@@ -2948,7 +2985,7 @@ window.addEventListener('load', tryInitAuth);
       range.insertNode(list);
       sel.removeAllRanges();
       hideFmtToolbar();
-      if(window.checkDirty && editorId) checkDirty(editorId);
+      if(window.checkDirty && artIdLocal) checkDirty(artIdLocal);
     }
   };
 
@@ -2970,7 +3007,23 @@ window.addEventListener('load', tryInitAuth);
     if(rect.width === 0 && rect.height === 0){ hideFmtToolbar(); return; }
     // force layout so offsetHeight is correct
     toolbar.classList.add('visible');
-    showFmtToolbar(rect, id);
+    showFmtToolbar(rect, 'artEditor_' + id);
+  };
+
+  window.checkIncisoFmt = function(fullId){
+    if(window.isLector && window.isLector()){ hideFmtToolbar(); return; }
+    const sel = window.getSelection();
+    const hasText = sel && sel.rangeCount > 0 && sel.toString().trim().length > 0;
+    if(!hasText){ hideFmtToolbar(); return; }
+    const editor = document.getElementById(fullId);
+    if(!editor) return;
+    const anchorNode = sel.anchorNode;
+    if(!editor.contains(anchorNode)) return;
+    const range = sel.getRangeAt(0);
+    const rect = range.getBoundingClientRect();
+    if(rect.width === 0 && rect.height === 0){ hideFmtToolbar(); return; }
+    toolbar.classList.add('visible');
+    showFmtToolbar(rect, fullId);
   };
 
   // Hide toolbar when clicking outside
