@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Editor EER — ISSyS · Chubut</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Encode+Sans+Condensed:wght@300;600;900&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
@@ -315,6 +316,7 @@ button:hover .btn-lbl{display:inline}
 .ep-editor{width:100%;min-height:260px;font-family:var(--font-serif);font-size:16px;line-height:1.8;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:14px 16px;outline:none;transition:border-color .15s,box-shadow .15s;background:#ffffff;white-space:pre-wrap;word-break:break-word;overflow-wrap:break-word;cursor:text}
 .ep-editor:focus{border-color:var(--navy2);background:#fff;box-shadow:0 0 0 3px rgba(70,87,160,.08)}
 .ep-editor.dirty{border-color:var(--accent);background:var(--warn-bg)}
+.ep-editor b,.ep-editor strong,.inciso-edit-editor b,.inciso-edit-editor strong{font-weight:700}
 .ep-editor ol li::marker{font-weight:700}
 
 /* FORMAT TOOLBAR */
@@ -373,6 +375,7 @@ button:hover .btn-lbl{display:inline}
 .inciso-item{display:flex;align-items:flex-start;gap:10px;padding:10px 13px;border:1px solid var(--border);border-radius:8px;background:#ffffff}
 .inciso-letra{font-family:var(--font-mono);font-weight:700;color:var(--navy2);font-size:16px;min-width:26px;padding-top:1px}
 .inciso-texto{flex:1;font-family:var(--font-serif);font-size:16px;line-height:1.75;color:var(--text);word-break:break-word}
+.inciso-texto b,.inciso-texto strong{font-weight:700}
 .inciso-actions{display:flex;gap:4px;flex-shrink:0}
 .inciso-btn{font-size:10px;padding:2px 8px;border-radius:4px;border:1px solid;cursor:pointer;font-weight:600;line-height:1.4;background:transparent;transition:background .12s;font-family:var(--font-sans)}
 .inciso-btn-edit{color:var(--blue);border-color:#a0aacc}.inciso-btn-edit:hover{background:var(--blue-bg)}
@@ -491,6 +494,7 @@ body[data-role="lector"] .art-card-btns{display:none!important}
       </div>
     </div>
     <button class="hdr-btn" id="ghBtn" data-tooltip="Guardar en GitHub + Firebase" onclick="saveToGitHub()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg></button>
+    <button class="hdr-btn" data-tooltip="Mapa de Conceptos EER" onclick="window.location.href='eer-graph.html'"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><line x1="8.5" y1="7.5" x2="15.5" y2="16"/><line x1="8.5" y1="6" x2="15.5" y2="6"/><line x1="9.5" y1="16" x2="16.5" y2="7.5"/></svg></button>
     <button class="hdr-btn accent" data-tooltip="Imprimir" onclick="openPrintModal()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>
     <div class="hdr-sep"></div>
     <div class="hdr-dropdown" id="userDropdown">
@@ -2930,6 +2934,7 @@ window.addEventListener('load', tryInitAuth);
 (function(){
   const toolbar = document.getElementById('fmtToolbar');
   let _fmtEditorId = null;
+  let _fmtRange = null;
 
   function isBoldActive(){
     return document.queryCommandState('bold');
@@ -2940,8 +2945,9 @@ window.addEventListener('load', tryInitAuth);
     if(btn) btn.classList.toggle('active', isBoldActive());
   }
 
-  function showFmtToolbar(anchorRect, editorId){
+  function showFmtToolbar(anchorRect, editorId, range){
     _fmtEditorId = editorId;
+    _fmtRange = range ? range.cloneRange() : null;
     updateBoldState();
     const top = anchorRect.top + window.scrollY - toolbar.offsetHeight - 10;
     const left = anchorRect.left + anchorRect.width / 2 + window.scrollX - toolbar.offsetWidth / 2;
@@ -2953,6 +2959,7 @@ window.addEventListener('load', tryInitAuth);
   function hideFmtToolbar(){
     toolbar.classList.remove('visible');
     _fmtEditorId = null;
+    _fmtRange = null;
   }
 
   window.applyFmt = function(type){
@@ -2960,7 +2967,14 @@ window.addEventListener('load', tryInitAuth);
     if(!editor) return;
     editor.focus();
     const sel = window.getSelection();
-    if(!sel || sel.rangeCount === 0) return;
+    if(!sel) return;
+    // La selección "viva" puede haberse perdido al mover el mouse hacia la
+    // toolbar; restauramos el range capturado al mostrar el botón flotante.
+    if(_fmtRange){
+      sel.removeAllRanges();
+      sel.addRange(_fmtRange.cloneRange());
+    }
+    if(sel.rangeCount === 0) return;
     const _artId = _fmtEditorId && _fmtEditorId.startsWith('artEditor_') ? _fmtEditorId.slice('artEditor_'.length) : null;
 
     if(type === 'bold'){
@@ -3007,7 +3021,7 @@ window.addEventListener('load', tryInitAuth);
     if(rect.width === 0 && rect.height === 0){ hideFmtToolbar(); return; }
     // force layout so offsetHeight is correct
     toolbar.classList.add('visible');
-    showFmtToolbar(rect, 'artEditor_' + id);
+    showFmtToolbar(rect, 'artEditor_' + id, range);
   };
 
   window.checkIncisoFmt = function(fullId){
@@ -3023,7 +3037,7 @@ window.addEventListener('load', tryInitAuth);
     const rect = range.getBoundingClientRect();
     if(rect.width === 0 && rect.height === 0){ hideFmtToolbar(); return; }
     toolbar.classList.add('visible');
-    showFmtToolbar(rect, fullId);
+    showFmtToolbar(rect, fullId, range);
   };
 
   // Hide toolbar when clicking outside
