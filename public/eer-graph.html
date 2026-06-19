@@ -77,12 +77,16 @@ body{font-family:var(--font-sans);font-weight:300;background:var(--bg);color:var
 .gc-btn::after{content:attr(data-tooltip);position:absolute;right:calc(100% + 8px);top:50%;transform:translateY(-50%);background:var(--navy);color:#fff;padding:4px 9px;border-radius:6px;font-size:11px;font-weight:600;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s}
 .gc-btn:hover::after{opacity:1}
 
+.node{transition:opacity .2s}
 .node circle{cursor:pointer;stroke:#fff;stroke-width:2px}
 .node text{pointer-events:none;user-select:none;font-size:10.5px;font-weight:600;fill:var(--text)}
 .node.selected circle{stroke:var(--navy);stroke-width:3px}
 .node.related circle{stroke:#E8821E;stroke-width:2.5px;stroke-opacity:.85}
 .node.linking circle{stroke:var(--accent);stroke-width:3px;stroke-dasharray:3 2}
+.node.dim{opacity:.15}
 
+.edge{transition:opacity .2s}
+.edge.dim{opacity:.08}
 .edge-line{stroke:var(--navy);stroke-opacity:.45;stroke-width:1.8px;cursor:pointer}
 .edge-line:hover{stroke:#D32F2F;stroke-opacity:.9}
 .edge-label{font-size:9.5px;fill:var(--muted);pointer-events:none;user-select:none}
@@ -133,6 +137,9 @@ body{font-family:var(--font-sans);font-weight:300;background:var(--bg);color:var
 
 /* AUTH OVERLAY */
 .auth-overlay{position:fixed;inset:0;background:linear-gradient(145deg,var(--navy) 0%,#3a4a88 50%,#2d3a70 100%);z-index:9999;display:flex;align-items:center;justify-content:center}
+.boot-loader{position:fixed;inset:0;background:linear-gradient(145deg,var(--navy) 0%,#3a4a88 50%,#2d3a70 100%);z-index:9998;display:flex;align-items:center;justify-content:center}
+.boot-spinner{width:38px;height:38px;border:4px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:boot-spin .8s linear infinite}
+@keyframes boot-spin{to{transform:rotate(360deg)}}
 .auth-box{background:#fff;border-radius:16px;width:380px;max-width:95vw;box-shadow:0 20px 60px rgba(70,87,160,.5);overflow:hidden}
 .auth-header{background:var(--navy);padding:32px 40px 24px;text-align:center;border-bottom:2px solid rgba(89,181,126,.25)}
 .auth-header img{width:54px}
@@ -204,9 +211,18 @@ body[data-role="revisor"] .role-edit-only{display:none!important}
       <radialGradient id="grad-persona" cx="35%" cy="32%" r="68%">
         <stop offset="0%" stop-color="#fdf8ed"/><stop offset="100%" stop-color="#b88a00"/>
       </radialGradient>
+      <radialGradient id="grad-instrumento" cx="35%" cy="32%" r="68%">
+        <stop offset="0%" stop-color="#e8f5f4"/><stop offset="100%" stop-color="#2d8f8f"/>
+      </radialGradient>
+      <radialGradient id="grad-entidad_colectiva" cx="35%" cy="32%" r="68%">
+        <stop offset="0%" stop-color="#fdf1ea"/><stop offset="100%" stop-color="#c2410c"/>
+      </radialGradient>
       <radialGradient id="grad-otro" cx="35%" cy="32%" r="68%">
         <stop offset="0%" stop-color="#f2f2f2"/><stop offset="100%" stop-color="#878787"/>
       </radialGradient>
+      <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--navy)" fill-opacity=".7"/>
+      </marker>
     </defs>
     <g id="graphRoot">
       <g id="edgeLayer"></g>
@@ -244,6 +260,7 @@ body[data-role="revisor"] .role-edit-only{display:none!important}
     </div>
     <div class="detail-body" id="detailBody">
       <div id="detailDesc"></div>
+      <div id="detailArticleLinks"></div>
       <div class="rel-sec-title">Relaciones</div>
       <div id="relList"></div>
       <button class="detail-btn-blue role-edit-only" onclick="openLinkModal()">+ Vincular con otro concepto</button>
@@ -274,6 +291,8 @@ body[data-role="revisor"] .role-edit-only{display:none!important}
         <option value="organismo">Organismo</option>
         <option value="concepto">Concepto</option>
         <option value="persona">Persona</option>
+        <option value="instrumento">Instrumento</option>
+        <option value="entidad_colectiva">Entidad Colectiva</option>
         <option value="otro">Otro</option>
       </select>
     </div>
@@ -300,6 +319,11 @@ body[data-role="revisor"] .role-edit-only{display:none!important}
       <label class="modal-label">Etiqueta de la relación</label>
       <input class="modal-input" id="linkLabel" placeholder="Ej: regula, complementa, deriva de…" maxlength="60">
     </div>
+    <div class="modal-field">
+      <label class="modal-label">Artículo asociado (opcional)</label>
+      <input class="modal-input" id="linkArticle" list="linkArticleDatalist" placeholder="Buscar artículo del Estatuto…" autocomplete="off">
+      <datalist id="linkArticleDatalist"></datalist>
+    </div>
     <div class="modal-footer">
       <button class="modal-btn-cancel" onclick="closeLinkModal()">Cancelar</button>
       <button class="modal-btn-confirm" id="linkModalConfirmBtn" onclick="saveLinkModal()">Vincular</button>
@@ -322,6 +346,8 @@ body[data-role="revisor"] .role-edit-only{display:none!important}
         <option value="organismo">Organismo</option>
         <option value="concepto" selected>Concepto</option>
         <option value="persona">Persona</option>
+        <option value="instrumento">Instrumento</option>
+        <option value="entidad_colectiva">Entidad Colectiva</option>
         <option value="otro">Otro</option>
       </select>
     </div>
@@ -332,8 +358,11 @@ body[data-role="revisor"] .role-edit-only{display:none!important}
   </div>
 </div>
 
+<!-- BOOT LOADER — visible mientras Firebase verifica si ya hay sesión activa, evita el parpadeo del formulario de login al navegar entre páginas -->
+<div id="authBootLoader" class="boot-loader"><div class="boot-spinner"></div></div>
+
 <!-- AUTH OVERLAY — bloquea la app hasta que el usuario inicie sesión -->
-<div id="authOverlay" class="auth-overlay">
+<div id="authOverlay" class="auth-overlay" style="display:none">
   <div class="auth-box">
     <div class="auth-header">
       <img src="logo128x128_blanco.png" alt="ISSyS">
@@ -403,9 +432,11 @@ const CAT_COLORS = {
   organismo: { base:'#6a309a', bg:'#f5eeff', grad:'url(#grad-organismo)' },
   concepto:  { base:'#59B57E', bg:'#edf8f2', grad:'url(#grad-concepto)' },
   persona:   { base:'#b88a00', bg:'#fdf8ed', grad:'url(#grad-persona)' },
+  instrumento: { base:'#2d8f8f', bg:'#e8f5f4', grad:'url(#grad-instrumento)' },
+  entidad_colectiva: { base:'#c2410c', bg:'#fdf1ea', grad:'url(#grad-entidad_colectiva)' },
   otro:      { base:'#878787', bg:'#f2f2f2', grad:'url(#grad-otro)' }
 };
-const CAT_LABELS = { normativa:'Normativa', organismo:'Organismo', concepto:'Concepto', persona:'Persona', otro:'Otro' };
+const CAT_LABELS = { normativa:'Normativa', organismo:'Organismo', concepto:'Concepto', persona:'Persona', instrumento:'Instrumento', entidad_colectiva:'Entidad Colectiva', otro:'Otro' };
 
 const SEED_CONCEPTS = [
   { label: 'Ley 3339', description: 'Ley Orgánica del ISSyS', category: 'normativa' },
@@ -424,6 +455,8 @@ const SEED_CONCEPTS = [
 
 let concepts = loadConcepts();
 let links = loadLinks();
+let articleLinksByConcept = {}; // conceptId -> [{ artId, label }] — vínculos creados desde el editor
+let articleCatalog = []; // [{ id, label }] — catálogo completo de artículos, publicado por el editor
 let selectedId = null;
 let svg, g, sim, zoomBehavior;
 let currentUser = null;
@@ -480,12 +513,59 @@ async function loadGraphFromFirebase() {
     }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(concepts));
     localStorage.setItem(LINKS_KEY, JSON.stringify(links));
+    await loadArticleLinksFromEditor();
     renderGraph();
     showToast('☁️ Datos cargados desde Firebase');
+    const qpNode = new URLSearchParams(location.search).get('node');
+    if (qpNode) {
+      const c = concepts.find(c => c.id === qpNode);
+      if (c) setTimeout(() => openDetail(c), 300);
+    }
   } catch(e) {
     console.warn('Firebase: no se pudo cargar el grafo, usando datos locales:', e.message);
     showToast('⚠️ No se pudo conectar a Firebase — usando datos locales');
   }
+}
+
+// ─── VÍNCULOS CON ARTÍCULOS DEL ESTATUTO (editor) ──────────────────────────
+// El editor (estatuto_editor.html) guarda en `eerEditor/state.graphLinks` el
+// vínculo artículo → nodos del grafo, y publica en `eerEditor/state.articleCatalog`
+// un catálogo liviano { id, label } de todos los artículos — lo leemos en modo
+// solo-lectura para mostrar qué artículo referencia a cada nodo y para poder
+// elegir un artículo cualquiera al asociarlo a una relación.
+async function loadArticleLinksFromEditor() {
+  articleLinksByConcept = {};
+  articleCatalog = [];
+  if (!window._fbDb) return;
+  try {
+    const snap = await window._fbGetDoc(window._fbDoc(window._fbDb, 'eerEditor', 'state'));
+    if (snap.exists()) {
+      const data = snap.data();
+      const graphLinks = data.graphLinks || {};
+      Object.entries(graphLinks).forEach(([artId, info]) => {
+        (info.conceptIds || []).forEach(cid => {
+          if (!articleLinksByConcept[cid]) articleLinksByConcept[cid] = [];
+          articleLinksByConcept[cid].push({ artId, label: info.label || artId });
+        });
+      });
+      if (Array.isArray(data.articleCatalog)) articleCatalog = data.articleCatalog;
+    }
+  } catch(e) {
+    console.warn('No se pudieron cargar los vínculos de artículos del editor:', e.message);
+  }
+}
+function populateLinkArticleDatalist() {
+  document.getElementById('linkArticleDatalist').innerHTML =
+    articleCatalog.map(a => `<option value="${escapeHtml(a.label)}">`).join('');
+}
+function renderArticleLinks(conceptId) {
+  const box = document.getElementById('detailArticleLinks');
+  const arts = articleLinksByConcept[conceptId] || [];
+  if (!arts.length) { box.innerHTML = ''; return; }
+  box.innerHTML = `<div class="rel-sec-title">Artículo vinculado</div>` + arts.map(a =>
+    `<div class="rel-item"><span class="rel-item-label">📄 ${escapeHtml(a.label)}</span>
+      <button class="rel-item-edit" title="Abrir en el editor" onclick="window.open('estatuto_editor.html?art=${a.artId}','_blank')">↗</button>
+    </div>`).join('');
 }
 
 // ─── MODAL: AGREGAR / EDITAR CONCEPTO ───────────────────────────────────────
@@ -546,6 +626,7 @@ function openDetail(c) {
   document.getElementById('detailTitle').textContent = c.label;
   document.getElementById('detailDesc').textContent = c.description || '(sin descripción)';
   document.getElementById('detailPnl').classList.add('open');
+  renderArticleLinks(c.id);
   renderRelList();
   updateSelectionHighlight();
 }
@@ -572,13 +653,18 @@ function renderRelList() {
   const rel = links.filter(l => l.source === selectedId || l.target === selectedId);
   if (!rel.length) { list.innerHTML = '<div class="rel-empty">Sin relaciones todavía.</div>'; return; }
   list.innerHTML = rel.map(l => {
-    const otherId = l.source === selectedId ? l.target : l.source;
+    const isSource = l.source === selectedId;
+    const otherId = isSource ? l.target : l.source;
     const other = concepts.find(c => c.id === otherId);
-    const lbl = (other?.label || '?') + (l.label ? ` (${l.label})` : '');
+    const arrow = isSource ? '→' : '←';
+    const lbl = arrow + ' ' + (other?.label || '?') + (l.label ? ` (${l.label})` : '');
+    const artChip = l.articleId
+      ? `<button class="rel-item-edit" title="Abrir ${escapeHtml(l.articleLabel||'')} en el editor" onclick="window.open('estatuto_editor.html?art=${l.articleId}','_blank')">📄</button>`
+      : '';
     const actions = canEdit()
       ? `<button class="rel-item-edit" onclick="openEditLinkModal('${l.id}')" title="Editar etiqueta">✎</button><button class="rel-item-del" onclick="deleteLink('${l.id}')" title="Eliminar">✕</button>`
       : '';
-    return `<div class="rel-item"><span class="rel-item-label">${escapeHtml(lbl)}</span>${actions}</div>`;
+    return `<div class="rel-item"><span class="rel-item-label">${escapeHtml(lbl)}</span>${artChip}${actions}</div>`;
   }).join('');
 }
 function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
@@ -595,6 +681,8 @@ function openLinkModal() {
   document.getElementById('linkTargetField').style.display = '';
   document.getElementById('linkTargetReadonly').style.display = 'none';
   document.getElementById('linkLabel').value = '';
+  document.getElementById('linkArticle').value = '';
+  populateLinkArticleDatalist();
   document.getElementById('linkModal').classList.add('open');
 }
 function openEditLinkModal(linkId) {
@@ -608,19 +696,35 @@ function openEditLinkModal(linkId) {
   document.getElementById('linkModalConfirmBtn').textContent = 'Guardar';
   document.getElementById('linkTargetField').style.display = 'none';
   document.getElementById('linkTargetReadonly').style.display = '';
-  document.getElementById('linkTargetReadonlyText').textContent = other?.label || '?';
+  const isSource = l.source === selectedId;
+  document.getElementById('linkTargetReadonlyText').textContent = (isSource ? '→ ' : '← ') + (other?.label || '?');
   document.getElementById('linkLabel').value = l.label || '';
+  document.getElementById('linkArticle').value = l.articleLabel || '';
+  populateLinkArticleDatalist();
   document.getElementById('linkModal').classList.add('open');
   setTimeout(() => document.getElementById('linkLabel').focus(), 50);
 }
 function closeLinkModal() { document.getElementById('linkModal').classList.remove('open'); _editingLinkId = null; }
+// Resuelve el texto tipeado/elegido en el campo "Artículo asociado" contra el
+// catálogo cargado desde el editor. Devuelve null si el campo está vacío, o
+// false si el texto no coincide con ningún artículo del catálogo.
+function _resolveLinkArticle() {
+  const input = document.getElementById('linkArticle').value.trim();
+  if (!input) return null;
+  const match = articleCatalog.find(a => a.label === input);
+  return match || false;
+}
 function saveLinkModal() {
   if (!canEdit()) { showToast('No tenés permiso para editar el grafo'); return; }
   const label = document.getElementById('linkLabel').value.trim();
+  const articleMatch = _resolveLinkArticle();
+  if (articleMatch === false) { showToast('⚠️ Seleccioná un artículo de la lista (o dejá el campo vacío)'); return; }
   if (_editingLinkId) {
     const l = links.find(l => l.id === _editingLinkId);
     if (!l) { closeLinkModal(); return; }
     l.label = label;
+    l.articleId = articleMatch ? articleMatch.id : null;
+    l.articleLabel = articleMatch ? articleMatch.label : '';
     persistLinks();
     closeLinkModal();
     renderRelList();
@@ -630,10 +734,16 @@ function saveLinkModal() {
   }
   const target = document.getElementById('linkTarget').value;
   if (!target) return;
-  const exists = links.some(l =>
-    (l.source === selectedId && l.target === target) || (l.source === target && l.target === selectedId));
-  if (exists) { showToast('Ya existe una relación entre estos conceptos'); return; }
-  links.push({ id: crypto.randomUUID(), source: selectedId, target, label });
+  // Las relaciones son direccionales (source → target): se permite que también
+  // exista la inversa (target → source) como una relación distinta, solo se
+  // bloquea crear dos veces la misma dirección exacta.
+  const exists = links.some(l => l.source === selectedId && l.target === target);
+  if (exists) { showToast('Ya existe esa relación en esta dirección'); return; }
+  links.push({
+    id: crypto.randomUUID(), source: selectedId, target, label,
+    articleId: articleMatch ? articleMatch.id : null,
+    articleLabel: articleMatch ? articleMatch.label : ''
+  });
   persistLinks();
   closeLinkModal();
   renderRelList();
@@ -779,6 +889,8 @@ function renderGraph() {
       .on('zoom', ev => g.attr('transform', ev.transform));
     svg.call(zoomBehavior);
   }
+  // Click en un área vacía del canvas (no sobre un nodo) deselecciona el nodo actual
+  svg.on('click', ev => { if (ev.target === svgEl) closeDetail(); });
 
   const nodes = concepts.map(c => {
     const n = { ...c, r: nodeRadius(c.label) };
@@ -804,11 +916,11 @@ function renderGraph() {
   const edgeSel = edgeLayer.selectAll('g.edge').data(edges, d => d.id);
   edgeSel.exit().remove();
   const edgeEnter = edgeSel.enter().append('g').attr('class', 'edge');
-  edgeEnter.append('line').attr('class', 'edge-line');
+  edgeEnter.append('line').attr('class', 'edge-line').attr('marker-end', 'url(#arrow)');
   edgeEnter.append('text').attr('class', 'edge-label').attr('text-anchor', 'middle');
 
   const allEdgeSel = edgeLayer.selectAll('g.edge');
-  allEdgeSel.select('text').text(d => d.label || '');
+  allEdgeSel.select('text').text(d => (d.label || '') + (d.articleId ? ' 📄' : ''));
   allEdgeSel.select('line').on('click', (ev, d) => {
     if (canEdit() && confirm('¿Eliminar esta relación?')) deleteLink(d.id);
   });
@@ -831,7 +943,10 @@ function renderGraph() {
       sel.append('tspan').attr('x', 0).attr('dy', i === 0 ? startDy : lineHeight).text(line);
     });
   });
-  allNodeSel.on('click', (ev, d) => openDetail(d));
+  allNodeSel.on('click', (ev, d) => {
+    ev.stopPropagation();
+    if (d.id === selectedId) closeDetail(); else openDetail(d);
+  });
   allNodeSel.call(d3.drag()
     .on('start', (ev, d) => { d.fx = d.x; d.fy = d.y; })
     .on('drag', (ev, d) => { d.fx = ev.x; d.fy = ev.y; sim.alpha(0.3).restart(); })
@@ -842,7 +957,16 @@ function renderGraph() {
     nodeLayer.selectAll('g.node').attr('transform', d => `translate(${d.x},${d.y})`);
     edgeLayer.selectAll('g.edge').select('line')
       .attr('x1', d => d.source.x).attr('y1', d => d.source.y)
-      .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+      .attr('x2', d => {
+        const dx = d.target.x - d.source.x, dy = d.target.y - d.source.y;
+        const len = Math.hypot(dx, dy) || 1;
+        return d.target.x - (dx / len) * (d.target.r + 4);
+      })
+      .attr('y2', d => {
+        const dx = d.target.x - d.source.x, dy = d.target.y - d.source.y;
+        const len = Math.hypot(dx, dy) || 1;
+        return d.target.y - (dy / len) * (d.target.r + 4);
+      });
     edgeLayer.selectAll('g.edge').select('text')
       .attr('x', d => (d.source.x + d.target.x) / 2)
       .attr('y', d => (d.source.y + d.target.y) / 2 - 4);
@@ -862,7 +986,10 @@ function updateSelectionHighlight() {
   }
   d3.select('#nodeLayer').selectAll('g.node')
     .classed('selected', d => d.id === selectedId)
-    .classed('related', d => relatedIds.has(d.id));
+    .classed('related', d => relatedIds.has(d.id))
+    .classed('dim', d => !!selectedId && d.id !== selectedId && !relatedIds.has(d.id));
+  d3.select('#edgeLayer').selectAll('g.edge')
+    .classed('dim', d => !!selectedId && d.source.id !== selectedId && d.target.id !== selectedId);
 }
 
 function centerGraph() {
@@ -895,6 +1022,8 @@ function canEdit() { return currentUserProfile && ['admin','editor'].includes(cu
 
 function initAuth() {
   window._fbOnAuthChanged(async user => {
+    const bootLoader = document.getElementById('authBootLoader');
+    if (bootLoader) bootLoader.style.display = 'none';
     if (user) {
       currentUser = user;
       try {
