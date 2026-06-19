@@ -448,6 +448,7 @@ window.initAuth();
 // ─── ESTADO (localStorage como caché + Firestore como fuente compartida) ──
 const STORAGE_KEY = 'eerGraphTestConcepts';
 const LINKS_KEY   = 'eerGraphTestLinks';
+const POSITIONS_KEY = 'eerGraphPositions';
 // Paleta pastel ISSyS — { base: color sólido para texto/badge, bg: tono claro, grad: gradiente SVG del nodo }
 const CAT_COLORS = {
   normativa: { base:'#4657A0', bg:'#ebedf8', grad:'url(#grad-normativa)' },
@@ -485,7 +486,7 @@ let currentUser = null;
 let currentUserProfile = null;
 let _editingConceptId = null;
 let _editingLinkId = null;
-let _nodePos = {}; // id -> {x, y, fixed} — preserva el layout entre renders
+let _nodePos = loadPositions(); // id -> {x, y, fixed} — preserva el layout entre renders y entre sesiones
 
 function loadConcepts() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
@@ -503,6 +504,17 @@ function persistLinks() {
   localStorage.setItem(LINKS_KEY, JSON.stringify(links));
   pushLinksToFirebase();
 }
+function loadPositions() {
+  try { return JSON.parse(localStorage.getItem(POSITIONS_KEY)) || {}; }
+  catch(e) { return {}; }
+}
+// Persiste el layout (posiciones de los nodos) para que el grafo no vuelva a
+// "desordenarse" cada vez que se reingresa — sin esto, cada carga de página
+// recalculaba la disposición desde cero y el resultado variaba visualmente.
+function persistPositions() {
+  localStorage.setItem(POSITIONS_KEY, JSON.stringify(_nodePos));
+  pushPositionsToFirebase();
+}
 
 // ─── FIREBASE — sync de conceptos y relaciones (colección eerGraph) ──────
 async function pushConceptsToFirebase() {
@@ -517,12 +529,19 @@ async function pushLinksToFirebase() {
     await window._fbSetDoc(window._fbDoc(window._fbDb, 'eerGraph', 'links'), { items: links, _ts: Date.now() });
   } catch(e) { console.warn('Firebase: no se pudieron guardar las relaciones:', e.message); }
 }
+async function pushPositionsToFirebase() {
+  if (!window._fbDb || !canEdit()) return;
+  try {
+    await window._fbSetDoc(window._fbDoc(window._fbDb, 'eerGraph', 'positions'), { items: _nodePos, _ts: Date.now() });
+  } catch(e) { console.warn('Firebase: no se pudieron guardar las posiciones:', e.message); }
+}
 async function loadGraphFromFirebase() {
   if (!window._fbDb) return;
   try {
-    const [conceptsSnap, linksSnap] = await Promise.all([
+    const [conceptsSnap, linksSnap, positionsSnap] = await Promise.all([
       window._fbGetDoc(window._fbDoc(window._fbDb, 'eerGraph', 'concepts')),
-      window._fbGetDoc(window._fbDoc(window._fbDb, 'eerGraph', 'links'))
+      window._fbGetDoc(window._fbDoc(window._fbDb, 'eerGraph', 'links')),
+      window._fbGetDoc(window._fbDoc(window._fbDb, 'eerGraph', 'positions'))
     ]);
     if (conceptsSnap.exists() && Array.isArray(conceptsSnap.data().items)) {
       concepts = conceptsSnap.data().items;
@@ -533,8 +552,12 @@ async function loadGraphFromFirebase() {
     if (linksSnap.exists() && Array.isArray(linksSnap.data().items)) {
       links = linksSnap.data().items;
     }
+    if (positionsSnap.exists() && positionsSnap.data().items) {
+      _nodePos = { ..._nodePos, ...positionsSnap.data().items };
+    }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(concepts));
     localStorage.setItem(LINKS_KEY, JSON.stringify(links));
+    localStorage.setItem(POSITIONS_KEY, JSON.stringify(_nodePos));
     await loadArticleLinksFromEditor();
     renderGraph();
     showToast('☁️ Datos cargados desde Firebase');
@@ -955,11 +978,15 @@ function renderGraph() {
 
   if (sim) sim.stop();
   sim = d3.forceSimulation(nodes)
-    .force('charge', d3.forceManyBody().strength(-230))
+    .force('charge', d3.forceManyBody().strength(-420))
     .force('center', d3.forceCenter(W / 2, H / 2))
-    .force('collide', d3.forceCollide(d => d.r + 22))
-    .force('link', d3.forceLink(edges).id(d => d.id).distance(165).strength(0.6))
-    .on('tick', ticked);
+    .force('x', d3.forceX(W / 2).strength(0.04))
+    .force('y', d3.forceY(H / 2).strength(0.04))
+    .force('collide', d3.forceCollide(d => d.r + 30))
+    .force('link', d3.forceLink(edges).id(d => d.id).distance(190).strength(0.5))
+    .alphaDecay(0.018)
+    .on('tick', ticked)
+    .on('end', () => persistPositions());
 
   const edgeSel = edgeLayer.selectAll('g.edge').data(edges, d => d.id);
   edgeSel.exit().remove();
@@ -998,7 +1025,7 @@ function renderGraph() {
   allNodeSel.call(d3.drag()
     .on('start', (ev, d) => { d.fx = d.x; d.fy = d.y; })
     .on('drag', (ev, d) => { d.fx = ev.x; d.fy = ev.y; sim.alpha(0.3).restart(); })
-    .on('end', (ev, d) => { _nodePos[d.id] = { x: d.fx, y: d.fy, fixed: true }; }));
+    .on('end', (ev, d) => { _nodePos[d.id] = { x: d.fx, y: d.fy, fixed: true }; persistPositions(); }));
 
   function ticked() {
     nodes.forEach(d => { _nodePos[d.id] = { x: d.x, y: d.y, fixed: d.fx != null }; });
