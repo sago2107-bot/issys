@@ -309,7 +309,29 @@ body[data-role="revisor"] .role-edit-only{display:none!important}
     <div class="modal-title" id="linkModalTitle">Vincular conceptos</div>
     <div class="modal-field" id="linkTargetField">
       <label class="modal-label">Concepto destino *</label>
-      <select class="modal-select" id="linkTarget"></select>
+      <select class="modal-select" id="linkTarget" onchange="toggleLinkNewConceptFields()"></select>
+    </div>
+    <div id="linkNewConceptFields" style="display:none">
+      <div class="modal-field">
+        <label class="modal-label">Nombre del nuevo concepto *</label>
+        <input class="modal-input" id="linkNewLabel" placeholder="Ej: Junta de Disciplina" maxlength="60">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Descripción</label>
+        <input class="modal-input" id="linkNewDesc" placeholder="Descripción breve…" maxlength="120">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Categoría</label>
+        <select class="modal-select" id="linkNewCat">
+          <option value="normativa">Normativa</option>
+          <option value="organismo">Organismo</option>
+          <option value="concepto" selected>Concepto</option>
+          <option value="persona">Persona</option>
+          <option value="instrumento">Instrumento</option>
+          <option value="entidad_colectiva">Entidad Colectiva</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
     </div>
     <div class="modal-field" id="linkTargetReadonly" style="display:none">
       <label class="modal-label">Concepto vinculado</label>
@@ -672,9 +694,10 @@ function escapeHtml(s) { const d = document.createElement('div'); d.textContent 
 function openLinkModal() {
   if (!selectedId || !canEdit()) return;
   const sel = document.getElementById('linkTarget');
-  sel.innerHTML = concepts.filter(c => c.id !== selectedId)
+  const existing = concepts.filter(c => c.id !== selectedId)
     .map(c => `<option value="${c.id}">${escapeHtml(c.label)}</option>`).join('');
-  if (!sel.options.length) { showToast('Necesitás al menos otro concepto para vincular'); return; }
+  sel.innerHTML = `<option value="__new__">+ Crear nuevo concepto…</option>` + existing;
+  sel.selectedIndex = existing ? 1 : 0; // por defecto, vincular a uno existente si hay
   _editingLinkId = null;
   document.getElementById('linkModalTitle').textContent = 'Vincular conceptos';
   document.getElementById('linkModalConfirmBtn').textContent = 'Vincular';
@@ -682,8 +705,17 @@ function openLinkModal() {
   document.getElementById('linkTargetReadonly').style.display = 'none';
   document.getElementById('linkLabel').value = '';
   document.getElementById('linkArticle').value = '';
+  document.getElementById('linkNewLabel').value = '';
+  document.getElementById('linkNewDesc').value = '';
+  document.getElementById('linkNewCat').value = 'concepto';
   populateLinkArticleDatalist();
+  toggleLinkNewConceptFields();
   document.getElementById('linkModal').classList.add('open');
+}
+function toggleLinkNewConceptFields() {
+  const isNew = document.getElementById('linkTarget').value === '__new__';
+  document.getElementById('linkNewConceptFields').style.display = isNew ? '' : 'none';
+  if (isNew) setTimeout(() => document.getElementById('linkNewLabel')?.focus(), 50);
 }
 function openEditLinkModal(linkId) {
   if (!canEdit()) { showToast('No tenés permiso para editar el grafo'); return; }
@@ -695,6 +727,7 @@ function openEditLinkModal(linkId) {
   document.getElementById('linkModalTitle').textContent = 'Editar relación';
   document.getElementById('linkModalConfirmBtn').textContent = 'Guardar';
   document.getElementById('linkTargetField').style.display = 'none';
+  document.getElementById('linkNewConceptFields').style.display = 'none';
   document.getElementById('linkTargetReadonly').style.display = '';
   const isSource = l.source === selectedId;
   document.getElementById('linkTargetReadonlyText').textContent = (isSource ? '→ ' : '← ') + (other?.label || '?');
@@ -732,12 +765,27 @@ function saveLinkModal() {
     showToast('✓ Relación actualizada');
     return;
   }
-  const target = document.getElementById('linkTarget').value;
+  let target = document.getElementById('linkTarget').value;
   if (!target) return;
+  let createdNew = false;
+  if (target === '__new__') {
+    const newLabel = document.getElementById('linkNewLabel').value.trim();
+    if (!newLabel) { showToast('⚠️ Ingresá un nombre para el nuevo concepto'); return; }
+    const newConcept = {
+      id: crypto.randomUUID(),
+      label: newLabel,
+      description: document.getElementById('linkNewDesc').value.trim(),
+      category: document.getElementById('linkNewCat').value
+    };
+    concepts.push(newConcept);
+    persistConcepts();
+    target = newConcept.id;
+    createdNew = true;
+  }
   // Las relaciones son direccionales (source → target): se permite que también
   // exista la inversa (target → source) como una relación distinta, solo se
   // bloquea crear dos veces la misma dirección exacta.
-  const exists = links.some(l => l.source === selectedId && l.target === target);
+  const exists = !createdNew && links.some(l => l.source === selectedId && l.target === target);
   if (exists) { showToast('Ya existe esa relación en esta dirección'); return; }
   links.push({
     id: crypto.randomUUID(), source: selectedId, target, label,
@@ -748,7 +796,7 @@ function saveLinkModal() {
   closeLinkModal();
   renderRelList();
   renderGraph();
-  showToast('✓ Relación creada');
+  showToast(createdNew ? '✓ Concepto y relación creados' : '✓ Relación creada');
 }
 function deleteLink(linkId) {
   if (!canEdit()) return;
