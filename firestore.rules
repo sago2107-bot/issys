@@ -1,0 +1,104 @@
+rules_version = '2';
+
+// Sistemas ISSyS — proyecto issys-procesos.
+// Estas reglas se publican SÓLO desde D:\issys (firebase deploy --only firestore:rules).
+// No volver a publicarlas desde D:\issys-procesos: pisaría la colección usuarios.
+//
+// usuarios/{email}: { admin: bool, activo: bool, sistemas: ['procesos', 'presentaciones', ...] }
+//   Permisos del login único. Lo gestiona el portal (sólo administradores).
+//
+// Colecciones de cada sistema:
+//   Procesos        → datos/{clave}
+//   Presentaciones  → presentaciones/{id}, presentacionesImagenes/{hash}
+//
+// TRANSICIÓN: acceso/{email} y presentacionesAcceso/{email} son las listas anteriores de cada sistema.
+// Se mantienen para que los sitios viejos (issys-procesos.web.app / issys-presentaciones.web.app)
+// sigan andando mientras se pasa al portal. Cuando se den de baja, borrar el bloque "LEGADO".
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function logueado() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+    function email() {
+      return request.auth.token.email.lower();
+    }
+    // Administrador fijo (también figura en public/shared/firebase-config.js)
+    function dueno() {
+      return logueado() && email() == 'sago2107@gmail.com';
+    }
+
+    // ---------- Login único ----------
+    function rutaPerfil() {
+      return /databases/$(database)/documents/usuarios/$(email());
+    }
+    function registrado() {
+      return logueado() && exists(rutaPerfil()) && get(rutaPerfil()).data.get('activo', true) != false;
+    }
+    function adminGlobal() {
+      return dueno() || (registrado() && get(rutaPerfil()).data.get('admin', false) == true);
+    }
+    function habilitado(sistema) {
+      return adminGlobal() || (registrado() && sistema in get(rutaPerfil()).data.get('sistemas', []));
+    }
+
+    match /usuarios/{mail} {
+      allow read: if logueado() && (mail == email() || adminGlobal());
+      allow create, update: if adminGlobal()
+        && mail == mail.lower()
+        && request.resource.data.sistemas is list
+        && request.resource.data.get('admin', false) is bool
+        && request.resource.data.get('activo', true) is bool;
+      allow delete: if adminGlobal();
+    }
+
+    // ---------- LEGADO (listas de acceso anteriores) ----------
+    function legadoProcesos() {
+      return logueado() && exists(/databases/$(database)/documents/acceso/$(email()));
+    }
+    function legadoAdminProcesos() {
+      return legadoProcesos() && get(/databases/$(database)/documents/acceso/$(email())).data.admin == true;
+    }
+    function legadoPres() {
+      return logueado() && exists(/databases/$(database)/documents/presentacionesAcceso/$(email()));
+    }
+    function legadoAdminPres() {
+      return legadoPres() && get(/databases/$(database)/documents/presentacionesAcceso/$(email())).data.admin == true;
+    }
+
+    match /acceso/{mail} {
+      allow read: if logueado() && (mail == email() || adminGlobal() || legadoAdminProcesos());
+      allow write: if (adminGlobal() || legadoAdminProcesos()) && mail == mail.lower();
+    }
+    match /presentacionesAcceso/{mail} {
+      allow read: if logueado() && (mail == email() || adminGlobal() || legadoAdminPres());
+      allow write: if (adminGlobal() || legadoAdminPres()) && mail == mail.lower();
+    }
+    // ---------- fin LEGADO ----------
+
+    // ---------- Procesos ----------
+    function puedeProcesos() {
+      return habilitado('procesos') || legadoProcesos();
+    }
+    match /datos/{clave} {
+      allow read, write: if puedeProcesos();
+    }
+
+    // ---------- Presentaciones ----------
+    function puedePresentaciones() {
+      return habilitado('presentaciones') || legadoPres();
+    }
+    match /presentaciones/{id} {
+      allow read, delete: if puedePresentaciones();
+      allow create, update: if puedePresentaciones()
+        && request.resource.data.deck is string
+        && request.resource.data.rev is int;
+    }
+    match /presentacionesImagenes/{hash} {
+      allow read, delete: if puedePresentaciones();
+      allow create, update: if puedePresentaciones()
+        && hash.matches('^[0-9a-f]{64}$')
+        && request.resource.data.data is string;
+    }
+  }
+}

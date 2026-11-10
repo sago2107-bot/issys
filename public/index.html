@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistemas ISSyS</title>
+<meta name="theme-color" content="#4657A0">
+<link rel="icon" type="image/png" href="/shared/marca/issys-isologo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Encode+Sans+Condensed:wght@300;400;600;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/shared/issys.css" data-issys-css>
+<script src="/shared/firebase-config.js"></script>
+<script src="/shared/auth.js"></script>
+<!--
+  Portal de los Sistemas ISSyS: ingreso único con Google, selector de sistemas y
+  gestión de usuarios y permisos (colección usuarios/{email}, sólo administradores).
+-->
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:#fff;font-family:var(--issys-font);color:var(--issys-ink);-webkit-font-smoothing:antialiased}
+a{color:var(--issys-blue)}
+
+/* ---------- Barra superior ---------- */
+.top{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:14px;padding:10px 24px;background:#fff;border-bottom:4px solid var(--issys-green)}
+.top .sep{width:1px;height:28px;background:var(--issys-gray-light)}
+.top .nombre{font-size:20px;font-weight:600;letter-spacing:.01em}
+.top .esp{flex:1}
+
+/* ---------- Contenido ---------- */
+.pagina{min-height:calc(100vh - 62px)}
+main{max-width:1120px;margin:0 auto;padding:56px 24px 72px}
+.ceja{font-size:14px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--issys-green-dark);margin:0 0 10px}
+h1.saludo{font-size:clamp(40px,7vw,64px);font-weight:900;line-height:.95;margin:0;letter-spacing:-.01em}
+h1.saludo .punto{color:var(--issys-green)}
+.bajada{font-size:clamp(18px,2.4vw,22px);font-weight:300;margin:14px 0 0;max-width:620px}
+
+/* ---------- Tarjetas de sistemas ---------- */
+.grilla{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;margin-top:44px}
+.sis{position:relative;display:flex;flex-direction:column;gap:12px;min-height:210px;padding:26px 24px 22px;background:#fff;border:1px solid var(--issys-gray-light);
+  border-radius:var(--issys-radius);color:inherit;text-decoration:none;overflow:hidden;transition:transform .18s ease,box-shadow .18s ease,border-color .18s}
+.sis::before{content:'';position:absolute;left:0;top:0;right:0;height:6px;background:var(--ac)}
+.sis[data-color=green]{--ac:var(--issys-green);--ac-tint:var(--issys-green-tint);--ac-ink:var(--issys-green-dark)}
+.sis[data-color=blue]{--ac:var(--issys-blue);--ac-tint:var(--issys-blue-tint);--ac-ink:var(--issys-blue)}
+a.sis:hover{transform:translateY(-3px);box-shadow:var(--issys-shadow-lg);border-color:var(--ac)}
+a.sis:focus-visible{outline-offset:3px}
+.sis .ico{width:52px;height:52px;border-radius:12px;display:grid;place-items:center;background:var(--ac-tint);color:var(--ac-ink)}
+.sis .ico svg{width:28px;height:28px}
+.sis h2{font-size:26px;font-weight:900;line-height:1.05;margin:4px 0 0}
+.sis p{font-size:16px;line-height:1.4;color:var(--issys-muted);margin:0;flex:1}
+.sis .pie{display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:600;color:var(--ac-ink)}
+.sis .pie .flecha{transition:transform .18s}
+a.sis:hover .pie .flecha{transform:translateX(4px)}
+.sis.prox{background:var(--issys-surface);border-style:dashed}
+.sis.prox::before{background:var(--issys-gray-light)}
+.sis.prox .ico{background:#fff;color:var(--issys-gray)}
+.sis.prox h2{color:var(--issys-muted)}
+.vacio{margin-top:40px;padding:28px;border:1px dashed var(--issys-gray-light);border-radius:var(--issys-radius);color:var(--issys-muted);font-size:17px}
+
+/* ---------- Usuarios y permisos ---------- */
+.admin{margin-top:72px;padding-top:36px;border-top:1px solid var(--issys-line)}
+.admin .cab{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.admin h2{font-size:32px;font-weight:900;margin:0;line-height:1}
+.admin .nota{font-size:16px;color:var(--issys-muted);margin:8px 0 0;max-width:700px;line-height:1.45}
+.alta{margin-top:24px;padding:18px;background:var(--issys-surface);border-radius:var(--issys-radius);display:flex;flex-wrap:wrap;gap:12px 16px;align-items:center}
+.alta input[type=email]{flex:1 1 260px;min-width:0;border:1px solid var(--issys-gray-light);border-radius:10px;padding:10px 12px;font:16px var(--issys-font);background:#fff}
+.checks{display:flex;flex-wrap:wrap;gap:6px}
+.ch{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;border:1px solid var(--issys-gray-light);background:#fff;font-size:14px;cursor:pointer;user-select:none}
+.ch input{accent-color:var(--issys-blue);margin:0}
+.ch:has(input:checked){border-color:var(--issys-blue);background:var(--issys-blue-tint);color:var(--issys-blue-dark)}
+.ch.adm:has(input:checked){border-color:var(--issys-green-dark);background:var(--issys-green-tint);color:var(--issys-green-dark)}
+.lista{list-style:none;margin:20px 0 0;padding:0}
+.lista li{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:14px 4px;border-top:1px solid var(--issys-line)}
+.lista li .mail{flex:1 1 240px;min-width:0;font-size:17px;word-break:break-all}
+.lista li .mail small{display:block;font-size:13px;color:var(--issys-muted)}
+.lista li.inactivo .mail{color:var(--issys-gray);text-decoration:line-through}
+.lista .acc{display:flex;gap:6px}
+
+footer{border-top:1px solid var(--issys-line);padding:18px 24px;font-size:13px;color:var(--issys-muted);text-align:center}
+
+@media (max-width:640px){
+  .top{padding:10px 16px}
+  .top .sep,.top .nombre{display:none}
+  main{padding:36px 16px 56px}
+  .grilla{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <img class="issys-logo" src="/shared/marca/issys-logo-recorte.png" alt="ISSyS">
+  <span class="sep" aria-hidden="true"></span>
+  <span class="nombre">Sistemas</span>
+  <span class="esp"></span>
+  <div id="usuario"></div>
+</header>
+
+<div class="pagina marca-diagonales">
+<main>
+  <p class="ceja">Instituto de Seguridad Social y Seguros</p>
+  <h1 class="saludo" id="saludo">Sistemas<span class="punto">.</span></h1>
+  <p class="bajada">Elegí el sistema con el que vas a trabajar. Tu sesión de Google sirve para todos.</p>
+
+  <section class="grilla" id="grilla" aria-label="Sistemas disponibles"></section>
+
+  <section class="admin" id="usuarios" hidden aria-labelledby="t-usuarios">
+    <div class="cab">
+      <div>
+        <h2 id="t-usuarios">Usuarios y permisos</h2>
+        <p class="nota">Cada persona ingresa con su cuenta de Google y ve sólo los sistemas que tiene habilitados. Un administrador ve todos y gestiona esta lista.</p>
+      </div>
+      <button class="issys-btn chico" type="button" id="importar" title="Copia a esta lista los usuarios de las listas propias que tenían Procesos y Presentaciones">⇣ Importar accesos anteriores</button>
+    </div>
+
+    <form class="alta" id="alta" autocomplete="off">
+      <input type="email" required placeholder="correo@gmail.com" aria-label="Correo de Google">
+      <div class="checks" id="alta-checks"></div>
+      <button class="issys-btn prim" type="submit">Agregar</button>
+    </form>
+
+    <ul class="lista" id="lista"><li><span class="mail">Cargando…</span></li></ul>
+  </section>
+</main>
+</div>
+
+<footer>Instituto de Seguridad Social y Seguros del Chubut · Sección Enlace Delegaciones</footer>
+
+<script>
+(function () {
+  const { esc, avisar, config: CFG } = ISSyS;
+  const $ = id => document.getElementById(id);
+
+  const ICONOS = {
+    procesos: '<rect x="3" y="3" width="8" height="8" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect x="13" y="13" width="8" height="8" rx="2"/>',
+    presentaciones: '<path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-5 5 5"/>',
+    estatuto: '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+    delegaciones: '<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+    consultorios: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>'
+  };
+  const icono = id => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONOS[id] || ICONOS.procesos}</svg>`;
+
+  ISSyS.iniciar({
+    sistema: null,
+    titulo: 'Sistemas ISSyS',
+    subtitulo: 'Acceso institucional',
+    texto: 'Ingresá con tu cuenta de Google para acceder a los sistemas del Instituto.'
+  }).then(ses => {
+    const u = ses.usuario;
+    const nombre = (u.nombre || '').split(' ')[0];
+    if (nombre) $('saludo').innerHTML = `Hola, ${esc(nombre)}<span class="punto">.</span>`;
+    ISSyS.ponerUsuario($('usuario'), u, { portal: false, usuarios: false });
+    pintarSistemas(u);
+    if (u.admin) iniciarAdmin(ses);
+    ses.mostrar();
+    if (location.hash === '#usuarios' && u.admin) setTimeout(() => $('usuarios').scrollIntoView({ behavior: 'smooth' }), 100);
+  });
+
+  // ------------------------------------------------------------
+  // Selector
+  // ------------------------------------------------------------
+  function pintarSistemas(u) {
+    const visibles = CFG.sistemas.filter(s => s.estado === 'activo' ? u.sistemas.includes(s.id) : u.admin);
+    if (!visibles.length) {
+      $('grilla').outerHTML = '<div class="vacio">Tu cuenta todavía no tiene sistemas habilitados. Pedile al administrador que te los habilite.</div>';
+      return;
+    }
+    $('grilla').innerHTML = visibles.map(s => s.estado === 'activo'
+      ? `<a class="sis" href="${esc(s.url)}" data-color="${esc(s.color)}">
+           <span class="ico">${icono(s.icono)}</span>
+           <h2>${esc(s.nombre)}</h2><p>${esc(s.descripcion)}</p>
+           <span class="pie"><span>Abrir</span><span class="flecha" aria-hidden="true">→</span></span></a>`
+      : `<div class="sis prox" data-color="${esc(s.color)}" aria-disabled="true">
+           <span class="ico">${icono(s.icono)}</span>
+           <h2>${esc(s.nombre)}</h2><p>${esc(s.descripcion)}</p>
+           <span class="pie"><span class="issys-tag gris">Próximamente</span></span></div>`).join('');
+  }
+
+  // ------------------------------------------------------------
+  // Usuarios y permisos (sólo administradores; las reglas lo garantizan igual)
+  // ------------------------------------------------------------
+  function iniciarAdmin(ses) {
+    const { db, firebase, usuario } = ses;
+    const col = db.collection('usuarios');
+    const ahora = () => firebase.firestore.FieldValue.serverTimestamp();
+    const nombreDe = id => (CFG.sistemas.find(s => s.id === id) || { nombre: id }).nombre;
+    const chk = (id, marcado, attrs = '') => `<label class="ch"><input type="checkbox" value="${esc(id)}" ${marcado ? 'checked' : ''} ${attrs}>${esc(nombreDe(id))}</label>`;
+
+    $('usuarios').hidden = false;
+    $('alta-checks').innerHTML = CFG.sistemas.map(s => chk(s.id, false)).join('')
+      + '<label class="ch adm"><input type="checkbox" data-admin>Administrador</label>';
+
+    $('alta').onsubmit = async (e) => {
+      e.preventDefault();
+      const f = e.target;
+      const email = f.querySelector('input[type=email]').value.trim().toLowerCase();
+      if (!email) return;
+      if (email === CFG.dueno) return avisar('Esa cuenta es el administrador fijo: ya tiene acceso a todo.');
+      const sistemas = [...f.querySelectorAll('#alta-checks input[value]:checked')].map(i => i.value);
+      try {
+        await col.doc(email).set({
+          sistemas, admin: f.querySelector('[data-admin]').checked, activo: true,
+          actualizadoPor: usuario.email, actualizado: ahora()
+        }, { merge: true });
+        f.reset();
+      } catch (err) { console.error(err); avisar('No se pudo guardar el usuario.'); }
+    };
+
+    col.onSnapshot(snap => {
+      const filas = [`<li><span class="mail">${esc(CFG.dueno)}<small>Acceso a todos los sistemas</small></span><span class="issys-tag verde">Administrador fijo</span></li>`];
+      snap.docs.filter(d => d.id !== CFG.dueno).sort((a, b) => a.id.localeCompare(b.id)).forEach(d => {
+        const x = d.data();
+        const sis = Array.isArray(x.sistemas) ? x.sistemas : [];
+        const activo = x.activo !== false;
+        filas.push(`<li data-mail="${esc(d.id)}" class="${activo ? '' : 'inactivo'}">
+          <span class="mail">${esc(d.id)}${x.admin ? '<small>Administrador: ve todos los sistemas</small>' : ''}</span>
+          <span class="checks">${CFG.sistemas.map(s => chk(s.id, sis.includes(s.id), 'data-sis')).join('')}
+            <label class="ch adm"><input type="checkbox" data-admin ${x.admin ? 'checked' : ''}>Administrador</label></span>
+          <span class="acc">
+            <button class="issys-btn chico" type="button" data-activo>${activo ? 'Suspender' : 'Reactivar'}</button>
+            <button class="issys-btn chico peligro" type="button" data-quitar>Quitar</button>
+          </span></li>`);
+      });
+      $('lista').innerHTML = filas.join('');
+    }, err => { console.error(err); $('lista').innerHTML = '<li><span class="mail">No se pudo leer la lista de usuarios.</span></li>'; });
+
+    $('lista').onchange = async (e) => {
+      const li = e.target.closest('li[data-mail]');
+      if (!li) return;
+      const ref = col.doc(li.dataset.mail);
+      try {
+        if (e.target.matches('[data-sis]')) {
+          const sistemas = [...li.querySelectorAll('[data-sis]:checked')].map(i => i.value);
+          await ref.update({ sistemas, actualizadoPor: usuario.email, actualizado: ahora() });
+        }
+        if (e.target.matches('[data-admin]')) await ref.update({ admin: e.target.checked, actualizadoPor: usuario.email, actualizado: ahora() });
+      } catch (err) { console.error(err); avisar('No se pudo modificar el usuario.'); }
+    };
+    $('lista').onclick = async (e) => {
+      const li = e.target.closest('li[data-mail]');
+      if (!li) return;
+      const ref = col.doc(li.dataset.mail);
+      try {
+        if (e.target.matches('[data-activo]')) await ref.update({ activo: li.classList.contains('inactivo'), actualizadoPor: usuario.email, actualizado: ahora() });
+        if (e.target.matches('[data-quitar]') && confirm(`¿Quitar a ${li.dataset.mail} de los Sistemas ISSyS?`)) await ref.delete();
+      } catch (err) { console.error(err); avisar('No se pudo modificar el usuario.'); }
+    };
+
+    // Migración de permisos: acceso (Procesos) y presentacionesAcceso (Presentaciones) → usuarios
+    $('importar').onclick = async () => {
+      const fuentes = [['acceso', 'procesos'], ['presentacionesAcceso', 'presentaciones']];
+      const porMail = new Map();
+      try {
+        for (const [coleccion, sistema] of fuentes) {
+          const snap = await db.collection(coleccion).get();
+          snap.forEach(d => {
+            const mail = d.id.toLowerCase();
+            if (mail === CFG.dueno) return;
+            if (!porMail.has(mail)) porMail.set(mail, new Set());
+            porMail.get(mail).add(sistema);
+          });
+        }
+      } catch (err) { console.error(err); return avisar('No se pudieron leer las listas anteriores.'); }
+      if (!porMail.size) return avisar('Las listas anteriores no tienen usuarios para importar (el administrador fijo no hace falta).');
+      const detalle = [...porMail].map(([m, s]) => `• ${m}: ${[...s].map(nombreDe).join(', ')}`).join('\n');
+      if (!confirm(`Se van a agregar estos permisos (no se quita nada de lo que ya exista):\n\n${detalle}\n\nNadie queda como administrador: eso se marca a mano. ¿Continuar?`)) return;
+      try {
+        const lote = db.batch();
+        porMail.forEach((s, mail) => lote.set(col.doc(mail), {
+          sistemas: firebase.firestore.FieldValue.arrayUnion(...s), activo: true,
+          importado: ahora(), actualizadoPor: usuario.email, actualizado: ahora()
+        }, { merge: true }));
+        await lote.commit();
+        avisar(`Listo: ${porMail.size} usuario(s) importados.`);
+      } catch (err) { console.error(err); avisar('No se pudo completar la importación.'); }
+    };
+  }
+})();
+</script>
+</body>
+</html>

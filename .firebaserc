@@ -1,0 +1,12 @@
+{
+  "projects": {
+    "default": "issys-procesos"
+  },
+  "targets": {
+    "issys-procesos": {
+      "hosting": {
+        "sistemas": ["issys-sistemas"]
+      }
+    }
+  }
+}

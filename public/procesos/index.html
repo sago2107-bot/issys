@@ -1,0 +1,3292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4657A0">
+    <link rel="icon" type="image/png" href="/shared/marca/issys-isologo.png">
+    <title>ISSyS BPMN Modeler & Modernización — Sección Enlace Delegaciones</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Encode Sans Condensed (tipografía institucional) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Encode+Sans+Condensed:wght@300;400;600;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Identidad ISSyS: paleta y tipografía del manual de marca -->
+    <script src="/shared/issys-tailwind.js"></script>
+    <link rel="stylesheet" href="/shared/issys.css" data-issys-css>
+    <style>
+        body { font-size: 18px; }
+        /* Custom scrollbar & UI refinements */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #EDEEF1; }
+        ::-webkit-scrollbar-thumb { background: #C6C6C6; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #878787; }
+        .node-selected { stroke: #4657A0 !important; stroke-width: 2.5px !important; filter: drop-shadow(0 0 6px rgba(70, 87, 160, 0.4)); }
+        .lane-band:nth-child(even) { fill: #ffffff; }
+        .lane-band:nth-child(odd) { fill: #F5F6F8; }
+        .bpmn-connector { stroke: #4B4B49; stroke-width: 1.8; fill: none; cursor: pointer; transition: stroke 0.15s; }
+        .bpmn-connector:hover { stroke: #4657A0; stroke-width: 2.5; }
+        /* Modo lectura (visor): los conectores no son interactivos */
+        .readonly .bpmn-connector { cursor: default; }
+        .readonly .bpmn-connector:hover { stroke: #4B4B49; stroke-width: 1.8; }
+        .canvas-grid {
+            background-size: 20px 20px;
+            background-image: radial-gradient(circle, #C6C6C6 1px, transparent 1px);
+        }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+        }
+
+        /* Visor BPMN (bpmn-js) */
+        #viewer-bpmn {
+            background-color: #ffffff;
+            background-size: 20px 20px;
+            background-image: radial-gradient(circle, #E1E2E5 1px, transparent 1px);
+        }
+        #viewer-bpmn .bjs-powered-by { opacity: .5; }
+        .djs-element.issys-selected .djs-visual > :first-child { stroke: #4657A0 !important; stroke-width: 3px !important; }
+        /* Caminos del proceso: el camino elegido resaltado y el resto atenuado */
+        #viewer-bpmn { --path-color: #2F7D50; }
+        #viewer-bpmn.path-alt { --path-color: #4657A0; }
+        #viewer-bpmn .djs-element.issys-dim { opacity: .18; }
+        #viewer-bpmn .djs-shape.issys-path .djs-visual > :first-child,
+        #viewer-bpmn .djs-connection.issys-path .djs-visual > path { stroke: var(--path-color) !important; stroke-width: 3px !important; }
+        #viewer-bpmn .djs-connection.issys-path marker path { stroke: var(--path-color) !important; fill: var(--path-color) !important; }
+        .path-card.selected { box-shadow: 0 0 0 2px var(--card-color); }
+
+        /* Presentación paso a paso de un camino */
+        #viewer-bpmn .djs-element.issys-future { opacity: .45; }
+        #viewer-bpmn .djs-shape.issys-current .djs-visual > :first-child { stroke-width: 5px !important; filter: drop-shadow(0 0 8px var(--path-color)); }
+        #viewer-bpmn-wrap:fullscreen { background: #EDEEF1; }
+        .issys-chips { display: flex; gap: 2px; pointer-events: none; white-space: nowrap; }
+        .issys-chip { font: 600 8px/1 'Encode Sans Condensed', sans-serif; padding: 2px 4px; border-radius: 3px; border: 1px solid; letter-spacing: .02em; }
+        .issys-chip.presencial { background: #F9DEDC; color: #B3261E; border-color: #F2B8B5; }
+        .issys-chip.hipotesis { background: #FDF3D3; color: #6E5006; border-color: #F9D76B; }
+        .issys-chip.doblecarga { background: #E3E6F1; color: #36457F; border-color: #A5ADD3; }
+    </style>
+    <!-- bpmn-js (bpmn.io): visor de diagramas BPMN 2.0 -->
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js@17.11.1/dist/assets/diagram-js.css">
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js@17.11.1/dist/assets/bpmn-js.css">
+    <script src="https://unpkg.com/bpmn-js@17.11.1/dist/bpmn-navigated-viewer.production.min.js"></script>
+    <!-- Modelos BPMN compartidos con modelador.html -->
+    <script src="bpmn-modelos.js"></script>
+    <!-- Ingreso con Google y datos compartidos en Firestore -->
+    <script src="/shared/firebase-config.js"></script>
+    <script src="/shared/auth.js"></script>
+    <script src="nube.js"></script>
+</head>
+<body class="bg-issys-surface text-slate-800 font-sans h-screen flex flex-col overflow-hidden select-none">
+
+    <!-- Top Header: Institutional Identity ISSyS -->
+    <header class="bg-white text-issys-ink h-16 border-b-4 border-issys-green flex items-center justify-between gap-4 px-4 z-30 shadow-sm flex-shrink-0">
+        <a href="#/" class="flex items-center gap-4 min-w-0" title="Ir al listado de procesos">
+            <img src="/shared/marca/issys-logo-recorte.png" alt="ISSyS" class="issys-logo">
+            <div class="min-w-0 border-l border-slate-300 pl-4">
+                <div class="font-extrabold text-lg leading-tight">Procesos BPMN</div>
+                <p class="text-[13px] font-light text-slate-500 leading-tight truncate">Sección Enlace Delegaciones · Modelado y optimización de procesos</p>
+            </div>
+        </a>
+
+        <!-- Breadcrumb (se completa según la pantalla activa) -->
+        <nav id="breadcrumb" class="hidden md:flex items-center gap-1.5 text-xs text-slate-500 min-w-0"></nav>
+    </header>
+
+    <!-- ============================================================ -->
+    <!-- PANTALLA 1: Selección de proceso                              -->
+    <!-- ============================================================ -->
+    <section id="view-home" class="hidden flex-1 overflow-y-auto marca-diagonales">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+            <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-6">
+                <div>
+                    <h1 class="text-2xl font-extrabold text-issys-navy tracking-tight">Procesos relevados</h1>
+                    <p class="text-sm text-slate-500 mt-1">Elegí un proceso para ver su circuito actual (AS-IS), la etapa de transición y la propuesta de modernización (TO-BE).</p>
+                </div>
+                <div class="p-3 bg-gradient-to-r from-teal-50 to-sky-50 border border-teal-100 rounded-lg text-xs lg:max-w-sm">
+                    <div class="flex items-center gap-1.5 text-teal-900 font-semibold mb-0.5">
+                        <i data-lucide="target" class="w-3.5 h-3.5 text-teal-600"></i>
+                        <span>Objetivo Rector</span>
+                    </div>
+                    <p class="text-[13px] text-slate-600 leading-tight">
+                        Minimizar concurrencia presencial y migrar hacia autogestión digital del afiliado.
+                    </p>
+                </div>
+            </div>
+
+            <div id="process-grid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- PANTALLA 2: Visor del diagrama (AS-IS / Transición / TO-BE)    -->
+    <!-- ============================================================ -->
+    <section id="view-viewer" class="hidden flex-1 flex flex-col overflow-hidden">
+        <!-- Viewer toolbar -->
+        <div class="bg-white border-b border-slate-200 px-4 py-2 flex items-center gap-3 flex-wrap shadow-sm z-20">
+            <button onclick="navigate('#/')" class="flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded transition" title="Volver al listado de procesos">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                <span class="hidden sm:inline">Procesos</span>
+            </button>
+            <div class="h-6 w-px bg-slate-200"></div>
+            <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1 min-w-0">
+                    <h2 id="viewer-process-name" class="font-bold text-sm text-issys-navy truncate">Proceso</h2>
+                    <button onclick="openProcessForm(state.processId)" class="text-slate-400 hover:text-issys-blue p-1 rounded flex-shrink-0" title="Editar nombre, área y descripción del proceso">
+                        <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+                <p id="viewer-process-area" class="text-[13px] text-slate-500 truncate"></p>
+            </div>
+
+            <!-- Solapas AS-IS / Transición / TO-BE -->
+            <div role="tablist" class="flex bg-slate-100 rounded-lg p-1 border border-slate-200 text-xs font-semibold">
+                <button id="viewer-tab-asis" role="tab" onclick="switchModelTab('asis')" class="px-3 py-1.5 rounded-md flex items-center gap-1.5 transition">
+                    <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                    <span>AS-IS</span>
+                    <span class="hidden lg:inline font-normal opacity-70">· Estado actual</span>
+                </button>
+                <button id="viewer-tab-trans" role="tab" onclick="switchModelTab('trans')" class="px-3 py-1.5 rounded-md flex items-center gap-1.5 transition" title="Etapa intermedia: mejoras posibles con los recursos actuales">
+                    <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+                    <span>Transición</span>
+                    <span class="hidden lg:inline font-normal opacity-70">· Etapa intermedia</span>
+                </button>
+                <button id="viewer-tab-tobe" role="tab" onclick="switchModelTab('tobe')" class="px-3 py-1.5 rounded-md flex items-center gap-1.5 transition">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span>TO-BE</span>
+                    <span class="hidden lg:inline font-normal opacity-70">· Propuesta</span>
+                </button>
+            </div>
+
+            <div class="flex items-center gap-2 ml-auto">
+                <button id="btn-viewer-zoom" onclick="toggleViewerZoom()" class="flex items-center gap-1.5 px-2.5 py-1.5 border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-medium rounded transition" title="Cambiar escala del diagrama">
+                    <i data-lucide="scan" class="w-3.5 h-3.5"></i>
+                    <span id="viewer-zoom-label" class="hidden md:inline">Tamaño real</span>
+                </button>
+                <button id="btn-toggle-paths" onclick="togglePathsPanel()" class="flex items-center gap-1.5 px-2.5 py-1.5 border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-medium rounded transition" title="Ver el camino feliz y los caminos alternativos del proceso">
+                    <i data-lucide="route" class="w-3.5 h-3.5 text-emerald-600"></i>
+                    <span class="hidden md:inline">Caminos</span>
+                </button>
+                <button id="btn-toggle-analysis" onclick="toggleAnalysisPanel()" class="flex items-center gap-1.5 px-2.5 py-1.5 border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-medium rounded transition" title="Mostrar diagnóstico y matriz TO-BE">
+                    <i data-lucide="activity" class="w-3.5 h-3.5 text-amber-600"></i>
+                    <span class="hidden md:inline">Análisis</span>
+                </button>
+                <button id="btn-export-report" class="flex items-center gap-1.5 px-2.5 py-1.5 border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-medium rounded transition">
+                    <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                    <span class="hidden xl:inline">Informe de Diagnóstico</span>
+                </button>
+                <div class="relative inline-block text-left" id="export-dropdown-container">
+                    <button id="btn-export-menu" class="flex items-center gap-1.5 px-2.5 py-1.5 border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-medium rounded transition">
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                        <span class="hidden md:inline">Exportar</span>
+                        <i data-lucide="chevron-down" class="w-3 h-3"></i>
+                    </button>
+                    <div id="export-dropdown" class="hidden absolute right-0 mt-1 w-48 bg-white text-slate-800 rounded-md shadow-xl border border-slate-200 py-1 z-50 text-xs">
+                        <button id="opt-export-mermaid" class="w-full text-left px-3 py-2 hover:bg-slate-100 flex items-center gap-2">
+                            <i data-lucide="code-2" class="w-3.5 h-3.5 text-cyan-600"></i> Código Mermaid BPMN
+                        </button>
+                        <button id="opt-export-bpmn" class="w-full text-left px-3 py-2 hover:bg-slate-100 flex items-center gap-2">
+                            <i data-lucide="file-code-2" class="w-3.5 h-3.5 text-cyan-600"></i> Archivo BPMN 2.0
+                        </button>
+                        <button id="opt-export-svg" class="w-full text-left px-3 py-2 hover:bg-slate-100 flex items-center gap-2">
+                            <i data-lucide="image" class="w-3.5 h-3.5 text-emerald-600"></i> Vectorial (SVG)
+                        </button>
+                        <button id="opt-export-json" class="w-full text-left px-3 py-2 hover:bg-slate-100 flex items-center gap-2">
+                            <i data-lucide="file-json" class="w-3.5 h-3.5 text-blue-600"></i> Modelo JSON
+                        </button>
+                    </div>
+                </div>
+                <button onclick="openEditor()" class="flex items-center gap-1.5 px-3 py-1.5 bg-issys-blue hover:bg-issys-blue-dark text-white text-xs font-semibold rounded shadow transition">
+                    <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                    <span>Editar <span id="viewer-edit-label">AS-IS</span></span>
+                </button>
+            </div>
+        </div>
+
+        <div class="flex-1 flex overflow-hidden">
+            <!-- Read-only diagram -->
+            <main class="flex-1 relative bg-slate-100 overflow-hidden">
+                <div id="viewer-scroll" class="absolute inset-0 overflow-auto p-6">
+                    <div class="mb-3 flex items-baseline gap-2 flex-wrap">
+                        <h3 id="viewer-model-title" class="font-semibold text-slate-800 text-sm"></h3>
+                        <span id="viewer-model-updated" class="text-[13px] text-slate-400"></span>
+                    </div>
+
+                    <div id="viewer-empty" class="hidden mb-3 p-4 bg-white border border-dashed border-slate-300 rounded-xl text-center">
+                        <i data-lucide="pen-tool" class="w-7 h-7 mx-auto mb-2 text-slate-400"></i>
+                        <p class="text-sm font-semibold text-slate-700">Este diagrama todavía no tiene elementos</p>
+                        <p class="text-xs text-slate-500 mt-0.5 mb-3">Abrí el editor para empezar a modelar el circuito.</p>
+                        <button onclick="openEditor()" class="px-3 py-1.5 bg-issys-blue hover:bg-issys-blue-dark text-white text-xs font-semibold rounded shadow transition">Abrir editor</button>
+                    </div>
+
+                    <div id="viewer-canvas" class="inline-block align-top bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"></div>
+                </div>
+
+                <!-- BPMN diagram (procesos modelados en el modelador) -->
+                <div id="viewer-bpmn-wrap" class="hidden absolute inset-0 p-6 flex-col">
+                    <div class="mb-3 flex items-baseline gap-2 flex-wrap">
+                        <h3 id="viewer-bpmn-title" class="font-semibold text-slate-800 text-sm"></h3>
+                        <span id="viewer-bpmn-updated" class="text-[13px] text-slate-400"></span>
+                        <span class="ml-auto hidden lg:flex items-center gap-1">
+                            <span class="issys-chip presencial">PRESENCIAL</span>
+                            <span class="issys-chip hipotesis">HIPÓTESIS</span>
+                            <span class="issys-chip doblecarga">DOBLE CARGA</span>
+                        </span>
+                        <span class="text-[13px] text-slate-400 hidden md:inline">Rueda: zoom · Arrastrar: mover · Clic: detalle</span>
+                    </div>
+                    <div id="viewer-bpmn-empty" class="hidden mb-3 p-3 bg-white border border-dashed border-slate-300 rounded-xl text-center text-xs text-slate-600">
+                        Este diagrama todavía no tiene tareas.
+                        <button onclick="openEditor()" class="ml-1 font-semibold text-cyan-700 hover:underline">Abrir el modelador</button>
+                    </div>
+                    <div id="viewer-bpmn" class="flex-1 min-h-0 relative rounded-xl border border-slate-200 shadow-sm overflow-hidden"></div>
+
+                    <!-- Presentación de un camino, paso a paso -->
+                    <div id="present-bar" class="hidden absolute left-1/2 -translate-x-1/2 bottom-10 w-[min(960px,calc(100%-64px))] bg-white/95 backdrop-blur rounded-2xl shadow-2xl border border-slate-200 z-30 overflow-hidden">
+                        <div class="h-1.5 bg-slate-100"><div id="present-progress" class="h-full transition-all duration-300"></div></div>
+                        <div class="flex items-center gap-4 px-4 pt-4 pb-2">
+                            <button id="present-prev" onclick="presentGo(-1)" class="h-12 w-12 flex-shrink-0 rounded-full border border-slate-300 hover:bg-slate-50 disabled:opacity-30 flex items-center justify-center" title="Paso anterior (←)">
+                                <i data-lucide="chevron-left" class="w-6 h-6"></i>
+                            </button>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 flex-wrap text-xs">
+                                    <span id="present-counter" class="font-mono font-bold text-slate-500"></span>
+                                    <span id="present-type" class="px-2 py-0.5 rounded bg-cyan-50 text-cyan-800 border border-cyan-200 font-semibold"></span>
+                                    <span id="present-lane" class="text-slate-500"></span>
+                                    <span id="present-chips" class="flex flex-wrap gap-1"></span>
+                                </div>
+                                <p id="present-title" class="text-2xl font-bold text-slate-800 mt-1.5 leading-tight"></p>
+                                <div id="present-detail" class="text-base text-slate-600 mt-1.5 leading-relaxed max-h-32 overflow-y-auto"></div>
+                            </div>
+                            <button id="present-next" onclick="presentGo(1)" class="h-12 w-12 flex-shrink-0 rounded-full bg-issys-blue hover:bg-issys-blue-dark text-white disabled:opacity-30 flex items-center justify-center" title="Paso siguiente (→ o espacio)">
+                                <i data-lucide="chevron-right" class="w-6 h-6"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between gap-3 px-4 pb-3 text-[13px] text-slate-400">
+                            <span id="present-path-name" class="truncate"></span>
+                            <span class="hidden md:inline flex-shrink-0">← → avanzar · Esc salir</span>
+                            <button onclick="stopPresentation()" class="flex-shrink-0 px-2.5 py-1 rounded border border-slate-300 text-slate-600 hover:bg-slate-50 font-medium">Salir</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Legend -->
+                <div id="viewer-legend" class="absolute bottom-4 right-4 bg-white/95 backdrop-blur rounded-lg border border-slate-200 shadow-sm px-3 py-2 text-[12px] text-slate-600 flex flex-wrap gap-x-3 gap-y-1 max-w-xs z-0">
+                    <span class="flex items-center gap-1"><span class="w-3 h-2.5 rounded-sm border-2 border-rose-500 bg-rose-50"></span>Presencial</span>
+                    <span class="flex items-center gap-1"><span class="w-3 h-2.5 rounded-sm border-2 border-teal-600 bg-teal-50"></span>Automatizada</span>
+                    <span class="flex items-center gap-1"><span class="w-3 h-2.5 rounded-sm border border-amber-600 bg-amber-100"></span>Hipótesis</span>
+                </div>
+            </main>
+
+            <!-- Detalle del elemento seleccionado (solo lectura) -->
+            <aside id="node-info" class="hidden w-80 bg-white border-l border-slate-200 flex-col z-20 shadow-lg flex-shrink-0">
+                <div class="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-slate-200 bg-slate-50">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                        <i data-lucide="info" class="w-4 h-4 text-cyan-700"></i>
+                        <span>Detalle del elemento</span>
+                    </h4>
+                    <button onclick="hideNodeInfo(true)" class="text-slate-400 hover:text-slate-700 p-0.5 rounded" title="Cerrar y volver a la vista completa (Esc)">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                <div class="flex-1 overflow-y-auto p-4 space-y-3">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <span id="node-info-type" class="px-2 py-0.5 rounded bg-cyan-50 text-cyan-800 border border-cyan-200 text-xs font-semibold"></span>
+                        <span id="node-info-code" class="px-1.5 py-0.5 rounded bg-slate-100 font-mono text-[12px] font-bold text-slate-600"></span>
+                    </div>
+                    <p id="node-info-label" class="text-base font-semibold text-slate-800 leading-snug"></p>
+                    <p id="node-info-lane" class="text-xs text-slate-500"></p>
+                    <div id="node-info-flags" class="flex flex-wrap gap-1"></div>
+                    <div id="node-info-notes-wrap" class="pt-3 border-t border-slate-100">
+                        <h5 class="text-[13px] font-bold uppercase tracking-wider text-slate-400 mb-1">Notas</h5>
+                        <p id="node-info-notes" class="text-xs text-slate-600 leading-relaxed whitespace-pre-line"></p>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Caminos del proceso (camino feliz y alternativos) -->
+            <aside id="paths-panel" class="hidden w-96 bg-white border-l border-slate-200 flex-col z-20 shadow-lg flex-shrink-0">
+                <div class="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-slate-200 bg-slate-50">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                        <i data-lucide="route" class="w-4 h-4 text-emerald-600"></i>
+                        <span>Caminos del proceso</span>
+                    </h4>
+                    <button onclick="togglePathsPanel(false)" class="text-slate-400 hover:text-slate-700 p-0.5 rounded" title="Cerrar panel">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                <div id="paths-body" class="flex-1 overflow-y-auto p-4 space-y-4 text-xs"></div>
+            </aside>
+
+            <!-- Analysis panel: Diagnosis & TO-BE matrix -->
+            <aside id="analysis-panel" class="hidden w-96 bg-white border-l border-slate-200 flex-col z-20 shadow-lg flex-shrink-0">
+                <div class="flex border-b border-slate-200 bg-slate-50 text-xs font-semibold text-slate-600">
+                    <button id="tab-btn-diag" onclick="switchRightTab('diagnosis')" class="flex-1 py-2.5 px-2 border-b-2 border-transparent hover:text-slate-900 flex items-center justify-center gap-1.5 transition">
+                        <i data-lucide="activity" class="w-3.5 h-3.5 text-amber-600"></i>
+                        <span>Diagnóstico</span>
+                    </button>
+                    <button id="tab-btn-matr" onclick="switchRightTab('matrix')" class="flex-1 py-2.5 px-2 border-b-2 border-transparent hover:text-slate-900 flex items-center justify-center gap-1.5 transition">
+                        <i data-lucide="arrow-left-right" class="w-3.5 h-3.5 text-emerald-600"></i>
+                        <span>Matriz TO-BE</span>
+                    </button>
+                    <button onclick="toggleAnalysisPanel(false)" class="px-3 text-slate-400 hover:text-slate-700" title="Cerrar panel">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-4 text-xs">
+                    <!-- Diagnosis & KPI Panel -->
+                    <div id="tab-content-diagnosis" class="space-y-4">
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-bold text-slate-800 flex items-center gap-1.5">
+                                    <i data-lucide="bar-chart-2" class="w-4 h-4 text-cyan-700"></i>
+                                    <span>Métricas de Fricción & Modernización</span>
+                                </h4>
+                                <span id="diag-process-name" class="font-mono text-[12px] text-slate-500">AS-IS</span>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2 text-center">
+                                <div class="p-2 bg-rose-50 border border-rose-200 rounded">
+                                    <span id="kpi-physical-trips" class="text-xl font-extrabold text-rose-700">0</span>
+                                    <span class="block text-[12px] font-medium text-rose-900 leading-tight">Traslados físicos obligatorios</span>
+                                </div>
+                                <div class="p-2 bg-indigo-50 border border-indigo-200 rounded">
+                                    <span id="kpi-manual-entries" class="text-xl font-extrabold text-indigo-700">0</span>
+                                    <span class="block text-[12px] font-medium text-indigo-900 leading-tight">Doble carga / transcripción</span>
+                                </div>
+                                <div class="p-2 bg-amber-50 border border-amber-200 rounded">
+                                    <span id="kpi-hypotheses" class="text-xl font-extrabold text-amber-700">0</span>
+                                    <span class="block text-[12px] font-medium text-amber-900 leading-tight">Hipótesis a validar con Delegación</span>
+                                </div>
+                                <div class="p-2 bg-emerald-50 border border-emerald-200 rounded">
+                                    <span id="kpi-automated" class="text-xl font-extrabold text-emerald-700">0</span>
+                                    <span class="block text-[12px] font-medium text-emerald-900 leading-tight">Pasos automatizados</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Puntos Críticos de Fricción Identificados -->
+                        <div>
+                            <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-1.5">
+                                <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-amber-600"></i>
+                                <span>Hallazgos del Circuito Relevado</span>
+                            </h4>
+                            <div id="findings-container" class="space-y-2">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Impacto Territorial en Delegaciones -->
+                        <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <h5 class="font-bold text-blue-950 flex items-center gap-1 text-[13px] mb-1">
+                                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-blue-700"></i>
+                                <span>Impacto en Delegaciones del Interior</span>
+                            </h5>
+                            <p class="text-[13px] text-blue-900 leading-relaxed">
+                                Agencias de la Comarca Andina (Epuyén, Cholila, El Maitén, El Hoyo), Esquel y Río Mayo sufren el mayor costo por traslado y valija física hacia Casa Central en Rawson. Cada trámite 100% digitalizado ahorra hasta <strong>12 días corridos</strong> de correo postal o valija física.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Oportunidades TO-BE Matrix -->
+                    <div id="tab-content-matrix" class="hidden space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-slate-800 text-[13px] flex items-center gap-1">
+                                <i data-lucide="layers" class="w-3.5 h-3.5 text-cyan-600"></i>
+                                <span>Mapeo AS-IS → TO-BE</span>
+                            </h4>
+                            <span class="text-[12px] text-slate-500 font-mono">Piloto ISSyS</span>
+                        </div>
+
+                        <div class="space-y-2.5" id="matrix-cards-container">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- PANTALLA 3: Editor del diagrama                               -->
+    <!-- ============================================================ -->
+    <section id="view-editor" class="hidden flex-1 flex flex-col overflow-hidden">
+        <!-- Editor toolbar -->
+        <div class="bg-white border-b border-slate-200 px-4 py-2 flex items-center gap-3 flex-wrap shadow-sm z-20">
+            <button onclick="navigate(viewerHash())" class="flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded transition" title="Volver al visor">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                <span class="hidden sm:inline">Volver al visor</span>
+            </button>
+            <div class="h-6 w-px bg-slate-200"></div>
+            <span id="editor-model-badge" class="px-2 py-0.5 text-[13px] font-bold rounded border">AS-IS</span>
+            <div class="min-w-0 flex-1">
+                <h2 class="font-bold text-sm text-issys-navy truncate">Editando: <span id="editor-process-name"></span></h2>
+                <p id="editor-model-title" class="text-[13px] text-slate-500 truncate"></p>
+            </div>
+
+            <div class="flex items-center gap-2 ml-auto">
+                <span id="editor-dirty-chip" class="hidden px-2 py-0.5 text-[12px] font-semibold rounded bg-amber-100 text-amber-800 border border-amber-200">Cambios sin guardar</span>
+                <button id="btn-restore-original" onclick="restoreOriginalModel()" class="flex items-center gap-1.5 px-2.5 py-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 text-xs font-medium rounded transition" title="Volver a la versión original del relevamiento">
+                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                    <span class="hidden lg:inline">Restaurar original</span>
+                </button>
+                <button onclick="discardEditor()" class="px-3 py-1.5 border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-medium rounded transition">
+                    Descartar
+                </button>
+                <button onclick="saveEditor()" class="flex items-center gap-1.5 px-3 py-1.5 bg-issys-blue hover:bg-issys-blue-dark text-white text-xs font-semibold rounded shadow transition">
+                    <i data-lucide="save" class="w-3.5 h-3.5"></i>
+                    <span>Guardar cambios</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="flex-1 flex overflow-hidden">
+            <!-- Left Toolbar: BPMN Palette & Lanes Control -->
+            <aside class="w-64 bg-white border-r border-slate-200 flex flex-col z-20 shadow-sm flex-shrink-0">
+                <!-- Elements Palette -->
+                <div class="p-3 overflow-y-auto flex-1 space-y-4">
+                    <div>
+                        <h3 class="text-[13px] font-bold uppercase tracking-wider text-slate-400 mb-2">Elementos BPMN 2.0</h3>
+                        <div class="grid grid-cols-2 gap-1.5">
+                            <button onclick="addNodeFromPalette('start')" class="p-2 bg-slate-50 border border-slate-200 rounded hover:border-emerald-500 hover:bg-emerald-50 text-left transition group">
+                                <div class="w-5 h-5 rounded-full border-2 border-emerald-600 bg-emerald-100 flex items-center justify-center mb-1 group-hover:scale-110 transition">
+                                    <i data-lucide="play" class="w-2.5 h-2.5 text-emerald-700"></i>
+                                </div>
+                                <span class="text-[13px] font-medium text-slate-700 block">Inicio</span>
+                            </button>
+                            <button onclick="addNodeFromPalette('end')" class="p-2 bg-slate-50 border border-slate-200 rounded hover:border-rose-500 hover:bg-rose-50 text-left transition group">
+                                <div class="w-5 h-5 rounded-full border-4 border-rose-600 bg-rose-100 flex items-center justify-center mb-1 group-hover:scale-110 transition"></div>
+                                <span class="text-[13px] font-medium text-slate-700 block">Fin</span>
+                            </button>
+                            <button onclick="addNodeFromPalette('task-user')" class="p-2 bg-slate-50 border border-slate-200 rounded hover:border-blue-500 hover:bg-blue-50 text-left transition group">
+                                <div class="w-5 h-4 border border-blue-600 rounded bg-blue-100 flex items-center justify-center mb-1">
+                                    <i data-lucide="user" class="w-2.5 h-2.5 text-blue-700"></i>
+                                </div>
+                                <span class="text-[13px] font-medium text-slate-700 block">Tarea Afiliado/Usr</span>
+                            </button>
+                            <button onclick="addNodeFromPalette('task-manual')" class="p-2 bg-slate-50 border border-slate-200 rounded hover:border-amber-500 hover:bg-amber-50 text-left transition group">
+                                <div class="w-5 h-4 border border-amber-600 rounded bg-amber-100 flex items-center justify-center mb-1">
+                                    <i data-lucide="hand" class="w-2.5 h-2.5 text-amber-700"></i>
+                                </div>
+                                <span class="text-[13px] font-medium text-slate-700 block">Tarea Manual</span>
+                            </button>
+                            <button onclick="addNodeFromPalette('task-service')" class="p-2 bg-slate-50 border border-slate-200 rounded hover:border-cyan-500 hover:bg-cyan-50 text-left transition group">
+                                <div class="w-5 h-4 border border-cyan-600 rounded bg-cyan-100 flex items-center justify-center mb-1">
+                                    <i data-lucide="cpu" class="w-2.5 h-2.5 text-cyan-700"></i>
+                                </div>
+                                <span class="text-[13px] font-medium text-slate-700 block">Automatizada/Sis</span>
+                            </button>
+                            <button onclick="addNodeFromPalette('gateway-xor')" class="p-2 bg-slate-50 border border-slate-200 rounded hover:border-indigo-500 hover:bg-indigo-50 text-left transition group">
+                                <div class="w-4 h-4 border-2 border-indigo-600 bg-indigo-50 rotate-45 flex items-center justify-center mb-1">
+                                    <span class="-rotate-45 text-[11px] font-bold text-indigo-700 leading-none">✕</span>
+                                </div>
+                                <span class="text-[13px] font-medium text-slate-700 block">Compuerta XOR</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Connect tool -->
+                    <div>
+                        <h3 class="text-[13px] font-bold uppercase tracking-wider text-slate-400 mb-2">Herramienta de Flujo</h3>
+                        <button id="btn-toggle-connect" class="w-full py-2 px-3 rounded border text-xs font-medium flex items-center justify-center gap-2 transition bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200">
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            <span id="connect-tool-text">Conectar Nodos</span>
+                        </button>
+                        <p class="text-[12px] text-slate-400 mt-1 italic leading-tight text-center">
+                            Hacé clic en nodo origen y luego en nodo destino para unir con flecha.
+                        </p>
+                    </div>
+
+                    <!-- Swimlanes management -->
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <h3 class="text-[13px] font-bold uppercase tracking-wider text-slate-400">Carriles (Roles)</h3>
+                            <button onclick="addNewLane()" class="text-[13px] text-cyan-700 hover:underline flex items-center gap-0.5 font-medium">
+                                <i data-lucide="plus" class="w-3 h-3"></i> Agregar
+                            </button>
+                        </div>
+                        <div id="lanes-list" class="space-y-1">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Quick Tips for Analyst -->
+                    <div class="p-2.5 bg-amber-50 rounded border border-amber-200 text-[13px] text-amber-900 leading-normal">
+                        <span class="font-bold flex items-center gap-1 text-amber-800">
+                            <i data-lucide="info" class="w-3.5 h-3.5"></i> Criterio Metodológico
+                        </span>
+                        Nombrar siempre con <strong class="text-amber-950">Verbo + Objeto</strong>. Si un paso no está comprobado en el circuito real, márquelo como <em>Hipótesis a validar</em>.
+                    </div>
+                </div>
+
+                <!-- Footer: Node Counter / Scale -->
+                <div class="p-2 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-[13px] text-slate-500">
+                    <span id="canvas-stats">0 Nodos | 0 Conectores</span>
+                    <button onclick="resetDiagramZoom()" class="hover:text-slate-800 flex items-center gap-1" title="Centrar">
+                        <i data-lucide="maximize" class="w-3 h-3"></i> 100%
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Center: Interactive BPMN Diagram Canvas -->
+            <main class="flex-1 flex flex-col bg-slate-200 relative overflow-hidden">
+                <!-- Canvas Toolbar Float -->
+                <div class="absolute top-3 left-4 z-10 bg-white/95 backdrop-blur px-3 py-1.5 rounded-lg border border-slate-300 shadow-sm flex items-center gap-3 text-xs text-slate-700">
+                    <span class="text-[13px] text-slate-500">Arrastre nodos para reubicar • Haga clic para editar propiedades • Supr para eliminar</span>
+                </div>
+
+                <div class="absolute top-3 right-4 z-10 flex gap-2">
+                    <button onclick="deleteSelectedNode()" class="bg-white hover:bg-rose-50 text-rose-600 border border-slate-300 hover:border-rose-300 p-1.5 rounded shadow-sm text-xs font-medium flex items-center gap-1 transition" title="Eliminar seleccionado">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <!-- SVG Canvas Area (el SVG se monta acá al entrar al editor) -->
+                <div id="editor-canvas" class="w-full h-full overflow-auto canvas-grid relative cursor-grab active:cursor-grabbing"></div>
+            </main>
+
+            <!-- Right Panel: Properties -->
+            <aside class="w-80 bg-white border-l border-slate-200 flex flex-col z-20 shadow-lg flex-shrink-0">
+                <div class="flex items-center gap-1.5 px-4 py-2.5 border-b border-slate-200 bg-slate-50 text-xs font-semibold text-cyan-800">
+                    <i data-lucide="sliders" class="w-3.5 h-3.5"></i>
+                    <span>Propiedades</span>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-4 text-xs">
+                    <div id="tab-content-properties" class="space-y-4">
+                        <div id="no-selection-notice" class="text-center py-10 text-slate-400">
+                            <i data-lucide="mouse-pointer-click" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+                            <p class="font-medium text-slate-600">Ningún elemento seleccionado</p>
+                            <p class="text-[13px] mt-1">Hacé clic sobre un nodo en el diagrama para modificar sus parámetros.</p>
+                        </div>
+
+                        <div id="properties-editor-form" class="hidden space-y-3">
+                            <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+                                <span class="font-bold text-slate-800 flex items-center gap-1.5">
+                                    <span id="prop-type-badge" class="px-2 py-0.5 rounded text-[12px] font-mono bg-blue-100 text-blue-800">TAREA</span>
+                                    <span id="prop-id-display" class="font-mono text-slate-500">T-01</span>
+                                </span>
+                            </div>
+
+                            <!-- Code / ID -->
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">Código del Elemento</label>
+                                <input type="text" id="prop-input-code" class="w-full px-2.5 py-1.5 border border-slate-300 rounded font-mono text-xs focus:ring-1 focus:ring-cyan-500 focus:outline-none" placeholder="ej. T-01, A-02">
+                            </div>
+
+                            <!-- Label / Task Name -->
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">Etiqueta (Verbo + Objeto)</label>
+                                <textarea id="prop-input-label" rows="2" class="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-cyan-500 focus:outline-none" placeholder="ej. Reúne comprobantes y se traslada a Delegación"></textarea>
+                                <p class="text-[12px] text-slate-400 mt-0.5">Mantener regla de redacción: Verbo activo + Objeto directo.</p>
+                            </div>
+
+                            <!-- Swimlane / Actor Assignment -->
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">Carril / Rol Asignado</label>
+                                <select id="prop-input-lane" class="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-cyan-500 focus:outline-none bg-white">
+                                    <!-- Populated dynamically -->
+                                </select>
+                            </div>
+
+                            <!-- Classification & Modernization Checks -->
+                            <div class="space-y-2 pt-2 border-t border-slate-200">
+                                <label class="block font-semibold text-slate-700">Atributos de Relevamiento ISSyS</label>
+
+                                <!-- Hipótesis a Validar Toggle -->
+                                <div class="flex items-start gap-2 p-2 rounded bg-amber-50 border border-amber-200">
+                                    <input type="checkbox" id="prop-check-hypothesis" class="mt-0.5 rounded text-amber-600 focus:ring-amber-500">
+                                    <div>
+                                        <label for="prop-check-hypothesis" class="font-bold text-amber-900 cursor-pointer block leading-tight">¿Hipótesis a validar?</label>
+                                        <p class="text-[12px] text-amber-700 leading-tight mt-0.5">Marcar si el procedimiento no fue verificado de forma fehaciente con los agentes.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Requiere Presencialidad Toggle -->
+                                <div class="flex items-start gap-2 p-2 rounded bg-rose-50 border border-rose-200">
+                                    <input type="checkbox" id="prop-check-physical" class="mt-0.5 rounded text-rose-600 focus:ring-rose-500">
+                                    <div>
+                                        <label for="prop-check-physical" class="font-bold text-rose-900 cursor-pointer block leading-tight">Contacto Presencial Obligatorio</label>
+                                        <p class="text-[12px] text-rose-700 leading-tight mt-0.5">El afiliado debe trasladarse físicamente a Delegación o Casa Central.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Carga Manual Duplicada Toggle -->
+                                <div class="flex items-start gap-2 p-2 rounded bg-indigo-50 border border-indigo-200">
+                                    <input type="checkbox" id="prop-check-duplicate" class="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500">
+                                    <div>
+                                        <label for="prop-check-duplicate" class="font-bold text-indigo-900 cursor-pointer block leading-tight">Carga Manual / Doble Carga</label>
+                                        <p class="text-[12px] text-indigo-700 leading-tight mt-0.5">El agente vuelve a transcribir datos que ya obran en el comprobante o formulario.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Notes / Normative reference -->
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">Notas y Normativa / Montos de Tope</label>
+                                <textarea id="prop-input-notes" rows="2" class="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-cyan-500 focus:outline-none" placeholder="ej. Tope delegacional $200.000 (Trámite N° 28811/2026)"></textarea>
+                            </div>
+
+                            <div class="pt-2 flex gap-2">
+                                <button onclick="applyNodeProperties()" class="flex-1 py-1.5 bg-cyan-700 hover:bg-cyan-800 text-white font-medium rounded transition shadow-sm">
+                                    Aplicar al nodo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </section>
+
+    <!-- SVG del diagrama: único lienzo compartido, se monta en el visor o en el editor -->
+    <div class="hidden">
+        <svg id="bpmn-svg" class="font-sans block" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <!-- Arrowhead Markers -->
+                <marker id="arrow-default" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 1 L 10 5 L 0 9 z" fill="#4B4B49" />
+                </marker>
+                <marker id="arrow-active" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 1 L 10 5 L 0 9 z" fill="#4657A0" />
+                </marker>
+                <filter id="node-shadow" x="-10%" y="-10%" width="120%" height="120%">
+                    <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#1D1D1B" flood-opacity="0.08" />
+                </filter>
+            </defs>
+
+            <!-- Background Swimlanes Layer -->
+            <g id="swimlanes-layer"></g>
+
+            <!-- Sequence Flows (Connectors) Layer -->
+            <g id="connectors-layer"></g>
+
+            <!-- Nodes Layer (Tasks, Gateways, Events) -->
+            <g id="nodes-layer"></g>
+
+            <!-- Interactive Connection Line Preview -->
+            <line id="preview-connector" x1="0" y1="0" x2="0" y2="0" stroke="#4657A0" stroke-width="2" stroke-dasharray="4" style="display:none;" />
+        </svg>
+    </div>
+
+    <!-- Modal for Mermaid / Raw BPMN Code Export -->
+    <!-- Datos del proceso (alta y edición) -->
+    <div id="modal-process" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <form id="process-form" class="bg-white rounded-xl shadow-2xl max-w-lg w-full flex flex-col max-h-[90vh] overflow-hidden border border-slate-200">
+            <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="file-pen-line" class="w-5 h-5 text-cyan-700"></i>
+                    <h3 id="process-form-title" class="font-bold text-slate-800 text-sm">Datos del proceso</h3>
+                </div>
+                <button type="button" onclick="closeProcessForm()" class="text-slate-400 hover:text-slate-700 p-1 rounded" title="Cerrar">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="p-4 flex-1 overflow-y-auto space-y-3 text-xs">
+                <label class="block">
+                    <span class="font-semibold text-slate-700">Nombre del proceso</span>
+                    <input id="pf-name" required maxlength="120" class="mt-1 w-full border border-slate-300 rounded-lg px-3 py-2 focus:border-cyan-600 outline-none" placeholder="Ej: Afiliación de grupo familiar">
+                </label>
+                <label class="block">
+                    <span class="font-semibold text-slate-700">Área responsable</span>
+                    <input id="pf-area" maxlength="120" class="mt-1 w-full border border-slate-300 rounded-lg px-3 py-2 focus:border-cyan-600 outline-none" placeholder="Ej: Dirección de Prestaciones · Delegaciones">
+                    <span class="block text-[13px] text-slate-500 mt-1">Dirección o sector dueño del proceso, y dónde se tramita.</span>
+                </label>
+                <label class="block">
+                    <span class="font-semibold text-slate-700">Descripción</span>
+                    <textarea id="pf-description" rows="3" maxlength="400" class="mt-1 w-full border border-slate-300 rounded-lg px-3 py-2 focus:border-cyan-600 outline-none resize-y" placeholder="Qué resuelve el proceso y para quién"></textarea>
+                </label>
+                <label class="block">
+                    <span class="font-semibold text-slate-700">Referencia</span>
+                    <input id="pf-reference" maxlength="120" class="mt-1 w-full border border-slate-300 rounded-lg px-3 py-2 focus:border-cyan-600 outline-none" placeholder="Ej: Trámite N° 28811/2026 (opcional)">
+                </label>
+            </div>
+            <div class="p-4 border-t border-slate-200 flex justify-end gap-2 bg-slate-50">
+                <button type="button" onclick="closeProcessForm()" class="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded transition">Cancelar</button>
+                <button type="submit" id="process-form-submit" class="px-4 py-1.5 bg-issys-blue hover:bg-issys-blue-dark text-white text-xs font-semibold rounded shadow transition">Guardar</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="modal-export" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full flex flex-col max-h-[85vh] overflow-hidden border border-slate-200">
+            <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="code" class="w-5 h-5 text-cyan-700"></i>
+                    <h3 id="modal-export-title" class="font-bold text-slate-800 text-sm">Exportación BPMN / Código</h3>
+                </div>
+                <button onclick="closeModalExport()" class="text-slate-400 hover:text-slate-700 p-1 rounded">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="p-4 flex-1 overflow-y-auto">
+                <p id="modal-export-desc" class="text-xs text-slate-600 mb-2">Diagrama reproducible en formato Mermaid Flowchart apto para documentación técnica institucional:</p>
+                <div class="relative">
+                    <pre id="modal-export-code" class="bg-slate-900 text-emerald-400 font-mono text-xs p-4 rounded-lg overflow-x-auto whitespace-pre leading-relaxed"></pre>
+                    <button onclick="copyExportCode()" class="absolute top-2 right-2 bg-slate-800 hover:bg-slate-700 text-white text-[13px] px-2.5 py-1 rounded flex items-center gap-1 border border-slate-700 transition">
+                        <i data-lucide="copy" class="w-3 h-3"></i>
+                        <span id="copy-btn-label">Copiar</span>
+                    </button>
+                </div>
+            </div>
+            <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-end">
+                <button onclick="closeModalExport()" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded text-xs transition">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Printable Executive Modernization Report -->
+    <div id="modal-report" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full flex flex-col max-h-[90vh] overflow-hidden border border-slate-200">
+            <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-issys-blue text-white">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="clipboard-check" class="w-5 h-5 text-cyan-400"></i>
+                    <h3 class="font-bold text-sm">Informe Ejecutivo de Relevamiento y Modernización — ISSyS Chubut</h3>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="window.print()" class="px-3 py-1 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-xs font-semibold flex items-center gap-1 transition">
+                        <i data-lucide="printer" class="w-3.5 h-3.5"></i> Imprimir / Guardar PDF
+                    </button>
+                    <button onclick="closeModalReport()" class="text-slate-300 hover:text-white p-1 rounded">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="printable-report-body" class="p-6 flex-1 overflow-y-auto space-y-6 text-slate-800 text-xs font-sans">
+                <!-- Header of Document -->
+                <div class="border-b-2 border-cyan-800 pb-3 flex justify-between items-end">
+                    <div>
+                        <h2 class="text-base font-extrabold text-issys-navy tracking-tight">INSTITUTO DE SEGURIDAD SOCIAL Y SEGUROS (ISSyS)</h2>
+                        <h3 class="text-xs font-semibold text-cyan-900">DIRECCIÓN DE ENLACE DELEGACIONES & MODERNIZACIÓN ADMINISTRATIVA</h3>
+                        <p class="text-[13px] text-slate-500 mt-0.5">Provincia del Chubut • República Argentina</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="inline-block bg-slate-100 text-slate-800 px-2 py-0.5 rounded font-mono text-[12px] font-bold">EXP: REF-2026-ENLACE</span>
+                        <p class="text-[12px] text-slate-400 mt-1">Fecha de Emisión: 01/11/2026</p>
+                    </div>
+                </div>
+
+                <!-- Section: Executive Summary -->
+                <div>
+                    <h4 class="text-xs font-bold text-issys-navy uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                        1. Objeto y Alcance del Relevamiento
+                    </h4>
+                    <p class="text-slate-700 leading-relaxed text-[13px]">
+                        El presente informe formaliza el análisis metodológico del proceso administrativo de <strong>Reintegros Médicos y Asistenciales</strong>, evaluando la carga operativa presencial del afiliado en Casa Central y las 6 Delegaciones regionales (Trelew, Comodoro Rivadavia, Puerto Madryn, Esquel, CABA y Agencias de la Comarca Andina). Se plasma la brecha entre el modelo AS-IS (estado actual relevado) y la propuesta de modernización TO-BE (autogestión digital).
+                    </p>
+                </div>
+
+                <!-- Section: Diagnostics & Bottlenecks -->
+                <div>
+                    <h4 class="text-xs font-bold text-issys-navy uppercase tracking-wider mb-2">
+                        2. Diagnóstico de Fricción y Hallazgos Principales (AS-IS)
+                    </h4>
+                    <div class="grid grid-cols-3 gap-3 mb-3">
+                        <div class="p-2.5 bg-rose-50 border border-rose-200 rounded">
+                            <span class="text-xs font-bold text-rose-900 block">Punto Crítico T-01</span>
+                            <span class="text-[13px] text-rose-800">Concurrencia física obligatoria del afiliado solo para ingresar comprobantes en papel.</span>
+                        </div>
+                        <div class="p-2.5 bg-indigo-50 border border-indigo-200 rounded">
+                            <span class="text-xs font-bold text-indigo-900 block">Doble Carga T-02</span>
+                            <span class="text-[13px] text-indigo-800">Mesa de Entradas transcribe manualmente datos que ya están impresos en las facturas.</span>
+                        </div>
+                        <div class="p-2.5 bg-amber-50 border border-amber-200 rounded">
+                            <span class="text-xs font-bold text-amber-900 block">Tope Excedido T-05</span>
+                            <span class="text-[13px] text-amber-800">Montos superiores a $200.000 viajan en expediente físico a Casa Central para firma.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: TO-BE Modernization Matrix -->
+                <div>
+                    <h4 class="text-xs font-bold text-issys-navy uppercase tracking-wider mb-2">
+                        3. Plan de Modernización y Reemplazo Operativo (TO-BE)
+                    </h4>
+                    <table class="w-full text-left border-collapse border border-slate-300 text-[13px]">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-800">
+                                <th class="border border-slate-300 p-2 font-bold w-20">Paso AS-IS</th>
+                                <th class="border border-slate-300 p-2 font-bold">Cambio Propuesto (TO-BE Autogestión)</th>
+                                <th class="border border-slate-300 p-2 font-bold">Impacto en Afiliado y Delegación</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200">
+                            <tr>
+                                <td class="border border-slate-300 p-2 font-mono font-bold text-slate-700">T-01</td>
+                                <td class="border border-slate-300 p-2">Carga de comprobantes por Portal Web / App Móvil de Autogestión (foto/PDF con OCR inicial).</td>
+                                <td class="border border-slate-300 p-2 text-emerald-800 font-medium">Elimina 100% el traslado presencial inicial del afiliado.</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-slate-300 p-2 font-mono font-bold text-slate-700">T-02</td>
+                                <td class="border border-slate-300 p-2">Checklist digital con validación automática de campos requeridos y número de afiliado.</td>
+                                <td class="border border-slate-300 p-2 text-emerald-800 font-medium">Elimina la carga manual repetida en Mesa de Entradas.</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-slate-300 p-2 font-mono font-bold text-slate-700">T-03 / T-04</td>
+                                <td class="border border-slate-300 p-2">Derivación por motor de reglas: Auditoría Médica solo audita excepciones tipificadas.</td>
+                                <td class="border border-slate-300 p-2 text-emerald-800 font-medium">Reduce tiempos muertos por valija y espera secuencial.</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-slate-300 p-2 font-mono font-bold text-slate-700">T-05</td>
+                                <td class="border border-slate-300 p-2">Autorización digital de montos mayores a $200.000 mediante firma electrónica en plataforma interna.</td>
+                                <td class="border border-slate-300 p-2 text-emerald-800 font-medium">Suprime el traslado físico del expediente papel a Casa Central.</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-slate-300 p-2 font-mono font-bold text-slate-700">Fin</td>
+                                <td class="border border-slate-300 p-2">Notificación push/email del estado del trámite y transferencia directa a CBU declarado.</td>
+                                <td class="border border-slate-300 p-2 text-emerald-800 font-medium">El afiliado permanece informado en tiempo real sin llamar ni viajar.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Section: Validation & Roadmap -->
+                <div class="pt-2 border-t border-slate-200">
+                    <h4 class="text-xs font-bold text-issys-navy uppercase tracking-wider mb-1">
+                        4. Recomendaciones de la Sección Enlace Delegaciones
+                    </h4>
+                    <p class="text-slate-600 leading-relaxed text-[13px]">
+                        1. <strong>Fase 1 (Quick Win):</strong> Habilitar formulario de carga web de facturas con validación de CBU bancario.<br>
+                        2. <strong>Fase 2 (Interoperabilidad):</strong> Integrar servicio con DSI (Sistemas) para control automático de tope ($200.000) y regla de coseguro.<br>
+                        3. <strong>Fase 3:</strong> Redirigir el personal de Mesa de Entradas a mesas de ayuda digital y asesoramiento para personas mayores.
+                    </p>
+                </div>
+            </div>
+
+            <div class="p-3 bg-slate-100 border-t border-slate-200 flex justify-end gap-2">
+                <button onclick="closeModalReport()" class="px-3 py-1.5 bg-slate-300 hover:bg-slate-400 text-slate-800 font-medium rounded text-xs transition">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-issys-navy text-white text-xs px-4 py-2.5 rounded-lg shadow-xl border border-cyan-500/30 transform translate-y-20 opacity-0 transition-all duration-200 z-50 flex items-center gap-2 pointer-events-none">
+        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+        <span id="toast-message">Mensaje</span>
+    </div>
+
+    <!-- Core BPMN Modeler & Engine Script -->
+    <script>
+        /**
+         * ISSyS BPMN Modeler & Modernización
+         * Organismo: Instituto de Seguridad Social y Seguros de la Provincia del Chubut
+         * Sección: Enlace Delegaciones
+         *
+         * Navegación (hash):
+         *   #/                         → Selección de proceso
+         *   #/p/<proceso>/<asis|trans|tobe>  → Visor del diagrama (solo lectura)
+         *   #/p/<proceso>/<asis|tobe>/editar → Editor del diagrama
+         */
+
+        const STORAGE_KEY = 'issys-procesos-v1';
+        const CANVAS_WIDTH = 1750;
+        const EDITOR_WIDTH = 1800;
+        const TYPE_LABELS = {
+            'start': 'Evento de inicio',
+            'end': 'Evento de fin',
+            'task-user': 'Tarea de usuario',
+            'task-manual': 'Tarea manual',
+            'task-service': 'Tarea automatizada',
+            'gateway-xor': 'Compuerta XOR',
+            'gateway-and': 'Compuerta AND'
+        };
+
+        // State definition
+        const state = {
+            view: 'home',          // 'home' | 'viewer' | 'editor'
+            processId: null,
+            modelKey: 'asis',      // 'asis' | 'trans' | 'tobe'
+            currentModelType: 'AS-IS', // 'AS-IS' | 'TO-BE'
+            dirty: false,
+            viewerZoom: 'fit',     // 'fit' | 'real'
+            analysisOpen: false,
+            selectedNodeId: null,
+            connectMode: false,
+            connectSourceId: null,
+            lanes: [],
+            nodes: [],
+            connectors: [],
+            isDragging: false,
+            draggedNodeId: null,
+            dragOffset: { x: 0, y: 0 },
+            engine: 'legacy'       // tipo de diagrama en el visor: 'legacy' | 'bpmn'
+        };
+
+        // Catálogo de procesos (se carga desde el navegador o desde SEED_PROCESSES)
+        let processes = [];
+
+        // Procesos relevados de base.
+        // Los procesos con engine 'bpmn' guardan su diagrama como XML BPMN 2.0 (ver bpmn-modelos.js) y se editan en modelador.html.
+        // Los demás usan el modelo simplificado anterior (carriles/nodos/conectores) y el editor interno.
+        const SEED_PROCESSES = [
+            {
+                // Versión previa del piloto "Solicitud y Liquidación de Reintegros", reemplazada por el relevamiento en Bizagi
+                id: 'reintegros-anterior',
+                name: 'Reintegros Médicos (versión anterior)',
+                area: 'Prestaciones · Delegaciones',
+                description: 'Modelo previo al relevamiento en Bizagi. Se conserva como referencia hasta eliminarlo.',
+                reference: 'Trámite N° 28811/2026',
+                seed: true,
+                removable: true,
+                hasReport: false,
+                models: {
+                    asis: {
+                        title: "Piloto BPMN: Reintegros Médicos (AS-IS - Estado Actual)",
+                        lanes: [
+                            { id: 'lane-afiliado', name: 'Afiliado', height: 130, y: 0 },
+                            { id: 'lane-delegacion', name: 'Delegación (Mesa de Entradas)', height: 140, y: 130 },
+                            { id: 'lane-auditoria', name: 'Auditoría Médica', height: 140, y: 270 },
+                            { id: 'lane-liquidaciones', name: 'Liquidaciones', height: 140, y: 410 },
+                            { id: 'lane-central', name: 'Tesorería / Casa Central', height: 150, y: 550 }
+                        ],
+                        nodes: [
+                            { id: 'start-1', code: 'INI', type: 'start', label: 'Genera un gasto\nreintegrable', laneId: 'lane-afiliado', x: 60, y: 50, hypothesis: false, physical: false, duplicate: false, notes: 'El afiliado abona consulta médica particular o farmacia.' },
+                            { id: 't-01', code: 'T-01', type: 'task-user', label: 'Reúne comprobantes y se\ntraslada a la Delegación', laneId: 'lane-afiliado', x: 190, y: 40, hypothesis: false, physical: true, duplicate: false, notes: 'Punto crítico: concurrencia física obligatoria solo para entrega en papel.' },
+                            { id: 't-02', code: 'T-02', type: 'task-manual', label: 'Mesa de entradas recibe y\ncarga manualmente los datos', laneId: 'lane-delegacion', x: 280, y: 170, hypothesis: false, physical: false, duplicate: true, notes: 'Doble carga: se transcriben datos impresos en la factura.' },
+                            { id: 't-03', code: 'T-03', type: 'task-user', label: 'Audita procedencia\nmédica del gasto', laneId: 'lane-auditoria', x: 440, y: 310, hypothesis: true, physical: false, duplicate: false, notes: 'Hipótesis a validar: circuito de derivación secuencial por valija/sistema.' },
+                            { id: 'gw-procede', code: 'GW-01', type: 'gateway-xor', label: '¿Procede?', laneId: 'lane-auditoria', x: 630, y: 320, hypothesis: false, physical: false, duplicate: false, notes: 'Compuerta de aprobación médica.' },
+                            { id: 'end-rechazo', code: 'FIN-R', type: 'end', label: 'Fin - Rechazado', laneId: 'lane-auditoria', x: 635, y: 385, hypothesis: false, physical: false, duplicate: false, notes: 'Se notifica formalmente rechazo al expediente.' },
+                            { id: 't-04', code: 'T-04', type: 'task-manual', label: 'Liquidaciones calcula el\nmonto a reintegrar', laneId: 'lane-liquidaciones', x: 740, y: 450, hypothesis: true, physical: false, duplicate: false, notes: 'Cálculo de coseguro y control contra nomenclador vigente.' },
+                            { id: 'gw-tope', code: 'GW-02', type: 'gateway-xor', label: '¿Monto > $200.000?', laneId: 'lane-liquidaciones', x: 930, y: 460, hypothesis: false, physical: false, duplicate: false, notes: 'Tope delegacional según Res. Trámite N° 28811/2026.' },
+                            { id: 't-05', code: 'T-05', type: 'task-manual', label: 'Casa Central autoriza la\nexcepción de monto', laneId: 'lane-central', x: 1040, y: 610, hypothesis: true, physical: false, duplicate: false, notes: 'Expediente físico/nota que viaja desde delegación a Rawson para firma.' },
+                            { id: 't-06', code: 'T-06', type: 'task-manual', label: 'Tesorería efectiviza el\npago bancario', laneId: 'lane-central', x: 1220, y: 590, hypothesis: false, physical: false, duplicate: false, notes: 'Generación de orden de pago y remesa bancaria.' },
+                            { id: 'end-exito', code: 'FIN', type: 'end', label: 'Recibe reintegro\nsin aviso previo', laneId: 'lane-afiliado', x: 1300, y: 50, hypothesis: false, physical: false, duplicate: false, notes: 'El afiliado se entera de la resolución al revisar su extracto bancario.' }
+                        ],
+                        connectors: [
+                            { from: 'start-1', to: 't-01', label: '' },
+                            { from: 't-01', to: 't-02', label: '' },
+                            { from: 't-02', to: 't-03', label: '' },
+                            { from: 't-03', to: 'gw-procede', label: '' },
+                            { from: 'gw-procede', to: 'end-rechazo', label: 'No' },
+                            { from: 'gw-procede', to: 't-04', label: 'Sí' },
+                            { from: 't-04', to: 'gw-tope', label: '' },
+                            { from: 'gw-tope', to: 't-05', label: 'Sí' },
+                            { from: 'gw-tope', to: 't-06', label: 'No' },
+                            { from: 't-05', to: 't-06', label: '' },
+                            { from: 't-06', to: 'end-exito', label: 'Sin aviso' }
+                        ]
+                    },
+                    tobe: {
+                        title: "Propuesta TO-BE: Reintegros Médicos con Autogestión y Automatización",
+                        lanes: [
+                            { id: 'lane-afiliado-portal', name: 'Afiliado (Portal Autogestión / App)', height: 140, y: 0 },
+                            { id: 'lane-sistema', name: 'Sistema ISSyS / Motor de Reglas', height: 150, y: 140 },
+                            { id: 'lane-auditoria', name: 'Auditoría Médica (Excepciones)', height: 140, y: 290 },
+                            { id: 'lane-central', name: 'Tesorería / Autorización Central', height: 150, y: 430 }
+                        ],
+                        nodes: [
+                            { id: 'start-tobe', code: 'INI', type: 'start', label: 'Genera gasto\nreintegrable', laneId: 'lane-afiliado-portal', x: 60, y: 55, hypothesis: false, physical: false, duplicate: false, notes: 'Factura con código QR de AFIP/ARCA.' },
+                            { id: 'a-01', code: 'A-01', type: 'task-user', label: 'Carga comprobantes en el\nPortal de Autogestión', laneId: 'lane-afiliado-portal', x: 190, y: 45, hypothesis: false, physical: false, duplicate: false, notes: 'Autogestión total: sube PDF/foto desde su domicilio.' },
+                            { id: 'a-02', code: 'A-02', type: 'task-service', label: 'Valida automáticamente la\ndocumentación (Checklist OCR)', laneId: 'lane-sistema', x: 340, y: 180, hypothesis: false, physical: false, duplicate: false, notes: 'El motor verifica CBU, padrón activo y formato de factura.' },
+                            { id: 'gw-valida', code: 'GW-01', type: 'gateway-xor', label: '¿Documentación\ncompleta?', laneId: 'lane-sistema', x: 530, y: 195, hypothesis: false, physical: false, duplicate: false, notes: 'Verificación automática inmediata.' },
+                            { id: 'a-03', code: 'A-03', type: 'task-user', label: 'Revisión médica solo en\ncasos derivados por sistema', laneId: 'lane-auditoria', x: 640, y: 330, hypothesis: false, physical: false, duplicate: false, notes: 'Auditoría solo interviene si la prestación supera topes de frecuencia.' },
+                            { id: 'a-04', code: 'A-04', type: 'task-service', label: 'Calcula el monto y aplica el\ntope automáticamente', laneId: 'lane-sistema', x: 800, y: 180, hypothesis: false, physical: false, duplicate: false, notes: 'Liquidación en tiempo real aplicando vademécum y coseguro institucional.' },
+                            { id: 'gw-tope-tobe', code: 'GW-02', type: 'gateway-xor', label: '¿Monto > $200.000?', laneId: 'lane-sistema', x: 970, y: 195, hypothesis: false, physical: false, duplicate: false, notes: 'Control automático de tope normativo.' },
+                            { id: 'a-05', code: 'A-05', type: 'task-service', label: 'Autorización digital de\nexcepción (Firma electrónica)', laneId: 'lane-central', x: 1070, y: 470, hypothesis: false, physical: false, duplicate: false, notes: 'Sin valija papel: bandeja electrónica de firma para Directores.' },
+                            { id: 'a-06', code: 'A-06', type: 'task-service', label: 'Pago automatizado\n(Transferencia programada)', laneId: 'lane-central', x: 1250, y: 470, hypothesis: false, physical: false, duplicate: false, notes: 'Envío de remesa automática vía API bancaria.' },
+                            { id: 'end-tobe', code: 'FIN', type: 'end', label: 'Recibe notificación\nde estado y pago sin trasladarse', laneId: 'lane-afiliado-portal', x: 1270, y: 55, hypothesis: false, physical: false, duplicate: false, notes: 'Notificación instantánea por App móvil / e-mail con comprobante.' }
+                        ],
+                        connectors: [
+                            { from: 'start-tobe', to: 'a-01', label: '' },
+                            { from: 'a-01', to: 'a-02', label: '' },
+                            { from: 'a-02', to: 'gw-valida', label: '' },
+                            { from: 'gw-valida', to: 'a-01', label: 'No - Corrige en Portal' },
+                            { from: 'gw-valida', to: 'a-03', label: 'Sí' },
+                            { from: 'a-03', to: 'a-04', label: '' },
+                            { from: 'a-04', to: 'gw-tope-tobe', label: '' },
+                            { from: 'gw-tope-tobe', to: 'a-05', label: 'Sí' },
+                            { from: 'gw-tope-tobe', to: 'a-06', label: 'No' },
+                            { from: 'a-05', to: 'a-06', label: '' },
+                            { from: 'a-06', to: 'end-tobe', label: 'Aviso directo' }
+                        ]
+                    }
+                },
+                // Table mapping for TO-BE Opportunities matrix
+                opportunities: [
+                    {
+                        step: 'T-01 (Afiliado)',
+                        change: 'Carga de comprobantes por Portal de Autogestión (foto o PDF) en vez de entrega en mano.',
+                        impact: 'Elimina 100% el traslado presencial inicial del afiliado a la Delegación.',
+                        badge: 'Autogestión'
+                    },
+                    {
+                        step: 'T-02 (Delegación)',
+                        change: 'Validación automática con checklist y OCR de comprobantes sin carga manual en Mesa de Entradas.',
+                        impact: 'Elimina doble carga de datos y libera tiempo del personal de Delegación.',
+                        badge: 'Automatización'
+                    },
+                    {
+                        step: 'T-03 / T-04 (Auditoría/Liq)',
+                        change: 'Derivación inteligente por sistema. Auditoría interviene por excepción; estado visible para el afiliado.',
+                        impact: 'Reduce tiempos muertos de espera y consultas reiteradas en ventanilla.',
+                        badge: 'Trazabilidad'
+                    },
+                    {
+                        step: 'T-05 (Casa Central)',
+                        change: 'Autorización digital de montos superiores a $200.000 (firma electrónica) dentro de la plataforma.',
+                        impact: 'Circuito de excepción sin expediente físico ni demoras por valija postal desde el interior.',
+                        badge: 'Firma Digital'
+                    },
+                    {
+                        step: 'Fin (Liquidación)',
+                        change: 'Notificación automática proactiva de liquidación y acreditación por App y correo electrónico.',
+                        impact: 'Afiliado informado con aviso fehaciente sin requerir llamado ni concurrencia para consultar.',
+                        badge: 'Transparencia'
+                    }
+                ]
+            }
+        ];
+
+        // Reintegros relevado en Bizagi: el diagrama original está en bpmn-modelos.js (ORIGINALS.reintegros)
+        SEED_PROCESSES.unshift({
+            id: 'reintegros',
+            engine: 'bpmn',
+            name: 'Reintegros Médicos',
+            area: 'Prestaciones · Delegaciones',
+            description: 'Solicitud y liquidación de reintegros por gastos médicos y de farmacia abonados por el afiliado.',
+            reference: 'Trámite N° 28811/2026',
+            seed: true,
+            hasReport: true,
+            opportunities: SEED_PROCESSES[0].opportunities
+        });
+
+        // Initialization
+        let currentHash = '';
+        let suppressRoute = false;
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            await window.nubeListo;
+            processes = loadProcesses();
+            state.analysisOpen = readPref('analysisOpen') === '1';
+            state.viewerZoom = readPref('viewerZoom') === 'real' ? 'real' : 'fit';
+            setupEventListeners();
+            handleRoute();
+            lucide.createIcons();
+        });
+
+        // ------------------------------------------------------------
+        // Persistence (localStorage del navegador)
+        // ------------------------------------------------------------
+        function clone(obj) {
+            return JSON.parse(JSON.stringify(obj));
+        }
+
+        function loadProcesses() {
+            let stored = null;
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) stored = JSON.parse(raw);
+            } catch (e) { stored = null; }
+
+            if (!Array.isArray(stored)) stored = [];
+
+            // Migración: el "reintegros" guardado con el modelo anterior pasa a ser la versión anterior
+            const legacy = stored.find(p => p.id === 'reintegros' && p.engine !== 'bpmn');
+            if (legacy) {
+                const legacySeed = SEED_PROCESSES.find(p => p.id === 'reintegros-anterior');
+                stored = stored.filter(p => p.id !== 'reintegros-anterior');
+                Object.assign(legacy, {
+                    id: legacySeed.id,
+                    name: legacySeed.name,
+                    description: legacySeed.description,
+                    removable: true,
+                    hasReport: false
+                });
+            }
+
+            // Incorporar procesos de base que no estén en lo guardado (salvo los eliminados a propósito)
+            const deleted = readDeletedSeeds();
+            SEED_PROCESSES.forEach((seed, i) => {
+                if (deleted.includes(seed.id) || stored.some(p => p.id === seed.id)) return;
+                stored.splice(Math.min(i, stored.length), 0, clone(seed));
+            });
+            return stored;
+        }
+
+        function readDeletedSeeds() {
+            try {
+                const list = JSON.parse(readPref('deletedSeeds') || '[]');
+                return Array.isArray(list) ? list : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function isBpmn(proc) {
+            return proc && proc.engine === 'bpmn';
+        }
+
+        function saveProcesses() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(processes));
+                return true;
+            } catch (e) {
+                showToast("No se pudo guardar en este navegador.");
+                return false;
+            }
+        }
+
+        function readPref(key) {
+            try { return localStorage.getItem(`${STORAGE_KEY}:${key}`); } catch (e) { return null; }
+        }
+
+        function writePref(key, value) {
+            try { localStorage.setItem(`${STORAGE_KEY}:${key}`, value); } catch (e) { /* sin persistencia */ }
+        }
+
+        function getProcess(id) {
+            return processes.find(p => p.id === id);
+        }
+
+        // ------------------------------------------------------------
+        // Routing between screens
+        // ------------------------------------------------------------
+        function parseRoute() {
+            const parts = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
+            if (parts[0] !== 'p' || !parts[1]) return { view: 'home' };
+            return {
+                view: parts[3] === 'editar' ? 'editor' : 'viewer',
+                processId: decodeURIComponent(parts[1]),
+                modelKey: parseModelKey(parts[2])
+            };
+        }
+
+        function navigate(hash) {
+            if (location.hash === hash) handleRoute();
+            else location.hash = hash;
+        }
+
+        function viewerHash(key) {
+            return `#/p/${encodeURIComponent(state.processId)}/${key || state.modelKey}`;
+        }
+
+        function handleRoute() {
+            if (suppressRoute) { suppressRoute = false; return; }
+            const route = parseRoute();
+
+            // Salir del editor con cambios pendientes
+            const sameEditor = route.view === 'editor' && route.processId === state.processId && route.modelKey === state.modelKey;
+            if (state.view === 'editor' && state.dirty && !sameEditor) {
+                if (!confirm("Hay cambios sin guardar en el diagrama. ¿Salir y descartarlos?")) {
+                    suppressRoute = true;
+                    location.hash = currentHash;
+                    return;
+                }
+                state.dirty = false;
+            }
+            currentHash = location.hash;
+            closeModalExport();
+            closeModalReport();
+
+            if (route.view === 'home') return showHome();
+
+            const proc = getProcess(route.processId);
+            if (!proc) {
+                showToast("El proceso solicitado no existe.");
+                return navigate('#/');
+            }
+            // La etapa de transición sólo existe en los procesos BPMN
+            if (route.modelKey === 'trans' && !isBpmn(proc)) return navigate(`#/p/${encodeURIComponent(proc.id)}/asis`);
+            if (route.view === 'editor' && isBpmn(proc)) {
+                location.replace(modeladorUrl(proc.id, route.modelKey));
+                return;
+            }
+            if (route.view === 'editor') showEditor(proc, route.modelKey);
+            else showViewer(proc, route.modelKey);
+        }
+
+        function modeladorUrl(processId, modelKey) {
+            return `modelador.html?proceso=${encodeURIComponent(processId)}&modelo=${modelKey}`;
+        }
+
+        function showView(name) {
+            state.view = name;
+            ['home', 'viewer', 'editor'].forEach(v => {
+                document.getElementById(`view-${v}`).classList.toggle('hidden', v !== name);
+            });
+        }
+
+        function renderBreadcrumb(items) {
+            const nav = document.getElementById('breadcrumb');
+            nav.innerHTML = items.map((item, i) => {
+                const sep = i > 0 ? '<i data-lucide="chevron-right" class="w-3 h-3 text-slate-400 flex-shrink-0"></i>' : '';
+                const label = escapeHtml(item.label);
+                return item.href
+                    ? `${sep}<a href="${item.href}" class="hover:text-issys-blue hover:underline truncate">${label}</a>`
+                    : `${sep}<span class="text-issys-ink font-semibold truncate">${label}</span>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        // Load a process model into the working state
+        function loadModel(proc, key) {
+            const model = proc.models[key];
+            state.processId = proc.id;
+            state.modelKey = key;
+            state.currentModelType = MODEL_LABEL[key];
+
+            // Deep clone to allow mutations
+            state.lanes = clone(model.lanes);
+            state.nodes = clone(model.nodes);
+            state.connectors = clone(model.connectors);
+            state.selectedNodeId = null;
+        }
+
+        // Move the shared SVG into the active screen
+        function mountCanvas(containerId) {
+            const svg = document.getElementById('bpmn-svg');
+            document.getElementById(containerId).appendChild(svg);
+            svg.classList.toggle('readonly', state.view !== 'editor');
+        }
+
+        // ------------------------------------------------------------
+        // SCREEN 1: Process selection
+        // ------------------------------------------------------------
+        function showHome() {
+            showView('home');
+            renderBreadcrumb([{ label: 'Procesos' }]);
+            renderProcessGrid();
+        }
+
+        function modelStats(model) {
+            const nodes = model.nodes || [];
+            return {
+                steps: nodes.filter(n => n.type.startsWith('task')).length,
+                physical: nodes.filter(n => n.physical).length,
+                automated: nodes.filter(n => n.type === 'task-service').length,
+                hypotheses: nodes.filter(n => n.hypothesis).length
+            };
+        }
+
+        // Métricas AS-IS / TO-BE y fecha de última modificación, para cualquier tipo de proceso
+        function processSummary(proc) {
+            if (isBpmn(proc)) {
+                const stored = MODEL_KEYS.map(k => readStoredBpmn(proc.id, k));
+                return {
+                    asis: analyzeBpmnXml(getBpmnXml(proc.id, 'asis')),
+                    // Sin guardar, la transición es sólo la copia del AS-IS: se informa como pendiente
+                    trans: stored[1] ? analyzeBpmnXml(stored[1].xml) : null,
+                    tobe: analyzeBpmnXml(getBpmnXml(proc.id, 'tobe')),
+                    updated: stored.filter(Boolean).map(s => s.savedAt).filter(Boolean).sort().pop()
+                };
+            }
+            return {
+                asis: modelStats(proc.models.asis),
+                tobe: modelStats(proc.models.tobe),
+                updated: [proc.models.asis.updatedAt, proc.models.tobe.updatedAt].filter(Boolean).sort().pop()
+            };
+        }
+
+        function formatDate(iso) {
+            if (!iso) return '';
+            const d = new Date(iso);
+            if (isNaN(d)) return '';
+            return d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+
+        function renderProcessGrid() {
+            const grid = document.getElementById('process-grid');
+            grid.innerHTML = '';
+
+            processes.forEach(proc => {
+                const { asis, trans, tobe, updated } = processSummary(proc);
+                const removable = !proc.seed || proc.removable;
+
+                const card = document.createElement('div');
+                card.className = "group bg-white rounded-xl border border-slate-200 hover:border-cyan-500 hover:shadow-md shadow-sm p-4 flex flex-col gap-3 cursor-pointer transition";
+                card.tabIndex = 0;
+                card.setAttribute('role', 'button');
+                card.addEventListener('click', () => navigate(`#/p/${encodeURIComponent(proc.id)}/asis`));
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.click(); }
+                });
+                card.innerHTML = `
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <div class="h-9 w-9 rounded-lg bg-cyan-50 border border-cyan-100 flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="workflow" class="w-5 h-5 text-cyan-700"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <h3 class="font-bold text-sm text-issys-navy truncate">${escapeHtml(proc.name)}</h3>
+                                <p class="text-[13px] text-slate-500 truncate">${escapeHtml(proc.area || '')}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center flex-shrink-0">
+                            <button data-edit class="text-slate-400 hover:text-issys-blue p-1 rounded opacity-0 group-hover:opacity-100 focus:opacity-100 transition" title="Editar datos del proceso">
+                                <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                            </button>
+                            ${!removable ? '' : `
+                            <button data-delete class="text-slate-400 hover:text-rose-600 p-1 rounded opacity-0 group-hover:opacity-100 focus:opacity-100 transition" title="Eliminar proceso">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>`}
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed flex-1">${escapeHtml(proc.description || '')}</p>
+                    <div class="grid ${isBpmn(proc) ? 'grid-cols-3' : 'grid-cols-2'} gap-2 text-[13px]">
+                        <div class="p-2 rounded-lg bg-amber-50/60 border border-amber-100">
+                            <span class="flex items-center gap-1 font-bold text-amber-800"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>AS-IS</span>
+                            <span class="block text-slate-600 mt-0.5">${asis.steps} pasos</span>
+                            <span class="block text-slate-600">${asis.physical} presencial${asis.physical === 1 ? '' : 'es'}</span>
+                        </div>
+                        ${!isBpmn(proc) ? '' : `
+                        <div class="p-2 rounded-lg bg-sky-50/60 border border-sky-100">
+                            <span class="flex items-center gap-1 font-bold text-sky-800"><span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>Transición</span>
+                            ${trans ? `
+                            <span class="block text-slate-600 mt-0.5">${trans.steps} pasos</span>
+                            <span class="block text-slate-600">${trans.physical} presencial${trans.physical === 1 ? '' : 'es'}</span>` : `
+                            <span class="block text-slate-500 mt-0.5">Sin definir</span>`}
+                        </div>`}
+                        <div class="p-2 rounded-lg bg-emerald-50/60 border border-emerald-100">
+                            <span class="flex items-center gap-1 font-bold text-emerald-800"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>TO-BE</span>
+                            <span class="block text-slate-600 mt-0.5">${tobe.steps} pasos</span>
+                            <span class="block text-slate-600">${tobe.automated} automatizado${tobe.automated === 1 ? '' : 's'}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-[13px]">
+                        <span class="text-slate-400">${updated ? 'Modificado ' + formatDate(updated) : escapeHtml(proc.reference || 'Relevamiento base')}</span>
+                        <span class="flex items-center gap-1 font-semibold text-cyan-700 group-hover:gap-1.5 transition-all">Abrir <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></span>
+                    </div>
+                `;
+                card.querySelector('[data-edit]').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openProcessForm(proc.id);
+                });
+                const delBtn = card.querySelector('[data-delete]');
+                if (delBtn) {
+                    delBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        deleteProcess(proc.id);
+                    });
+                }
+                grid.appendChild(card);
+            });
+
+            // New process card
+            const add = document.createElement('button');
+            add.className = "rounded-xl border-2 border-dashed border-slate-300 hover:border-cyan-500 hover:bg-cyan-50/40 p-4 flex flex-col items-center justify-center gap-2 text-slate-500 hover:text-cyan-800 transition min-h-[200px]";
+            add.innerHTML = `
+                <i data-lucide="plus-circle" class="w-7 h-7"></i>
+                <span class="text-sm font-semibold">Nuevo proceso</span>
+                <span class="text-[13px] text-slate-400">Crea un AS-IS y un TO-BE vacíos para relevar</span>
+            `;
+            add.addEventListener('click', createProcess);
+            grid.appendChild(add);
+
+            lucide.createIcons();
+        }
+
+        function slugify(text) {
+            return text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+                .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        }
+
+        function createProcess() {
+            openProcessForm(null);
+        }
+
+        // Formulario de datos del proceso: id null = alta
+        let processFormId = null;
+
+        function openProcessForm(id) {
+            const proc = id ? getProcess(id) : null;
+            if (id && !proc) return;
+            processFormId = id;
+            document.getElementById('process-form-title').textContent = proc ? 'Datos del proceso' : 'Nuevo proceso';
+            document.getElementById('process-form-submit').textContent = proc ? 'Guardar' : 'Crear proceso';
+            document.getElementById('pf-name').value = proc ? proc.name : '';
+            document.getElementById('pf-area').value = proc ? (proc.area || '') : '';
+            document.getElementById('pf-description').value = proc ? (proc.description || '') : '';
+            document.getElementById('pf-reference').value = proc ? (proc.reference || '') : '';
+            document.getElementById('modal-process').classList.remove('hidden');
+            lucide.createIcons();
+            document.getElementById('pf-name').focus();
+        }
+
+        function closeProcessForm() {
+            document.getElementById('modal-process').classList.add('hidden');
+        }
+
+        function submitProcessForm(e) {
+            e.preventDefault();
+            const data = {
+                name: document.getElementById('pf-name').value.trim(),
+                area: document.getElementById('pf-area').value.trim(),
+                description: document.getElementById('pf-description').value.trim(),
+                reference: document.getElementById('pf-reference').value.trim()
+            };
+            if (!data.name) return;
+
+            if (processFormId) {
+                const proc = getProcess(processFormId);
+                Object.assign(proc, data);
+                saveProcesses();
+                closeProcessForm();
+                showToast('Datos del proceso actualizados.');
+                handleRoute();
+                return;
+            }
+
+            const base = slugify(data.name) || 'proceso';
+            let id = base;
+            let i = 2;
+            while (getProcess(id)) id = `${base}-${i++}`;
+
+            // Los procesos nuevos se modelan en BPMN 2.0 (modelador.html)
+            processes.push({
+                id,
+                engine: 'bpmn',
+                name: data.name,
+                area: data.area || 'Área a definir',
+                description: data.description || 'Proceso nuevo, pendiente de relevamiento.',
+                reference: data.reference,
+                seed: false,
+                hasReport: false,
+                opportunities: []
+            });
+            saveProcesses();
+            closeProcessForm();
+            navigate(`#/p/${encodeURIComponent(id)}/asis`);
+        }
+
+        function deleteProcess(id) {
+            const proc = getProcess(id);
+            if (!proc) return;
+            if (!confirm(`¿Eliminar el proceso "${proc.name}" con todos sus diagramas?`)) return;
+            processes = processes.filter(p => p.id !== id);
+            if (isBpmn(proc)) removeStoredBpmn(id);
+            // Recordar los procesos de base eliminados para que no vuelvan a aparecer
+            if (SEED_PROCESSES.some(p => p.id === id)) {
+                const deleted = readDeletedSeeds();
+                if (!deleted.includes(id)) deleted.push(id);
+                writePref('deletedSeeds', JSON.stringify(deleted));
+            }
+            saveProcesses();
+            renderProcessGrid();
+            showToast("Proceso eliminado.");
+        }
+
+        // ------------------------------------------------------------
+        // SCREEN 2: Viewer (read-only, AS-IS / TO-BE tabs)
+        // ------------------------------------------------------------
+        function showViewer(proc, key) {
+            const bpmn = isBpmn(proc);
+            state.engine = bpmn ? 'bpmn' : 'legacy';
+            if (bpmn) {
+                state.processId = proc.id;
+                state.modelKey = key;
+                state.currentModelType = MODEL_LABEL[key];
+            } else {
+                loadModel(proc, key);
+            }
+            showView('viewer');
+
+            document.getElementById('viewer-process-name').textContent = proc.name;
+            document.getElementById('viewer-process-area').textContent = [proc.area, proc.reference].filter(Boolean).join(' · ');
+            document.getElementById('viewer-edit-label').textContent = MODEL_LABEL[key];
+            document.getElementById('btn-export-report').classList.toggle('hidden', !proc.hasReport);
+
+            // Contenedor y opciones según el tipo de diagrama
+            document.getElementById('viewer-scroll').classList.toggle('hidden', bpmn);
+            const wrap = document.getElementById('viewer-bpmn-wrap');
+            wrap.classList.toggle('hidden', !bpmn);
+            wrap.classList.toggle('flex', bpmn);
+            document.getElementById('viewer-legend').classList.toggle('hidden', bpmn);
+            document.getElementById('opt-export-bpmn').classList.toggle('hidden', !bpmn);
+            document.getElementById('opt-export-mermaid').classList.toggle('hidden', bpmn);
+            document.getElementById('opt-export-json').classList.toggle('hidden', bpmn);
+            document.getElementById('btn-toggle-paths').classList.toggle('hidden', !bpmn);
+            if (!bpmn && pathsPanelOpen()) setPathsPanel(false);
+
+            renderBreadcrumb([
+                { label: 'Procesos', href: '#/' },
+                { label: proc.name },
+                { label: MODEL_LABEL[key] }
+            ]);
+
+            updateViewerTabs();
+            updateZoomLabel();
+            hideNodeInfo();
+            setAnalysisPanel(state.analysisOpen);
+            renderMatrix();
+
+            if (bpmn) {
+                showBpmnDiagram(proc, key);
+                return;
+            }
+
+            mountCanvas('viewer-canvas');
+            document.getElementById('viewer-model-title').textContent = proc.models[key].title;
+            const updated = proc.models[key].updatedAt;
+            document.getElementById('viewer-model-updated').textContent = updated ? `· Última modificación ${formatDate(updated)}` : '';
+            document.getElementById('viewer-empty').classList.toggle('hidden', state.nodes.length > 0);
+            renderCanvas();
+            renderDiagnostics();
+            document.getElementById('viewer-scroll').scrollTo({ left: 0, top: 0 });
+        }
+
+        // ------------------------------------------------------------
+        // Visor BPMN (procesos modelados en modelador.html)
+        // ------------------------------------------------------------
+        let bpmnViewer = null;
+        let bpmnLoadToken = 0;
+        let bpmnSelectedId = null;
+
+        function getBpmnViewer() {
+            if (bpmnViewer) return bpmnViewer;
+            if (typeof BpmnJS === 'undefined') return null;
+            bpmnViewer = new BpmnJS({ container: '#viewer-bpmn', additionalModules: [SwimlaneLabelModule] });
+            bpmnViewer.on('element.click', (e) => onBpmnElementClick(e.element));
+            return bpmnViewer;
+        }
+
+        async function showBpmnDiagram(proc, key) {
+            const token = ++bpmnLoadToken;
+            if (presentation) stopPresentation();
+            const stored = readStoredBpmn(proc.id, key);
+            document.getElementById('viewer-bpmn-title').textContent = `${proc.name} — ${MODEL_TITLE[key]}`;
+            document.getElementById('viewer-bpmn-updated').textContent = stored && stored.savedAt
+                ? `· Última modificación ${formatDate(stored.savedAt)}`
+                : key === 'trans' ? '· Sin modelar todavía: se muestra el AS-IS como punto de partida'
+                : (originalBpmnDefinition(proc.id, key) ? '· Versión original del relevamiento' : '');
+
+            const viewer = getBpmnViewer();
+            if (!viewer) {
+                showToast("No se pudo cargar el visor BPMN (requiere conexión a internet).");
+                return;
+            }
+            try {
+                await viewer.importXML(getBpmnXml(proc.id, key));
+            } catch (err) {
+                console.error(err);
+                showToast("No se pudo mostrar el diagrama BPMN.");
+                return;
+            }
+            if (token !== bpmnLoadToken) return;
+
+            bpmnSelectedId = null;
+            drawIssysOverlays(viewer);
+            fitBpmn();
+            const hasActivities = !!viewer.get('elementRegistry').find(el => el.businessObject && el.businessObject.$instanceOf('bpmn:Activity'));
+            document.getElementById('viewer-bpmn-empty').classList.toggle('hidden', hasActivities);
+            renderDiagnostics();
+            if (pathsPanelOpen()) refreshPaths();
+        }
+
+        function fitBpmn(animate) {
+            if (!bpmnViewer) return;
+            const canvas = bpmnViewer.get('canvas');
+            canvas.resized();
+            if (state.viewerZoom === 'real' && !animate) {
+                canvas.zoom(1, 'auto');
+                return;
+            }
+            const inner = canvas.viewbox().inner;
+            if (!inner.width || !inner.height) return;
+            let box = { x: inner.x - 30, y: inner.y - 30, width: inner.width + 60, height: inner.height + 60 };
+            if (state.viewerZoom === 'real') {
+                // Escala 1 centrada en el diagrama (equivale a zoom(1, 'auto'))
+                const size = canvas.getSize();
+                box = { x: inner.x + inner.width / 2 - size.width / 2, y: inner.y + inner.height / 2 - size.height / 2, width: size.width, height: size.height };
+            }
+            if (animate) animateBpmnViewbox(box);
+            else canvas.viewbox(box);
+        }
+
+        // Acerca la vista al elemento seleccionado, dejando algo de contexto alrededor.
+        // bottomInset: píxeles tapados abajo (barra de presentación); el elemento se centra en el resto.
+        function zoomToBpmnElement(el, bottomInset = 0) {
+            const canvas = bpmnViewer.get('canvas');
+            canvas.resized();
+            const size = canvas.getSize();
+            const visibleHeight = Math.max(200, size.height - bottomInset);
+            const scale = Math.min(1.4, size.width / (el.width + 420), visibleHeight / (el.height + 300));
+            const width = size.width / scale;
+            const height = size.height / scale;
+            animateBpmnViewbox({
+                x: el.x + el.width / 2 - width / 2,
+                y: el.y + el.height / 2 - (visibleHeight / scale) / 2,
+                width,
+                height
+            });
+        }
+
+        let bpmnAnimToken = 0;
+        function animateBpmnViewbox(target, duration = 350) {
+            const canvas = bpmnViewer.get('canvas');
+            const from = canvas.viewbox();
+            const token = ++bpmnAnimToken;
+            const start = performance.now();
+            const ease = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+            const step = (now) => {
+                if (token !== bpmnAnimToken) return;
+                const t = Math.min(1, (now - start) / duration);
+                const k = ease(t);
+                canvas.viewbox({
+                    x: from.x + (target.x - from.x) * k,
+                    y: from.y + (target.y - from.y) * k,
+                    width: from.width + (target.width - from.width) * k,
+                    height: from.height + (target.height - from.height) * k
+                });
+                if (t < 1) requestAnimationFrame(step);
+            };
+            requestAnimationFrame(step);
+        }
+
+        // Reajusta el diagrama visible al cambiar zoom, panel o tamaño de ventana
+        function refreshViewerSize() {
+            if (state.engine === 'bpmn') fitBpmn();
+            else applyCanvasSize();
+        }
+
+        function onBpmnElementClick(element) {
+            const canvas = bpmnViewer.get('canvas');
+            const el = element.labelTarget || element;
+            if (presentation) {
+                presentJumpTo(el.id);
+                return;
+            }
+            const bo = el.businessObject;
+            const showable = bo && (bo.$instanceOf('bpmn:FlowNode') || bo.$instanceOf('bpmn:DataObjectReference') || bo.$instanceOf('bpmn:DataStoreReference'));
+            if (!showable) {
+                // Clic fuera de un elemento: cerrar el detalle y volver a la vista completa
+                if (bpmnSelectedId) hideNodeInfo(true);
+                return;
+            }
+
+            if (bpmnSelectedId) canvas.removeMarker(bpmnSelectedId, 'issys-selected');
+            bpmnSelectedId = el.id;
+            canvas.addMarker(el.id, 'issys-selected');
+            const lane = bo.lanes && bo.lanes[0];
+            showInfoCard({
+                code: bo.id,
+                type: bpmnTypeLabel(bo),
+                label: bo.name || '(sin nombre)',
+                lane: lane ? lane.name : '',
+                physical: issysFlag(bo, 'presencial'),
+                duplicate: issysFlag(bo, 'doblecarga'),
+                hypothesis: issysFlag(bo, 'hipotesis'),
+                automated: ['bpmn:ServiceTask', 'bpmn:ScriptTask', 'bpmn:BusinessRuleTask'].includes(bo.$type),
+                notes: (bo.documentation && bo.documentation[0] && bo.documentation[0].text) || ''
+            });
+            zoomToBpmnElement(el);
+        }
+
+        function switchModelTab(key) {
+            if (key === state.modelKey) return;
+            navigate(viewerHash(key));
+        }
+
+        function updateViewerTabs() {
+            const active = "px-3 py-1.5 rounded-md flex items-center gap-1.5 transition bg-white text-slate-900 shadow-sm";
+            const idle = "px-3 py-1.5 rounded-md flex items-center gap-1.5 transition text-slate-500 hover:text-slate-800";
+            MODEL_KEYS.forEach(k => {
+                const btn = document.getElementById(`viewer-tab-${k}`);
+                btn.className = k === state.modelKey ? active : idle;
+                btn.classList.toggle('hidden', k === 'trans' && state.engine !== 'bpmn');
+                btn.setAttribute('aria-selected', k === state.modelKey ? 'true' : 'false');
+            });
+        }
+
+        function openEditor() {
+            if (state.engine === 'bpmn') {
+                location.href = modeladorUrl(state.processId, state.modelKey);
+                return;
+            }
+            navigate(`${viewerHash()}/editar`);
+        }
+
+        function toggleViewerZoom() {
+            state.viewerZoom = state.viewerZoom === 'fit' ? 'real' : 'fit';
+            writePref('viewerZoom', state.viewerZoom);
+            updateZoomLabel();
+            refreshViewerSize();
+        }
+
+        function updateZoomLabel() {
+            document.getElementById('viewer-zoom-label').textContent = state.viewerZoom === 'fit' ? 'Tamaño real' : 'Ajustar a pantalla';
+        }
+
+        function toggleAnalysisPanel(force) {
+            setAnalysisPanel(force !== undefined ? force : !state.analysisOpen);
+            writePref('analysisOpen', state.analysisOpen ? '1' : '0');
+            if (state.analysisOpen) setPathsPanel(false);
+            refreshViewerSize();
+        }
+
+        // ------------------------------------------------------------
+        // Caminos del proceso (camino feliz y alternativos)
+        // ------------------------------------------------------------
+        let pathsData = null;
+        let selectedPathId = null;
+
+        function pathsPanelOpen() {
+            return !document.getElementById('paths-panel').classList.contains('hidden');
+        }
+
+        function togglePathsPanel(force) {
+            const open = force !== undefined ? force : !pathsPanelOpen();
+            if (open && state.analysisOpen) {
+                setAnalysisPanel(false);
+                writePref('analysisOpen', '0');
+            }
+            setPathsPanel(open);
+            refreshViewerSize();
+        }
+
+        function setPathsPanel(open) {
+            const panel = document.getElementById('paths-panel');
+            panel.classList.toggle('hidden', !open);
+            panel.classList.toggle('flex', open);
+            const btn = document.getElementById('btn-toggle-paths');
+            btn.classList.toggle('bg-emerald-50', open);
+            btn.classList.toggle('border-emerald-300', open);
+            if (open) refreshPaths();
+            else selectPath(null);
+        }
+
+        // Recalcula los caminos del diagrama cargado y muestra el camino feliz
+        function refreshPaths() {
+            if (!bpmnViewer || state.engine !== 'bpmn') return;
+            pathsData = analyzeProcessPaths(bpmnViewer.getDefinitions());
+            renderPathsPanel();
+            selectPath(pathsData.happy ? pathsData.happy.id : null);
+        }
+
+        function findPath(id) {
+            if (!pathsData || !id) return null;
+            return [pathsData.happy, ...pathsData.alternatives].find(p => p && p.id === id) || null;
+        }
+
+        function selectPath(id) {
+            selectedPathId = id;
+            highlightPath(findPath(id));
+            document.querySelectorAll('#paths-body [data-path]').forEach(card => {
+                card.classList.toggle('selected', card.dataset.path === id);
+            });
+        }
+
+        function highlightPath(path) {
+            if (!bpmnViewer) return;
+            const canvas = bpmnViewer.get('canvas');
+            const container = document.getElementById('viewer-bpmn');
+            bpmnViewer.get('elementRegistry').forEach(el => {
+                ['issys-path', 'issys-dim', 'issys-future', 'issys-current'].forEach(m => canvas.removeMarker(el, m));
+            });
+            container.classList.toggle('path-alt', !!path && path !== pathsData.happy);
+            if (!path) return;
+
+            forEachTraversable(el => {
+                const inPath = path.elementIds.has(el.businessObject.id);
+                canvas.addMarker(el, inPath ? 'issys-path' : 'issys-dim');
+                // Las etiquetas externas (nombres de eventos, compuertas y flechas) se atenúan con su elemento
+                if (el.label && !inPath) canvas.addMarker(el.label, 'issys-dim');
+            });
+        }
+
+        // Elementos que pueden formar parte de un camino (no carriles ni pools)
+        function forEachTraversable(fn) {
+            const traversable = ['bpmn:FlowNode', 'bpmn:SequenceFlow', 'bpmn:MessageFlow', 'bpmn:DataObjectReference',
+                'bpmn:DataStoreReference', 'bpmn:DataAssociation', 'bpmn:Association', 'bpmn:TextAnnotation'];
+            bpmnViewer.get('elementRegistry').forEach(el => {
+                const bo = el.businessObject;
+                if (el.type !== 'label' && bo && traversable.some(t => bo.$instanceOf(t))) fn(el);
+            });
+        }
+
+        // ------------------------------------------------------------
+        // Presentación de un camino, paso a paso y en pantalla completa
+        // ------------------------------------------------------------
+        let presentation = null;   // { path, index }
+
+        function startPresentation(pathId) {
+            const path = findPath(pathId);
+            if (!path || !path.sequence.length) return;
+            selectPath(pathId);
+            hideNodeInfo();
+            presentation = { path, index: 0 };
+            const happy = path === pathsData.happy;
+            const color = happy ? '#2F7D50' : '#4657A0';
+            document.getElementById('present-progress').style.background = color;
+            document.getElementById('present-path-name').textContent = happy ? 'Camino feliz' : `Camino alternativo: ${path.name}`;
+            document.getElementById('present-bar').classList.remove('hidden');
+
+            const wrap = document.getElementById('viewer-bpmn-wrap');
+            if (wrap.requestFullscreen) {
+                wrap.requestFullscreen().catch(() => {}).finally(() => setTimeout(renderPresentStep, 150));
+            } else {
+                renderPresentStep();
+            }
+        }
+
+        function stopPresentation() {
+            if (!presentation) return;
+            presentation = null;
+            document.getElementById('present-bar').classList.add('hidden');
+            if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+            highlightPath(findPath(selectedPathId));
+            setTimeout(() => fitBpmn(true), 150);
+        }
+
+        function presentGo(delta) {
+            if (!presentation) return;
+            const next = presentation.index + delta;
+            if (next < 0 || next >= presentation.path.sequence.length) return;
+            presentation.index = next;
+            renderPresentStep();
+        }
+
+        function presentJumpTo(id) {
+            const seq = presentation.path.sequence;
+            // Si el elemento aparece más de una vez (retrabajo), la próxima aparición después del paso actual
+            const later = seq.findIndex((s, i) => i > presentation.index && s.id === id);
+            const index = later >= 0 ? later : seq.findIndex(s => s.id === id);
+            if (index < 0) return;
+            presentation.index = index;
+            renderPresentStep();
+        }
+
+        function onPresentKey(e) {
+            const keys = {
+                ArrowRight: 1, ArrowDown: 1, PageDown: 1, ' ': 1, Enter: 1,
+                ArrowLeft: -1, ArrowUp: -1, PageUp: -1, Backspace: -1
+            };
+            if (e.key === 'Escape') { stopPresentation(); return true; }
+            if (e.key === 'Home') { presentation.index = 0; renderPresentStep(); }
+            else if (e.key === 'End') { presentation.index = presentation.path.sequence.length - 1; renderPresentStep(); }
+            else if (keys[e.key]) presentGo(keys[e.key]);
+            else return false;
+            e.preventDefault();
+            return true;
+        }
+
+        function renderPresentStep() {
+            if (!presentation) return;
+            const { path, index } = presentation;
+            const seq = path.sequence;
+            const registry = bpmnViewer.get('elementRegistry');
+            const canvas = bpmnViewer.get('canvas');
+            const el = registry.get(seq[index].id);
+            if (!el) return;
+            const bo = el.businessObject;
+
+            // Marcas: lo recorrido en color, lo que falta tenue, lo que no es del camino muy atenuado
+            const done = new Set();
+            seq.slice(0, index + 1).forEach(s => {
+                done.add(s.id);
+                if (s.via) done.add(s.via);
+                const sbo = registry.get(s.id) && registry.get(s.id).businessObject;
+                (sbo && (sbo.dataInputAssociations || []).concat(sbo.dataOutputAssociations || []) || []).forEach(a => {
+                    done.add(a.id);
+                    [].concat(a.sourceRef || [], a.targetRef || []).forEach(r => done.add(r.id));
+                });
+            });
+            forEachTraversable(e => {
+                ['issys-path', 'issys-dim', 'issys-future', 'issys-current'].forEach(m => canvas.removeMarker(e, m));
+                if (e.label) canvas.removeMarker(e.label, 'issys-dim');
+                const id = e.businessObject.id;
+                if (!path.elementIds.has(id)) {
+                    canvas.addMarker(e, 'issys-dim');
+                    if (e.label) canvas.addMarker(e.label, 'issys-dim');
+                } else {
+                    canvas.addMarker(e, done.has(id) ? 'issys-path' : 'issys-future');
+                }
+            });
+            canvas.addMarker(el, 'issys-current');
+
+            // Texto de la barra
+            const lane = laneOf(bo);
+            const prevTask = seq.slice(0, index).map(s => registry.get(s.id)).reverse()
+                .find(p => p && p.businessObject.$instanceOf('bpmn:FlowNode') && laneOf(p.businessObject));
+            const prevLane = prevTask ? laneOf(prevTask.businessObject) : null;
+            const repeat = seq.slice(0, index).filter(s => s.id === bo.id).length;
+
+            const chips = [];
+            if (lane && prevLane && lane !== prevLane) chips.push(`<span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 font-semibold">Pase: ${escapeHtml(prevLane.name)} → ${escapeHtml(lane.name)}</span>`);
+            if (repeat) chips.push(`<span class="px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 font-semibold">Retrabajo · ${repeat + 1}ª vez</span>`);
+            ISSYS_FLAGS.filter(f => issysFlag(bo, f.key)).forEach(f => chips.push(`<span class="issys-chip ${f.key}">${f.chip}</span>`));
+
+            document.getElementById('present-counter').textContent = `${index + 1} / ${seq.length}`;
+            document.getElementById('present-type').textContent = bpmnTypeLabel(bo);
+            document.getElementById('present-lane').textContent = lane ? lane.name : '';
+            document.getElementById('present-chips').innerHTML = chips.join('');
+            document.getElementById('present-title').textContent = bo.name || bpmnTypeLabel(bo);
+            document.getElementById('present-detail').innerHTML = presentDetailHtml(bo, index);
+            document.getElementById('present-progress').style.width = `${((index + 1) / seq.length) * 100}%`;
+            document.getElementById('present-prev').disabled = index === 0;
+            document.getElementById('present-next').disabled = index === seq.length - 1;
+            lucide.createIcons();
+
+            const bar = document.getElementById('present-bar');
+            zoomToBpmnElement(el, bar.offsetHeight + 48);
+        }
+
+        function presentDetailHtml(bo, index) {
+            const { path } = presentation;
+            const seq = path.sequence;
+            const parts = [];
+            const notes = bo.documentation && bo.documentation[0] && bo.documentation[0].text;
+
+            if (bo.$instanceOf('bpmn:StartEvent') && index === 0) parts.push('Inicio del proceso.');
+            if (isDecisionGateway(bo)) {
+                const next = seq.slice(index + 1).find(s => s.via && seqOut(bo).some(f => f.id === s.via));
+                const flow = next && seqOut(bo).find(f => f.id === next.via);
+                if (flow) {
+                    const expected = isExpectedFlow(flow);
+                    parts.push(`Decisión: <strong class="${expected ? 'text-emerald-700' : 'text-orange-700'}">${escapeHtml(flow.name || 'sigue')}</strong> → ${escapeHtml(flow.targetRef.name || bpmnTypeLabel(flow.targetRef))}${expected ? ' <span class="text-emerald-700">(lo esperado)</span>' : ' <span class="text-orange-700">(desvío)</span>'}`);
+                }
+            } else if (bo.$instanceOf('bpmn:Gateway')) {
+                parts.push('Se unen los caminos y el trámite continúa.');
+            }
+            if (notes) parts.push(escapeHtml(notes).replace(/\n/g, '<br>'));
+            const docs = (bo.dataInputAssociations || []).concat(bo.dataOutputAssociations || [])
+                .flatMap(a => [].concat(a.sourceRef || [], a.targetRef || []))
+                .filter(r => r.$instanceOf('bpmn:DataObjectReference') || r.$instanceOf('bpmn:DataStoreReference'))
+                .map(r => r.name || 'Documento');
+            if (docs.length) parts.push(`<span class="text-slate-500">Documentos:</span> ${docs.map(escapeHtml).join(', ')}`);
+            if (bo.$instanceOf('bpmn:EndEvent')) {
+                const m = path.metrics;
+                parts.push(`Fin del recorrido · <strong>${m.tasks}</strong> tareas · <strong>${m.handoffs}</strong> pases entre áreas · <strong>${m.presencial}</strong> paso${m.presencial === 1 ? '' : 's'} presencial${m.presencial === 1 ? '' : 'es'} · <strong>${m.docs}</strong> documentos`);
+            }
+            return parts.map(p => `<p>${p}</p>`).join('');
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            if (presentation && !document.fullscreenElement) stopPresentation();
+            else if (presentation) setTimeout(renderPresentStep, 100);
+        });
+
+        function renderPathsPanel() {
+            const body = document.getElementById('paths-body');
+            const d = pathsData;
+            let html = '';
+
+            if (d.unmarked.length) {
+                html += `
+                    <div class="p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 space-y-1">
+                        <p class="font-semibold flex items-center gap-1.5"><i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> Falta marcar el camino esperado</p>
+                        <p class="leading-snug">En el editor, seleccioná cada compuerta y elegí la salida esperada:</p>
+                        <ul class="list-disc pl-4">${d.unmarked.map(g => `<li>${escapeHtml(g.name || g.id)}</li>`).join('')}</ul>
+                    </div>`;
+            }
+
+            if (!d.happy && !d.alternatives.length) {
+                html += `<p class="text-slate-500">El diagrama no tiene un evento de inicio con un recorrido para analizar.</p>`;
+                body.innerHTML = html;
+                return;
+            }
+
+            if (d.happy) {
+                html += `<div class="space-y-2">
+                    <h5 class="text-[13px] font-bold uppercase tracking-wider text-emerald-700">Camino feliz</h5>
+                    ${pathCardHtml(d.happy, null)}
+                    ${d.ambiguous ? '<p class="text-[12px] text-amber-700">Hay más de un camino posible sin desvíos: se muestra el primero hasta marcar todas las compuertas.</p>' : ''}
+                </div>`;
+            }
+
+            const simple = d.alternatives.filter(p => p.deviations.length <= 1);
+            const combined = d.alternatives.filter(p => p.deviations.length > 1);
+            if (simple.length) {
+                html += `<div class="space-y-2">
+                    <h5 class="text-[13px] font-bold uppercase tracking-wider text-orange-700">Caminos alternativos <span class="font-normal text-slate-400 normal-case tracking-normal">· ${simple.length}</span></h5>
+                    ${simple.map(p => pathCardHtml(p, d.happy)).join('')}
+                </div>`;
+            }
+            if (combined.length) {
+                html += `<details class="space-y-2">
+                    <summary class="cursor-pointer text-[13px] font-bold uppercase tracking-wider text-slate-500">Combinaciones de desvíos <span class="font-normal normal-case tracking-normal">· ${combined.length}</span></summary>
+                    <div class="space-y-2 pt-2">${combined.map(p => pathCardHtml(p, d.happy)).join('')}</div>
+                </details>`;
+            }
+            if (d.truncated) html += `<p class="text-[12px] text-slate-500">Se muestran los primeros ${MAX_PATHS} caminos.</p>`;
+
+            body.innerHTML = html;
+            body.querySelectorAll('[data-path]').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    if (e.target.closest('details.path-steps')) return;
+                    const present = e.target.closest('[data-present]');
+                    if (present) {
+                        startPresentation(present.dataset.present);
+                        return;
+                    }
+                    selectPath(card.dataset.path === selectedPathId ? null : card.dataset.path);
+                });
+            });
+            lucide.createIcons();
+        }
+
+        // Tarjeta de un camino; base = camino feliz para mostrar las diferencias
+        function pathCardHtml(p, base) {
+            const happy = !base;
+            const color = happy ? '#2F7D50' : '#4657A0';
+            const stat = (key, label) => {
+                const v = p.metrics[key];
+                const diff = base ? v - base.metrics[key] : 0;
+                const delta = diff ? `<span class="text-[11px] font-semibold ${diff > 0 ? 'text-rose-600' : 'text-emerald-600'}">${diff > 0 ? '+' : ''}${diff}</span>` : '';
+                return `<div class="p-1.5 rounded bg-white border border-slate-200 text-center">
+                    <span class="block text-base font-extrabold text-slate-800 leading-tight">${v} ${delta}</span>
+                    <span class="text-[11px] text-slate-500 leading-tight">${label}</span>
+                </div>`;
+            };
+            const title = happy ? 'Todo sale según lo esperado' : escapeHtml(p.name);
+            return `
+                <div data-path="${p.id}" class="path-card cursor-pointer p-3 rounded-lg border space-y-2 ${happy ? 'bg-emerald-50 border-emerald-200 hover:border-emerald-400' : 'bg-orange-50/60 border-orange-200 hover:border-orange-400'}" style="--card-color:${color}">
+                    <div class="flex items-start justify-between gap-2">
+                        <p class="font-semibold text-slate-800 leading-snug">${title}</p>
+                        ${p.rework ? '<span class="flex-shrink-0 px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 text-[11px] font-semibold">Retrabajo</span>' : ''}
+                    </div>
+                    <div class="grid grid-cols-4 gap-1.5">
+                        ${stat('tasks', 'Tareas')}
+                        ${stat('handoffs', 'Pases')}
+                        ${stat('presencial', 'Presenc.')}
+                        ${stat('docs', 'Docum.')}
+                    </div>
+                    <div class="flex items-center justify-between gap-2">
+                        <p class="text-[12px] text-slate-600">Termina en: <strong>${escapeHtml(p.ends.join(' / ') || '—')}</strong></p>
+                        <button data-present="${p.id}" class="flex-shrink-0 flex items-center gap-1 px-2 py-1 rounded text-white text-[12px] font-semibold shadow-sm" style="background:${color}" title="Recorrer este camino paso a paso, en pantalla completa">
+                            <i data-lucide="presentation" class="w-3.5 h-3.5"></i> Presentar
+                        </button>
+                    </div>
+                    <details class="path-steps">
+                        <summary class="cursor-pointer text-[12px] font-semibold text-cyan-700">Ver pasos</summary>
+                        <ol class="mt-1.5 space-y-0.5 list-decimal pl-5 text-[12px] text-slate-700">
+                            ${p.tasks.map(t => `<li>${escapeHtml(t.name)}${t.lane ? ` <span class="text-slate-400">· ${escapeHtml(t.lane)}</span>` : ''}${t.presencial ? ' <span class="issys-chip presencial">PRESENCIAL</span>' : ''}</li>`).join('')}
+                        </ol>
+                    </details>
+                </div>`;
+        }
+
+        function setAnalysisPanel(open) {
+            state.analysisOpen = open;
+            const panel = document.getElementById('analysis-panel');
+            panel.classList.toggle('hidden', !open);
+            panel.classList.toggle('flex', open);
+            const btn = document.getElementById('btn-toggle-analysis');
+            btn.classList.toggle('bg-amber-50', open);
+            btn.classList.toggle('border-amber-300', open);
+            if (open) switchRightTab(document.getElementById('tab-content-matrix').classList.contains('hidden') ? 'diagnosis' : 'matrix');
+        }
+
+        function showNodeInfo(node) {
+            const lane = state.lanes.find(l => l.id === node.laneId);
+            showInfoCard({
+                code: node.code || node.id,
+                type: TYPE_LABELS[node.type] || node.type,
+                label: (node.label || '').replace(/\n/g, ' '),
+                lane: lane ? lane.name : '',
+                physical: node.physical,
+                duplicate: node.duplicate,
+                hypothesis: node.hypothesis,
+                automated: node.type === 'task-service',
+                notes: node.notes
+            });
+            // El panel achica el área del diagrama: reajustar y centrar el nodo
+            applyCanvasSize();
+            const scroll = document.getElementById('viewer-scroll');
+            const el = document.getElementById(`node-g-${node.id}`);
+            if (el) {
+                const r = el.getBoundingClientRect();
+                const sr = scroll.getBoundingClientRect();
+                scroll.scrollBy({ left: r.left + r.width / 2 - (sr.left + sr.width / 2), top: r.top + r.height / 2 - (sr.top + sr.height / 2), behavior: 'smooth' });
+            }
+        }
+
+        // Panel lateral con el detalle del elemento seleccionado (visor, solo lectura)
+        function showInfoCard(info) {
+            document.getElementById('node-info-code').textContent = info.code;
+            document.getElementById('node-info-type').textContent = info.type;
+            document.getElementById('node-info-label').textContent = info.label;
+            document.getElementById('node-info-lane').textContent = info.lane ? `Carril: ${info.lane}` : '';
+
+            const flags = [];
+            if (info.physical) flags.push('<span class="px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 text-[12px] font-semibold">Contacto presencial</span>');
+            if (info.duplicate) flags.push('<span class="px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800 text-[12px] font-semibold">Doble carga</span>');
+            if (info.hypothesis) flags.push('<span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[12px] font-semibold">Hipótesis a validar</span>');
+            if (info.automated) flags.push('<span class="px-1.5 py-0.5 rounded bg-teal-100 text-teal-800 text-[12px] font-semibold">Automatizada</span>');
+            const flagsEl = document.getElementById('node-info-flags');
+            flagsEl.innerHTML = flags.join('');
+            flagsEl.classList.toggle('hidden', !flags.length);
+
+            document.getElementById('node-info-notes').textContent = info.notes || '';
+            document.getElementById('node-info-notes-wrap').classList.toggle('hidden', !info.notes);
+
+            const panel = document.getElementById('node-info');
+            panel.classList.remove('hidden');
+            panel.classList.add('flex');
+        }
+
+        // refit: volver a la vista completa del diagrama (al cerrar el detalle por el usuario)
+        function hideNodeInfo(refit) {
+            const panel = document.getElementById('node-info');
+            const wasOpen = !panel.classList.contains('hidden');
+            panel.classList.add('hidden');
+            panel.classList.remove('flex');
+            if (bpmnViewer && bpmnSelectedId) {
+                bpmnViewer.get('canvas').removeMarker(bpmnSelectedId, 'issys-selected');
+                bpmnSelectedId = null;
+            }
+            if (refit && wasOpen) {
+                if (state.engine === 'bpmn') fitBpmn(true);
+                else applyCanvasSize();
+            }
+        }
+
+        // ------------------------------------------------------------
+        // SCREEN 3: Editor
+        // ------------------------------------------------------------
+        function showEditor(proc, key) {
+            loadModel(proc, key);
+            state.dirty = false;
+            showView('editor');
+            mountCanvas('editor-canvas');
+
+            document.getElementById('editor-process-name').textContent = proc.name;
+            document.getElementById('editor-model-title').textContent = proc.models[key].title;
+            const badge = document.getElementById('editor-model-badge');
+            badge.textContent = MODEL_LABEL[key];
+            badge.className = key === 'asis'
+                ? "px-2 py-0.5 text-[13px] font-bold rounded border bg-amber-50 text-amber-800 border-amber-300"
+                : "px-2 py-0.5 text-[13px] font-bold rounded border bg-emerald-50 text-emerald-800 border-emerald-300";
+            document.getElementById('btn-restore-original').classList.toggle('hidden', !SEED_PROCESSES.some(p => p.id === proc.id));
+
+            renderBreadcrumb([
+                { label: 'Procesos', href: '#/' },
+                { label: proc.name, href: viewerHash(key) },
+                { label: `Editar ${MODEL_LABEL[key]}` }
+            ]);
+
+            toggleConnectMode(false);
+            renderLanesList();
+            populateLaneDropdown();
+            clearPropertiesPanel();
+            renderCanvas();
+            updateDirtyIndicator();
+            document.getElementById('editor-canvas').scrollTo({ left: 0, top: 0 });
+        }
+
+        function markDirty() {
+            if (!state.dirty) {
+                state.dirty = true;
+                updateDirtyIndicator();
+            }
+        }
+
+        function updateDirtyIndicator() {
+            document.getElementById('editor-dirty-chip').classList.toggle('hidden', !state.dirty);
+        }
+
+        function saveEditor() {
+            const proc = getProcess(state.processId);
+            if (!proc) return;
+            proc.models[state.modelKey] = {
+                ...proc.models[state.modelKey],
+                lanes: clone(state.lanes),
+                nodes: clone(state.nodes),
+                connectors: clone(state.connectors),
+                updatedAt: new Date().toISOString()
+            };
+            if (!saveProcesses()) return;
+            state.dirty = false;
+            showToast(`Diagrama ${state.currentModelType} guardado.`);
+            navigate(viewerHash());
+        }
+
+        function discardEditor() {
+            if (state.dirty && !confirm("¿Descartar los cambios realizados en el diagrama?")) return;
+            state.dirty = false;
+            navigate(viewerHash());
+        }
+
+        function restoreOriginalModel() {
+            const seed = SEED_PROCESSES.find(p => p.id === state.processId);
+            if (!seed) return;
+            if (!confirm(`¿Reemplazar el diagrama ${state.currentModelType} por la versión original del relevamiento? Se aplica al guardar.`)) return;
+            const model = seed.models[state.modelKey];
+            state.lanes = clone(model.lanes);
+            state.nodes = clone(model.nodes);
+            state.connectors = clone(model.connectors);
+            markDirty();
+            renderLanesList();
+            populateLaneDropdown();
+            clearPropertiesPanel();
+            renderCanvas();
+            showToast("Versión original cargada. Guardá para confirmar.");
+        }
+
+        // Setup DOM event listeners
+        function setupEventListeners() {
+            window.addEventListener('hashchange', handleRoute);
+            document.getElementById('process-form').addEventListener('submit', submitProcessForm);
+            document.getElementById('modal-process').addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') { e.stopPropagation(); closeProcessForm(); }
+            });
+            window.addEventListener('resize', () => { if (state.view === 'viewer') refreshViewerSize(); });
+            window.addEventListener('beforeunload', (e) => {
+                if (state.view === 'editor' && state.dirty) {
+                    e.preventDefault();
+                    e.returnValue = '';
+                }
+            });
+            document.addEventListener('keydown', onKeyDown);
+
+            document.getElementById('btn-export-report').addEventListener('click', openModalReport);
+
+            // Export dropdown toggle
+            const exportBtn = document.getElementById('btn-export-menu');
+            const exportDropdown = document.getElementById('export-dropdown');
+            exportBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                exportDropdown.classList.toggle('hidden');
+            });
+            document.addEventListener('click', () => exportDropdown.classList.add('hidden'));
+
+            // Export options
+            document.getElementById('opt-export-mermaid').addEventListener('click', exportMermaid);
+            document.getElementById('opt-export-svg').addEventListener('click', exportSvgFile);
+            document.getElementById('opt-export-bpmn').addEventListener('click', exportBpmnFile);
+            document.getElementById('opt-export-json').addEventListener('click', exportJsonFile);
+
+            // Connect button toggle
+            document.getElementById('btn-toggle-connect').addEventListener('click', () => toggleConnectMode());
+
+            // Canvas drag and drop / click listeners
+            const svg = document.getElementById('bpmn-svg');
+            svg.addEventListener('mousemove', onCanvasMouseMove);
+            svg.addEventListener('mouseup', onCanvasMouseUp);
+            svg.addEventListener('mouseleave', onCanvasMouseUp);
+            svg.addEventListener('click', onCanvasClick);
+        }
+
+        function onKeyDown(e) {
+            const tag = (e.target.tagName || '').toLowerCase();
+            if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+            if (presentation && onPresentKey(e)) return;
+
+            if (e.key === 'Escape') {
+                closeModalExport();
+                closeModalReport();
+                if (state.view === 'editor' && state.connectMode) toggleConnectMode(false);
+                if (state.view === 'viewer') hideNodeInfo(true);
+            } else if (state.view === 'editor' && (e.key === 'Delete' || e.key === 'Backspace') && state.selectedNodeId) {
+                e.preventDefault();
+                deleteSelectedNode();
+            }
+        }
+
+        // ------------------------------------------------------------
+        // Diagram rendering (shared by viewer and editor)
+        // ------------------------------------------------------------
+
+        // Render Swimlanes
+        function renderLanes() {
+            const group = document.getElementById('swimlanes-layer');
+            group.innerHTML = '';
+
+            let currentY = 0;
+            state.lanes.forEach((lane, index) => {
+                lane.y = currentY;
+
+                // Swimlane background rect
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('x', '0');
+                rect.setAttribute('y', lane.y);
+                rect.setAttribute('width', CANVAS_WIDTH);
+                rect.setAttribute('height', lane.height);
+                rect.setAttribute('fill', index % 2 === 0 ? '#ffffff' : '#F5F6F8');
+                rect.setAttribute('stroke', '#C6C6C6');
+                rect.setAttribute('stroke-width', '1');
+                group.appendChild(rect);
+
+                // Lane Header Rect
+                const headerRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                headerRect.setAttribute('x', '0');
+                headerRect.setAttribute('y', lane.y);
+                headerRect.setAttribute('width', '170');
+                headerRect.setAttribute('height', lane.height);
+                headerRect.setAttribute('fill', '#4657A0');
+                headerRect.setAttribute('stroke', '#262624');
+                headerRect.setAttribute('stroke-width', '1');
+                group.appendChild(headerRect);
+
+                // Header text (Actor / Lane title)
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', '85');
+                text.setAttribute('y', lane.y + (lane.height / 2));
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('dominant-baseline', 'middle');
+                text.setAttribute('fill', '#F5F6F8');
+                text.setAttribute('font-size', '12');
+                text.setAttribute('font-weight', '700');
+                text.setAttribute('font-family', "'Encode Sans Condensed', sans-serif");
+
+                // Truncate / wrap lane name
+                const words = lane.name.split(' ');
+                if (words.length > 2) {
+                    const line1 = words.slice(0, 2).join(' ');
+                    const line2 = words.slice(2).join(' ');
+                    const tspan1 = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+                    tspan1.setAttribute('x', '85');
+                    tspan1.setAttribute('dy', '-7');
+                    tspan1.textContent = line1;
+                    const tspan2 = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+                    tspan2.setAttribute('x', '85');
+                    tspan2.setAttribute('dy', '15');
+                    tspan2.textContent = line2;
+                    text.appendChild(tspan1);
+                    text.appendChild(tspan2);
+                } else {
+                    text.textContent = lane.name;
+                }
+                group.appendChild(text);
+
+                currentY += lane.height;
+            });
+        }
+
+        // Size the SVG: fit-to-width in the viewer, 1:1 in the editor
+        function applyCanvasSize() {
+            const svg = document.getElementById('bpmn-svg');
+            const lanesHeight = state.lanes.reduce((sum, l) => sum + l.height, 0);
+
+            if (state.view === 'viewer') {
+                const h = Math.max(lanesHeight, 140);
+                let scale = 1;
+                if (state.viewerZoom === 'fit') {
+                    const available = document.getElementById('viewer-scroll').clientWidth - 60;
+                    scale = Math.max(0.3, available / CANVAS_WIDTH);
+                }
+                svg.setAttribute('viewBox', `0 0 ${CANVAS_WIDTH} ${h}`);
+                svg.setAttribute('width', Math.round(CANVAS_WIDTH * scale));
+                svg.setAttribute('height', Math.round(h * scale));
+            } else {
+                const h = Math.max(900, lanesHeight + 50);
+                svg.setAttribute('viewBox', `0 0 ${EDITOR_WIDTH} ${h}`);
+                svg.setAttribute('width', EDITOR_WIDTH);
+                svg.setAttribute('height', h);
+            }
+        }
+
+        // Render Sequence Flows (Connectors)
+        function renderConnectors() {
+            const group = document.getElementById('connectors-layer');
+            group.innerHTML = '';
+
+            state.connectors.forEach((conn, idx) => {
+                const source = state.nodes.find(n => n.id === conn.from);
+                const target = state.nodes.find(n => n.id === conn.to);
+                if (!source || !target) return;
+
+                const srcPos = getNodePort(source, 'right');
+                const tgtPos = getNodePort(target, 'left');
+
+                // Determine routing path (ortho / bezier)
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                let d = '';
+
+                // Smart orthogonal routing
+                if (Math.abs(srcPos.y - tgtPos.y) < 10) {
+                    // Straight horizontal line
+                    d = `M ${srcPos.x} ${srcPos.y} L ${tgtPos.x} ${tgtPos.y}`;
+                } else if (tgtPos.x > srcPos.x + 40) {
+                    // Stepped route
+                    const midX = srcPos.x + (tgtPos.x - srcPos.x) / 2;
+                    d = `M ${srcPos.x} ${srcPos.y} L ${midX} ${srcPos.y} L ${midX} ${tgtPos.y} L ${tgtPos.x} ${tgtPos.y}`;
+                } else {
+                    // Backward loop or sharp drop
+                    const loopOffset = 30;
+                    d = `M ${srcPos.x} ${srcPos.y} L ${srcPos.x + loopOffset} ${srcPos.y} L ${srcPos.x + loopOffset} ${tgtPos.y - 25} L ${tgtPos.x - 30} ${tgtPos.y - 25} L ${tgtPos.x - 30} ${tgtPos.y} L ${tgtPos.x} ${tgtPos.y}`;
+                }
+
+                path.setAttribute('d', d);
+                path.setAttribute('class', 'bpmn-connector');
+                path.setAttribute('marker-end', 'url(#arrow-default)');
+                path.setAttribute('data-index', idx);
+                path.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (state.view !== 'editor') return;
+                    if (confirm(`¿Desea eliminar la conexión de "${source.code}" hacia "${target.code}"?`)) {
+                        state.connectors.splice(idx, 1);
+                        markDirty();
+                        renderCanvas();
+                    }
+                });
+                group.appendChild(path);
+
+                // Connector label (e.g., Sí / No / Sin aviso)
+                if (conn.label) {
+                    const labelText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    const lx = (srcPos.x + tgtPos.x) / 2;
+                    const ly = Math.min(srcPos.y, tgtPos.y) + Math.abs(srcPos.y - tgtPos.y) / 2 - 8;
+                    labelText.setAttribute('x', lx);
+                    labelText.setAttribute('y', ly);
+                    labelText.setAttribute('text-anchor', 'middle');
+                    labelText.setAttribute('fill', conn.label.toLowerCase().includes('no') ? '#B3261E' : '#4657A0');
+                    labelText.setAttribute('font-size', '10');
+                    labelText.setAttribute('font-weight', '700');
+                    labelText.setAttribute('background', '#fff');
+                    labelText.textContent = conn.label;
+                    group.appendChild(labelText);
+                }
+            });
+        }
+
+        // Get node anchor port
+        function getNodePort(node, side) {
+            const dims = getNodeDimensions(node.type);
+            if (node.type === 'start' || node.type === 'end') {
+                const r = dims.r;
+                if (side === 'right') return { x: node.x + r * 2, y: node.y + r };
+                if (side === 'left') return { x: node.x, y: node.y + r };
+                if (side === 'bottom') return { x: node.x + r, y: node.y + r * 2 };
+                return { x: node.x + r, y: node.y };
+            } else if (node.type === 'gateway-xor' || node.type === 'gateway-and') {
+                const s = dims.size;
+                if (side === 'right') return { x: node.x + s + 10, y: node.y + s / 2 };
+                if (side === 'left') return { x: node.x - 10, y: node.y + s / 2 };
+                if (side === 'bottom') return { x: node.x + s / 2, y: node.y + s + 10 };
+                return { x: node.x + s / 2, y: node.y - 10 };
+            } else {
+                // Tasks
+                const w = dims.w;
+                const h = dims.h;
+                if (side === 'right') return { x: node.x + w, y: node.y + h / 2 };
+                if (side === 'left') return { x: node.x, y: node.y + h / 2 };
+                if (side === 'bottom') return { x: node.x + w / 2, y: node.y + h };
+                return { x: node.x + w / 2, y: node.y };
+            }
+        }
+
+        // Dimensions by type
+        function getNodeDimensions(type) {
+            if (type === 'start') return { r: 18 };
+            if (type === 'end') return { r: 18 };
+            if (type.startsWith('gateway')) return { size: 40 };
+            return { w: 155, h: 70 }; // Standard task
+        }
+
+        // Render BPMN Nodes
+        function renderNodes() {
+            const group = document.getElementById('nodes-layer');
+            group.innerHTML = '';
+
+            state.nodes.forEach(node => {
+                const isSelected = state.selectedNodeId === node.id;
+                const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                g.setAttribute('id', `node-g-${node.id}`);
+                g.setAttribute('class', 'cursor-pointer');
+                g.setAttribute('transform', `translate(${node.x}, ${node.y})`);
+
+                // Node drag listeners
+                g.addEventListener('mousedown', (e) => onNodeMouseDown(e, node.id));
+                g.addEventListener('click', (e) => onNodeClick(e, node.id));
+
+                if (node.type === 'start') {
+                    // Start Event (Green Circle)
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', '18');
+                    circle.setAttribute('cy', '18');
+                    circle.setAttribute('r', '17');
+                    circle.setAttribute('fill', '#E6F3EB');
+                    circle.setAttribute('stroke', '#2F7D50');
+                    circle.setAttribute('stroke-width', '2.5');
+                    if (isSelected) circle.classList.add('node-selected');
+                    g.appendChild(circle);
+
+                    appendNodeLabel(g, node.label, 18, 48, '#1F5536');
+
+                } else if (node.type === 'end') {
+                    // End Event (Thick Red Double Border)
+                    const circleOuter = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circleOuter.setAttribute('cx', '18');
+                    circleOuter.setAttribute('cy', '18');
+                    circleOuter.setAttribute('r', '17');
+                    circleOuter.setAttribute('fill', '#FCF1F0');
+                    circleOuter.setAttribute('stroke', '#C83E37');
+                    circleOuter.setAttribute('stroke-width', '3.5');
+                    if (isSelected) circleOuter.classList.add('node-selected');
+                    g.appendChild(circleOuter);
+
+                    appendNodeLabel(g, node.label, 18, 48, '#8C1D18');
+
+                } else if (node.type.startsWith('gateway')) {
+                    // Gateway (Diamond)
+                    const diamond = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                    diamond.setAttribute('points', '20,0 40,20 20,40 0,20');
+                    diamond.setAttribute('fill', '#ffffff');
+                    diamond.setAttribute('stroke', '#4657A0');
+                    diamond.setAttribute('stroke-width', '2');
+                    if (isSelected) diamond.classList.add('node-selected');
+                    g.appendChild(diamond);
+
+                    const mark = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    mark.setAttribute('x', '20');
+                    mark.setAttribute('y', '25');
+                    mark.setAttribute('text-anchor', 'middle');
+                    mark.setAttribute('font-size', '16');
+                    mark.setAttribute('font-weight', '900');
+                    mark.setAttribute('fill', '#4657A0');
+                    mark.textContent = node.type === 'gateway-xor' ? '✕' : '+';
+                    g.appendChild(mark);
+
+                    appendNodeLabel(g, node.label, 20, 56, '#222B4F');
+
+                } else {
+                    // Task (Rounded rectangle)
+                    const dims = getNodeDimensions(node.type);
+                    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    rect.setAttribute('x', '0');
+                    rect.setAttribute('y', '0');
+                    rect.setAttribute('width', dims.w);
+                    rect.setAttribute('height', dims.h);
+                    rect.setAttribute('rx', '8');
+                    rect.setAttribute('filter', 'url(#node-shadow)');
+
+                    // Distinct background styling by task nature
+                    if (node.physical) {
+                        rect.setAttribute('fill', '#FCF1F0');
+                        rect.setAttribute('stroke', '#DB6560');
+                        rect.setAttribute('stroke-width', '2');
+                    } else if (node.type === 'task-service') {
+                        rect.setAttribute('fill', '#F1F3F9');
+                        rect.setAttribute('stroke', '#4657A0');
+                        rect.setAttribute('stroke-width', '1.8');
+                    } else {
+                        rect.setAttribute('fill', '#ffffff');
+                        rect.setAttribute('stroke', '#5F5F5F');
+                        rect.setAttribute('stroke-width', '1.5');
+                    }
+
+                    if (isSelected) rect.classList.add('node-selected');
+                    g.appendChild(rect);
+
+                    // Task Header Code Badge (e.g., T-01 / A-01)
+                    const codeBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    codeBg.setAttribute('x', '6');
+                    codeBg.setAttribute('y', '6');
+                    codeBg.setAttribute('width', '38');
+                    codeBg.setAttribute('height', '14');
+                    codeBg.setAttribute('rx', '3');
+                    codeBg.setAttribute('fill', node.type === 'task-service' ? '#E3E6F1' : '#EDEEF1');
+                    g.appendChild(codeBg);
+
+                    const codeText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    codeText.setAttribute('x', '25');
+                    codeText.setAttribute('y', '16');
+                    codeText.setAttribute('text-anchor', 'middle');
+                    codeText.setAttribute('font-family', 'JetBrains Mono, monospace');
+                    codeText.setAttribute('font-size', '9');
+                    codeText.setAttribute('font-weight', '700');
+                    codeText.setAttribute('fill', node.type === 'task-service' ? '#36457F' : '#363634');
+                    codeText.textContent = node.code || 'T';
+                    g.appendChild(codeText);
+
+                    // Task Icon Indicator
+                    const iconText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    iconText.setAttribute('x', dims.w - 18);
+                    iconText.setAttribute('y', '16');
+                    iconText.setAttribute('font-size', '10');
+                    iconText.setAttribute('fill', '#5F5F5F');
+                    iconText.textContent = node.type === 'task-service' ? '⚙' : (node.type === 'task-user' ? '👤' : '✍');
+                    g.appendChild(iconText);
+
+                    // Task Label (Verbo + Objeto, multi-line)
+                    const lines = (node.label || '').split('\n');
+                    const startY = 32;
+                    lines.forEach((line, lIdx) => {
+                        const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                        t.setAttribute('x', '8');
+                        t.setAttribute('y', startY + (lIdx * 13));
+                        t.setAttribute('font-size', '10.5');
+                        t.setAttribute('font-weight', '600');
+                        t.setAttribute('fill', '#262624');
+                        t.textContent = line;
+                        g.appendChild(t);
+                    });
+
+                    // Badges for ISSyS Methodology
+                    let badgeY = dims.h - 16;
+                    if (node.hypothesis) {
+                        // Hipótesis a validar banner
+                        const hypBadge = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                        hypBadge.setAttribute('x', '6');
+                        hypBadge.setAttribute('y', badgeY);
+                        hypBadge.setAttribute('width', dims.w - 12);
+                        hypBadge.setAttribute('height', '12');
+                        hypBadge.setAttribute('rx', '2');
+                        hypBadge.setAttribute('fill', '#FDF3D3');
+                        hypBadge.setAttribute('stroke', '#EDB82A');
+                        hypBadge.setAttribute('stroke-width', '0.7');
+                        g.appendChild(hypBadge);
+
+                        const hypText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                        hypText.setAttribute('x', dims.w / 2);
+                        hypText.setAttribute('y', badgeY + 9);
+                        hypText.setAttribute('text-anchor', 'middle');
+                        hypText.setAttribute('font-size', '8');
+                        hypText.setAttribute('font-weight', '700');
+                        hypText.setAttribute('fill', '#6E5006');
+                        hypText.textContent = '⚠ HIPÓTESIS A VALIDAR';
+                        g.appendChild(hypText);
+                    } else if (node.physical) {
+                        // Presencialidad flag
+                        const phyBadge = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                        phyBadge.setAttribute('x', '6');
+                        phyBadge.setAttribute('y', badgeY);
+                        phyBadge.setAttribute('width', dims.w - 12);
+                        phyBadge.setAttribute('height', '12');
+                        phyBadge.setAttribute('rx', '2');
+                        phyBadge.setAttribute('fill', '#F9DEDC');
+                        phyBadge.setAttribute('stroke', '#C83E37');
+                        phyBadge.setAttribute('stroke-width', '0.7');
+                        g.appendChild(phyBadge);
+
+                        const phyText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                        phyText.setAttribute('x', dims.w / 2);
+                        phyText.setAttribute('y', badgeY + 9);
+                        phyText.setAttribute('text-anchor', 'middle');
+                        phyText.setAttribute('font-size', '8');
+                        phyText.setAttribute('font-weight', '700');
+                        phyText.setAttribute('fill', '#B3261E');
+                        phyText.textContent = '🚶 CONTACTO PRESENCIAL';
+                        g.appendChild(phyText);
+                    }
+                }
+
+                group.appendChild(g);
+            });
+        }
+
+        // Helper to append wrapped label for circles/gateways
+        function appendNodeLabel(group, fullText, centerX, startY, color) {
+            const lines = (fullText || '').split('\n');
+            lines.forEach((line, i) => {
+                const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                t.setAttribute('x', centerX);
+                t.setAttribute('y', startY + (i * 12));
+                t.setAttribute('text-anchor', 'middle');
+                t.setAttribute('font-size', '10');
+                t.setAttribute('font-weight', '600');
+                t.setAttribute('fill', color);
+                t.textContent = line;
+                group.appendChild(t);
+            });
+        }
+
+        // Full canvas redraw
+        function renderCanvas() {
+            renderLanes();
+            renderConnectors();
+            renderNodes();
+            applyCanvasSize();
+            document.getElementById('canvas-stats').textContent = `${state.nodes.length} Nodos | ${state.connectors.length} Conectores`;
+        }
+
+        // Node Mouse Down (Start Dragging)
+        function onNodeMouseDown(e, nodeId) {
+            if (state.view !== 'editor' || state.connectMode) return;
+            e.stopPropagation();
+            state.isDragging = true;
+            state.draggedNodeId = nodeId;
+            const node = state.nodes.find(n => n.id === nodeId);
+            state.dragOffset = {
+                x: e.clientX - node.x,
+                y: e.clientY - node.y
+            };
+        }
+
+        // Canvas Mouse Move (Drag & Drop Node / Preview connector)
+        function onCanvasMouseMove(e) {
+            if (state.view !== 'editor') return;
+            if (state.isDragging && state.draggedNodeId) {
+                const node = state.nodes.find(n => n.id === state.draggedNodeId);
+                if (!node) return;
+
+                // Restrict movement inside logical canvas bounds
+                const newX = Math.max(180, Math.min(1600, e.clientX - state.dragOffset.x));
+                const newY = Math.max(20, Math.min(850, e.clientY - state.dragOffset.y));
+                if (newX === node.x && newY === node.y) return;
+                node.x = newX;
+                node.y = newY;
+
+                // Auto assign lane based on current Y coordinate
+                const matchingLane = state.lanes.find(l => node.y >= l.y && node.y < (l.y + l.height));
+                if (matchingLane) {
+                    node.laneId = matchingLane.id;
+                }
+
+                markDirty();
+                renderCanvas();
+            } else if (state.connectMode && state.connectSourceId) {
+                // Update dashed line preview
+                const source = state.nodes.find(n => n.id === state.connectSourceId);
+                if (source) {
+                    const srcPort = getNodePort(source, 'right');
+                    const svgRect = document.getElementById('bpmn-svg').getBoundingClientRect();
+                    const line = document.getElementById('preview-connector');
+                    line.setAttribute('x1', srcPort.x);
+                    line.setAttribute('y1', srcPort.y);
+                    line.setAttribute('x2', e.clientX - svgRect.left);
+                    line.setAttribute('y2', e.clientY - svgRect.top);
+                    line.style.display = 'block';
+                }
+            }
+        }
+
+        // Canvas Mouse Up
+        function onCanvasMouseUp() {
+            state.isDragging = false;
+            state.draggedNodeId = null;
+        }
+
+        // Node Click (Selection or Connection Endpoint)
+        function onNodeClick(e, nodeId) {
+            e.stopPropagation();
+
+            if (state.view === 'viewer') {
+                // Read-only: highlight and show details
+                state.selectedNodeId = nodeId;
+                renderNodes();
+                const node = state.nodes.find(n => n.id === nodeId);
+                if (node) showNodeInfo(node);
+                return;
+            }
+
+            if (state.connectMode) {
+                if (!state.connectSourceId) {
+                    // First click: Select source
+                    state.connectSourceId = nodeId;
+                    showToast("Nodo origen seleccionado. Ahora elegí el nodo destino.");
+                } else {
+                    if (state.connectSourceId !== nodeId) {
+                        // Second click: Complete connection
+                        state.connectors.push({
+                            from: state.connectSourceId,
+                            to: nodeId,
+                            label: ''
+                        });
+                        markDirty();
+                        showToast("Conexión de secuencia establecida.");
+                    }
+                    toggleConnectMode(false);
+                    renderCanvas();
+                }
+                return;
+            }
+
+            // Normal selection
+            selectNode(nodeId);
+        }
+
+        function onCanvasClick() {
+            if (state.view === 'viewer') {
+                state.selectedNodeId = null;
+                hideNodeInfo(true);
+                renderNodes();
+                return;
+            }
+            if (state.connectMode) {
+                toggleConnectMode(false);
+                return;
+            }
+            // Clear selection
+            clearPropertiesPanel();
+            renderCanvas();
+        }
+
+        // Node selection and property panel population
+        function selectNode(nodeId) {
+            state.selectedNodeId = nodeId;
+            const node = state.nodes.find(n => n.id === nodeId);
+            if (!node) return;
+
+            renderCanvas();
+
+            document.getElementById('no-selection-notice').classList.add('hidden');
+            document.getElementById('properties-editor-form').classList.remove('hidden');
+
+            document.getElementById('prop-id-display').textContent = node.id;
+            document.getElementById('prop-type-badge').textContent = node.type.toUpperCase();
+            document.getElementById('prop-input-code').value = node.code || '';
+            document.getElementById('prop-input-label').value = node.label || '';
+            document.getElementById('prop-input-lane').value = node.laneId || '';
+            document.getElementById('prop-check-hypothesis').checked = !!node.hypothesis;
+            document.getElementById('prop-check-physical').checked = !!node.physical;
+            document.getElementById('prop-check-duplicate').checked = !!node.duplicate;
+            document.getElementById('prop-input-notes').value = node.notes || '';
+        }
+
+        function clearPropertiesPanel() {
+            state.selectedNodeId = null;
+            document.getElementById('no-selection-notice').classList.remove('hidden');
+            document.getElementById('properties-editor-form').classList.add('hidden');
+        }
+
+        // Apply changes from properties panel to node
+        function applyNodeProperties() {
+            if (!state.selectedNodeId) return;
+            const node = state.nodes.find(n => n.id === state.selectedNodeId);
+            if (!node) return;
+
+            node.code = document.getElementById('prop-input-code').value.trim();
+            node.label = document.getElementById('prop-input-label').value.trim();
+            node.laneId = document.getElementById('prop-input-lane').value;
+            node.hypothesis = document.getElementById('prop-check-hypothesis').checked;
+            node.physical = document.getElementById('prop-check-physical').checked;
+            node.duplicate = document.getElementById('prop-check-duplicate').checked;
+            node.notes = document.getElementById('prop-input-notes').value.trim();
+
+            markDirty();
+            renderCanvas();
+            showToast("Propiedades del nodo actualizadas.");
+        }
+
+        // Add node from left palette
+        function addNodeFromPalette(type) {
+            const newId = 'n-' + Date.now().toString().slice(-6);
+            const targetLane = state.lanes[0] ? state.lanes[0].id : '';
+            const yCoord = state.lanes[0] ? state.lanes[0].y + 40 : 50;
+
+            const newNode = {
+                id: newId,
+                code: type.startsWith('task') ? 'T-X' : (type.startsWith('gateway') ? 'GW' : 'EVT'),
+                type: type,
+                label: type === 'start' ? 'Inicio del trámite' : (type === 'end' ? 'Fin del proceso' : 'Acción verbal + objeto'),
+                laneId: targetLane,
+                x: 250,
+                y: yCoord,
+                hypothesis: false,
+                physical: false,
+                duplicate: false,
+                notes: ''
+            };
+
+            state.nodes.push(newNode);
+            markDirty();
+            selectNode(newId);
+            showToast("Nuevo elemento añadido al lienzo.");
+        }
+
+        // Toggle connector drawing tool
+        function toggleConnectMode(forceState) {
+            state.connectMode = forceState !== undefined ? forceState : !state.connectMode;
+            state.connectSourceId = null;
+            document.getElementById('preview-connector').style.display = 'none';
+
+            const btn = document.getElementById('btn-toggle-connect');
+            const txt = document.getElementById('connect-tool-text');
+
+            if (state.connectMode) {
+                btn.className = "w-full py-2 px-3 rounded border text-xs font-semibold flex items-center justify-center gap-2 transition bg-cyan-700 text-white border-cyan-800 shadow";
+                txt.textContent = "Modo Conexión Activo...";
+                showToast("Hacé clic en el nodo de inicio de la secuencia.");
+            } else {
+                btn.className = "w-full py-2 px-3 rounded border text-xs font-medium flex items-center justify-center gap-2 transition bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200";
+                txt.textContent = "Conectar Nodos";
+            }
+        }
+
+        // Delete currently selected node
+        function deleteSelectedNode() {
+            if (!state.selectedNodeId) {
+                showToast("Seleccioná un elemento para eliminar.");
+                return;
+            }
+            const node = state.nodes.find(n => n.id === state.selectedNodeId);
+            if (confirm(`¿Eliminar definitivamente el elemento "${node.code || node.label}"?`)) {
+                state.nodes = state.nodes.filter(n => n.id !== state.selectedNodeId);
+                state.connectors = state.connectors.filter(c => c.from !== state.selectedNodeId && c.to !== state.selectedNodeId);
+                markDirty();
+                clearPropertiesPanel();
+                renderCanvas();
+                showToast("Elemento eliminado.");
+            }
+        }
+
+        // Lanes list in left sidebar
+        function renderLanesList() {
+            const container = document.getElementById('lanes-list');
+            container.innerHTML = '';
+            state.lanes.forEach(lane => {
+                const item = document.createElement('div');
+                item.className = "flex items-center justify-between p-1.5 rounded bg-slate-50 border border-slate-200 text-xs";
+                item.innerHTML = `
+                    <span class="font-medium text-slate-700 truncate">${escapeHtml(lane.name)}</span>
+                    <button class="text-slate-400 hover:text-cyan-700 p-0.5" title="Renombrar carril">
+                        <i data-lucide="edit-3" class="w-3 h-3"></i>
+                    </button>
+                `;
+                item.querySelector('button').addEventListener('click', () => editLanePrompt(lane.id));
+                container.appendChild(item);
+            });
+            lucide.createIcons();
+        }
+
+        function populateLaneDropdown() {
+            const select = document.getElementById('prop-input-lane');
+            select.innerHTML = '';
+            state.lanes.forEach(l => {
+                const opt = document.createElement('option');
+                opt.value = l.id;
+                opt.textContent = l.name;
+                select.appendChild(opt);
+            });
+        }
+
+        function addNewLane() {
+            const name = prompt("Nombre del nuevo Rol / Carril (ej: Gerencia General, Afiliado, Sistemas):");
+            if (name && name.trim()) {
+                const id = 'lane-' + Date.now().toString().slice(-6);
+                state.lanes.push({
+                    id: id,
+                    name: name.trim(),
+                    height: 140,
+                    y: 0
+                });
+                markDirty();
+                renderLanesList();
+                populateLaneDropdown();
+                renderCanvas();
+                showToast("Nuevo carril agregado.");
+            }
+        }
+
+        function editLanePrompt(laneId) {
+            const lane = state.lanes.find(l => l.id === laneId);
+            if (!lane) return;
+            const newName = prompt("Modificar nombre del Rol / Carril:", lane.name);
+            if (newName && newName.trim()) {
+                lane.name = newName.trim();
+                markDirty();
+                renderLanesList();
+                populateLaneDropdown();
+                renderCanvas();
+            }
+        }
+
+        // ------------------------------------------------------------
+        // Analysis panel (viewer)
+        // ------------------------------------------------------------
+
+        // Render Modernization Diagnostics Tab
+        // Métricas del diagrama visible (modelo anterior o BPMN)
+        function viewerMetrics() {
+            if (state.engine === 'bpmn') {
+                const bos = bpmnViewer
+                    ? bpmnViewer.get('elementRegistry').filter(el => el.type !== 'label' && el.businessObject).map(el => el.businessObject)
+                    : [];
+                return {
+                    physical: bos.filter(bo => issysFlag(bo, 'presencial')).length,
+                    manual: bos.filter(bo => issysFlag(bo, 'doblecarga')).length,
+                    hypotheses: bos.filter(bo => issysFlag(bo, 'hipotesis')).length,
+                    automated: bos.filter(bo => ['bpmn:ServiceTask', 'bpmn:ScriptTask', 'bpmn:BusinessRuleTask'].includes(bo.$type)).length
+                };
+            }
+            return {
+                physical: state.nodes.filter(n => n.physical).length,
+                manual: state.nodes.filter(n => n.duplicate).length,
+                hypotheses: state.nodes.filter(n => n.hypothesis).length,
+                automated: state.nodes.filter(n => n.type === 'task-service').length
+            };
+        }
+
+        function renderDiagnostics() {
+            const metrics = viewerMetrics();
+            const physicalCount = metrics.physical;
+            const manualCount = metrics.manual;
+            const hypCount = metrics.hypotheses;
+            const autoCount = metrics.automated;
+
+            document.getElementById('kpi-physical-trips').textContent = physicalCount;
+            document.getElementById('kpi-manual-entries').textContent = manualCount;
+            document.getElementById('kpi-hypotheses').textContent = hypCount;
+            document.getElementById('kpi-automated').textContent = autoCount;
+            document.getElementById('diag-process-name').textContent = state.currentModelType;
+
+            const findingsDiv = document.getElementById('findings-container');
+            findingsDiv.innerHTML = '';
+
+            // Generate findings from model state
+            const findings = [];
+
+            if (physicalCount > 0) {
+                findings.push({
+                    type: 'danger',
+                    title: 'Presencialidad Forzada en Delegación',
+                    desc: 'El afiliado debe trasladarse a presentar facturas en papel. En Delegaciones cordilleranas (Comarca Andina) esto implica costos de transporte y demoras.'
+                });
+            } else {
+                findings.push({
+                    type: 'success',
+                    title: 'Autogestión 100% Remota',
+                    desc: 'No se detectan requerimientos de traslado físico obligatorio para el afiliado.'
+                });
+            }
+
+            if (manualCount > 0) {
+                findings.push({
+                    type: 'warning',
+                    title: 'Doble Carga en Mesa de Entradas',
+                    desc: 'Los datos ya presentes en comprobantes fiscales se transcriben a mano en el sistema institucional.'
+                });
+            }
+
+            if (hypCount > 0) {
+                findings.push({
+                    type: 'info',
+                    title: `${hypCount} Pasos son Hipótesis a Validar`,
+                    desc: 'Se requiere entrevista de confirmación con los agentes de Delegación y Liquidaciones antes de consolidar el TO-BE.'
+                });
+            }
+
+            findings.forEach(f => {
+                const box = document.createElement('div');
+                let colorClass = 'bg-amber-50 border-amber-200 text-amber-900';
+                if (f.type === 'danger') colorClass = 'bg-rose-50 border-rose-200 text-rose-900';
+                if (f.type === 'success') colorClass = 'bg-emerald-50 border-emerald-200 text-emerald-900';
+                if (f.type === 'info') colorClass = 'bg-blue-50 border-blue-200 text-blue-900';
+
+                box.className = `p-2.5 rounded border text-[13px] ${colorClass}`;
+                box.innerHTML = `
+                    <div class="font-bold flex items-center gap-1 mb-0.5">
+                        <i data-lucide="${f.type === 'danger' ? 'alert-octagon' : (f.type === 'success' ? 'check-circle' : 'help-circle')}" class="w-3.5 h-3.5"></i>
+                        <span>${f.title}</span>
+                    </div>
+                    <p class="leading-tight opacity-90">${f.desc}</p>
+                `;
+                findingsDiv.appendChild(box);
+            });
+
+            lucide.createIcons();
+        }
+
+        // Render TO-BE Matrix Cards
+        function renderMatrix() {
+            const container = document.getElementById('matrix-cards-container');
+            container.innerHTML = '';
+            const proc = getProcess(state.processId);
+            const items = (proc && proc.opportunities) || [];
+
+            if (!items.length) {
+                container.innerHTML = '<p class="text-[13px] text-slate-400 text-center py-6">Todavía no hay oportunidades de mejora cargadas para este proceso.</p>';
+                return;
+            }
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "p-2.5 rounded bg-slate-50 border border-slate-200 hover:border-cyan-400 transition space-y-1.5";
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono font-bold text-xs text-slate-800">${escapeHtml(item.step)}</span>
+                        <span class="text-[11px] font-semibold px-1.5 py-0.5 rounded bg-teal-100 text-teal-800">${escapeHtml(item.badge)}</span>
+                    </div>
+                    <div class="text-[13px] text-slate-700">
+                        <span class="font-semibold text-cyan-900">Propuesta TO-BE:</span> ${escapeHtml(item.change)}
+                    </div>
+                    <div class="text-[12px] text-emerald-800 bg-emerald-50 p-1.5 rounded border border-emerald-200/60 font-medium">
+                        <strong>Impacto:</strong> ${escapeHtml(item.impact)}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Switch analysis panel tab
+        function switchRightTab(tabName) {
+            const btnDiag = document.getElementById('tab-btn-diag');
+            const btnMatr = document.getElementById('tab-btn-matr');
+            const contentDiag = document.getElementById('tab-content-diagnosis');
+            const contentMatr = document.getElementById('tab-content-matrix');
+
+            [btnDiag, btnMatr].forEach(b => {
+                b.className = "flex-1 py-2.5 px-2 border-b-2 border-transparent hover:text-slate-900 flex items-center justify-center gap-1.5 transition text-slate-500";
+            });
+            [contentDiag, contentMatr].forEach(c => c.classList.add('hidden'));
+
+            if (tabName === 'diagnosis') {
+                btnDiag.className = "flex-1 py-2.5 px-2 border-b-2 border-amber-600 text-amber-800 bg-white flex items-center justify-center gap-1.5 transition font-semibold";
+                contentDiag.classList.remove('hidden');
+                renderDiagnostics();
+            } else if (tabName === 'matrix') {
+                btnMatr.className = "flex-1 py-2.5 px-2 border-b-2 border-emerald-600 text-emerald-800 bg-white flex items-center justify-center gap-1.5 transition font-semibold";
+                contentMatr.classList.remove('hidden');
+                renderMatrix();
+            }
+        }
+
+        // ------------------------------------------------------------
+        // Export
+        // ------------------------------------------------------------
+
+        // Mermaid export generator
+        function exportMermaid() {
+            const proc = getProcess(state.processId);
+            let code = `%% Diagrama de Procesos BPMN ISSyS Chubut\n%% Proceso: ${proc ? proc.name : ''}\n%% Modelo: ${state.currentModelType}\n\nflowchart TD\n`;
+
+            // Subgraphs per lane
+            state.lanes.forEach(lane => {
+                code += `  subgraph ${sanitizeId(lane.id)}["${lane.name}"]\n`;
+                const laneNodes = state.nodes.filter(n => n.laneId === lane.id);
+                laneNodes.forEach(node => {
+                    const cleanLabel = (node.label || node.code).replace(/\n/g, ' ');
+                    if (node.type === 'start') {
+                        code += `    ${sanitizeId(node.id)}(("${cleanLabel}"))\n`;
+                    } else if (node.type === 'end') {
+                        code += `    ${sanitizeId(node.id)}((("${cleanLabel}")))\n`;
+                    } else if (node.type.startsWith('gateway')) {
+                        code += `    ${sanitizeId(node.id)}{"${cleanLabel}"}\n`;
+                    } else {
+                        const prefix = node.code ? `[${node.code}] ` : '';
+                        code += `    ${sanitizeId(node.id)}["${prefix}${cleanLabel}"]\n`;
+                    }
+                });
+                code += `  end\n\n`;
+            });
+
+            // Connectors
+            state.connectors.forEach(conn => {
+                const lbl = conn.label ? `|${conn.label}| ` : '';
+                code += `  ${sanitizeId(conn.from)} --> ${lbl}${sanitizeId(conn.to)}\n`;
+            });
+
+            document.getElementById('modal-export-title').textContent = "Código Mermaid BPMN — ISSyS";
+            document.getElementById('modal-export-desc').textContent = "Copiá y pegá este bloque en cualquier visor Markdown o editor BPMN compatible:";
+            document.getElementById('modal-export-code').textContent = code;
+            document.getElementById('modal-export').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function sanitizeId(str) {
+            return (str || 'id').replace(/[^a-zA-Z0-9_]/g, '_');
+        }
+
+        function escapeHtml(str) {
+            return String(str == null ? '' : str)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function copyExportCode() {
+            const text = document.getElementById('modal-export-code').textContent;
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
+            const label = document.getElementById('copy-btn-label');
+            label.textContent = "¡Copiado!";
+            setTimeout(() => { label.textContent = "Copiar"; }, 2000);
+            showToast("Código copiado al portapapeles.");
+        }
+
+        function closeModalExport() {
+            document.getElementById('modal-export').classList.add('hidden');
+        }
+
+        function downloadBlob(blob, name) {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = name;
+            link.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        // BPMN 2.0 Export (procesos BPMN)
+        function exportBpmnFile() {
+            const xml = getBpmnXml(state.processId, state.modelKey);
+            downloadBlob(new Blob([xml], { type: 'application/xml' }), `ISSyS_${state.processId}_${state.currentModelType}.bpmn`);
+            showToast("Archivo BPMN descargado.");
+        }
+
+        // SVG Export (always at real size)
+        async function exportSvgFile() {
+            if (state.engine === 'bpmn') {
+                if (!bpmnViewer) return;
+                const { svg } = await bpmnViewer.saveSVG();
+                downloadBlob(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }), `ISSyS_${state.processId}_${state.currentModelType}.svg`);
+                showToast("Archivo vectorial SVG descargado.");
+                return;
+            }
+            const svgElement = document.getElementById('bpmn-svg').cloneNode(true);
+            const h = Math.max(state.lanes.reduce((sum, l) => sum + l.height, 0), 140);
+            svgElement.setAttribute('viewBox', `0 0 ${CANVAS_WIDTH} ${h}`);
+            svgElement.setAttribute('width', CANVAS_WIDTH);
+            svgElement.setAttribute('height', h);
+            const serializer = new XMLSerializer();
+            const source = serializer.serializeToString(svgElement);
+            const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `ISSyS_BPMN_${state.processId}_${state.currentModelType}_${Date.now()}.svg`;
+            link.click();
+            URL.revokeObjectURL(url);
+            showToast("Archivo vectorial SVG descargado.");
+        }
+
+        // JSON Model Export
+        function exportJsonFile() {
+            const proc = getProcess(state.processId);
+            const data = {
+                institution: "ISSyS Chubut",
+                section: "Enlace Delegaciones",
+                exportDate: new Date().toISOString(),
+                process: proc ? proc.name : '',
+                modelType: state.currentModelType,
+                lanes: state.lanes,
+                nodes: state.nodes,
+                connectors: state.connectors
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `ISSyS_Modelo_${state.processId}_${state.currentModelType}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+            showToast("Archivo JSON de proceso exportado.");
+        }
+
+        // Executive Report Modal
+        function openModalReport() {
+            document.getElementById('modal-report').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeModalReport() {
+            document.getElementById('modal-report').classList.add('hidden');
+        }
+
+        // Reset zoom / scroll
+        function resetDiagramZoom() {
+            const container = document.getElementById('editor-canvas');
+            container.scrollTo({ left: 0, top: 0, behavior: 'smooth' });
+            showToast("Vista restablecida.");
+        }
+
+        // Toast notification system
+        let toastTimer = null;
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2800);
+        }
+    </script>
+</body>
+</html>

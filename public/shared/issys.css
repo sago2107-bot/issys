@@ -1,0 +1,112 @@
+/*
+ * Identidad visual común de los Sistemas ISSyS (docs/ISSyS-brand-guidelines.md).
+ * Referencia estética: el sistema Presentaciones.
+ *
+ * Sólo define tokens y componentes con prefijo (issys-*), así se puede cargar en cualquier
+ * sistema sin pisar sus estilos propios. Los sistemas con Tailwind cargan además issys-tailwind.js.
+ */
+:root {
+    /* Marca [Manual] */
+    --issys-green: #59B57E;
+    --issys-blue: #4657A0;
+    --issys-gray: #878787;
+    --issys-gray-light: #C6C6C6;
+    --issys-yellow: #F9D76B;
+
+    /* Derivados digitales */
+    --issys-ink: #1D1D1B;
+    --issys-muted: #5F5F5F;
+    --issys-white: #FFFFFF;
+    --issys-surface: #F5F6F8;
+    --issys-line: #EDEEF1;
+    --issys-blue-dark: #36457F;
+    --issys-blue-tint: #E3E6F1;
+    --issys-green-dark: #2F7D50;
+    --issys-green-tint: #E6F3EB;
+    --issys-turismo: #B5B94B;
+    --issys-danger: #B3261E;
+
+    --issys-font: 'Encode Sans Condensed', 'Arial Narrow', Arial, sans-serif;
+    --issys-radius: 14px;
+    --issys-shadow: 0 2px 8px rgba(29, 29, 27, .08);
+    --issys-shadow-lg: 0 14px 40px rgba(29, 29, 27, .14);
+
+    /* Compatibilidad con marca.css de Procesos */
+    --font-family: var(--issys-font);
+    --color-danger: var(--issys-danger);
+}
+
+/* Foco visible con el azul de marca */
+:focus-visible { outline: 2px solid var(--issys-blue); outline-offset: 2px; }
+
+/* Logo: altura fija, ancho proporcional y zona de seguridad libre */
+.issys-logo { height: 32px; width: auto; display: block; padding: 4px 0; flex-shrink: 0; box-sizing: content-box; }
+
+/* Diagonales del BrandBook en la esquina superior (decoración, nunca detrás de texto denso) */
+.marca-diagonales { position: relative; isolation: isolate; }
+.marca-diagonales::before,
+.marca-diagonales::after { content: ''; position: absolute; top: 0; right: 0; z-index: -1; pointer-events: none; }
+.marca-diagonales::before { width: min(520px, 60%); height: 260px; background: linear-gradient(to bottom left, var(--issys-blue-tint) 50%, transparent 50%); }
+.marca-diagonales::after { width: min(300px, 38%); height: 180px; background: linear-gradient(to bottom left, var(--issys-green-tint) 50%, transparent 50%); }
+
+/* ---------- Botones ---------- */
+.issys-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; border-radius: 10px; font-weight: 600;
+    font-size: 15px; line-height: 1.2; padding: 10px 16px; cursor: pointer; border: 1.5px solid var(--issys-blue); background: #fff;
+    color: var(--issys-blue); font-family: var(--issys-font); text-decoration: none; }
+.issys-btn:hover { background: var(--issys-blue-tint); }
+.issys-btn.prim { background: var(--issys-blue); border-color: var(--issys-blue); color: #fff; }
+.issys-btn.prim:hover { background: var(--issys-blue-dark); border-color: var(--issys-blue-dark); }
+.issys-btn.chico { font-size: 13px; padding: 5px 10px; border-radius: 8px; gap: 6px; }
+.issys-btn.peligro { border-color: var(--issys-danger); color: var(--issys-danger); }
+.issys-btn.peligro:hover { background: #F9DEDC; }
+.issys-btn[disabled] { opacity: .5; cursor: default; }
+
+/* ---------- Pantalla de ingreso (la arma shared/auth.js) ---------- */
+html.issys-bloqueada body > *:not(#issys-gate) { visibility: hidden; }
+#issys-gate { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 16px;
+    background:
+        linear-gradient(to bottom left, var(--issys-green-tint) 50%, transparent 50%) top right / min(380px, 45%) 230px no-repeat,
+        linear-gradient(to bottom left, var(--issys-blue-tint) 50%, transparent 50%) top right / min(640px, 70%) 340px no-repeat,
+        var(--issys-surface);
+    font-family: var(--issys-font); color: var(--issys-ink); }
+#issys-gate .caja { background: #fff; border-radius: 16px; padding: 32px 28px; width: 100%; max-width: 380px; text-align: center;
+    border: 1px solid var(--issys-gray-light); box-shadow: var(--issys-shadow); }
+#issys-gate .logo { height: 44px; width: auto; display: block; margin: 0 auto 22px; padding: 6px 0; }
+#issys-gate h1 { font-size: 28px; font-weight: 900; margin: 0; line-height: 1.1; }
+#issys-gate .sub { font-size: 18px; font-weight: 300; margin: 2px 0 0; }
+#issys-gate p { font-size: 15px; color: var(--issys-muted); margin: 8px 0 0; line-height: 1.45; }
+#issys-gate p.err { color: var(--issys-danger); }
+#issys-gate .issys-btn { width: 100%; margin-top: 22px; }
+#issys-gate .issys-btn + .issys-btn { margin-top: 10px; }
+#issys-gate .pie { font-size: 12px; color: var(--issys-muted); margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--issys-line); }
+.issys-spin { width: 28px; height: 28px; border: 3px solid var(--issys-blue-tint); border-top-color: var(--issys-blue); border-radius: 50%;
+    margin: 18px auto 0; animation: issys-giro .8s linear infinite; }
+@keyframes issys-giro { to { transform: rotate(360deg); } }
+
+/* ---------- Avatar y menú de usuario ---------- */
+.issys-usuario { position: relative; flex: none; font-family: var(--issys-font); }
+.issys-usuario > button.avatar { display: block; width: 38px; height: 38px; border-radius: 50%; border: 0; padding: 0; cursor: pointer;
+    background: var(--issys-blue); color: #fff; font-weight: 600; font-size: 16px; overflow: hidden; font-family: inherit; }
+.issys-usuario img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.issys-menu { position: absolute; right: 0; top: 46px; z-index: 950; width: 280px; background: #fff; border: 1px solid var(--issys-gray-light);
+    border-radius: 12px; box-shadow: 0 12px 30px rgba(29, 29, 27, .2); padding: 6px; font-size: 15px; color: var(--issys-ink); }
+.issys-menu .cab { padding: 10px 10px 8px; border-bottom: 1px solid var(--issys-line); margin-bottom: 4px; }
+.issys-menu .cab b { display: block; font-size: 15px; }
+.issys-menu .cab span { color: var(--issys-muted); font-size: 13px; word-break: break-all; }
+.issys-menu .item { display: block; width: 100%; text-align: left; padding: 8px 10px; border: 0; background: none; border-radius: 8px;
+    cursor: pointer; font-size: 15px; color: var(--issys-ink); font-family: inherit; text-decoration: none; box-sizing: border-box; }
+.issys-menu .item:hover { background: var(--issys-surface); }
+.issys-menu .item.rojo { color: var(--issys-danger); }
+
+/* ---------- Aviso flotante ---------- */
+#issys-aviso { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 9980; background: var(--issys-ink); color: #fff;
+    border-radius: 10px; padding: 10px 12px 10px 16px; font: 15px var(--issys-font); display: flex; flex-wrap: wrap; gap: 10px;
+    align-items: center; box-shadow: 0 10px 25px rgba(0, 0, 0, .3); max-width: calc(100vw - 32px); }
+#issys-aviso .issys-btn { background: transparent; color: #fff; border-color: var(--issys-gray); }
+
+/* ---------- Etiquetas ---------- */
+.issys-tag { display: inline-block; font-size: 12px; font-weight: 600; line-height: 1.3; padding: 2px 8px; border-radius: 999px;
+    background: var(--issys-blue-tint); color: var(--issys-blue-dark); white-space: nowrap; }
+.issys-tag.verde { background: var(--issys-green-tint); color: var(--issys-green-dark); }
+.issys-tag.gris { background: var(--issys-line); color: var(--issys-muted); }
+.issys-tag.amarillo { background: #FDF3D3; color: #6E5006; }

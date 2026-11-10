@@ -1,0 +1,49 @@
+{
+  "titulo": "Informe de gestión",
+  "area": "institucional",
+  "movimiento": "camara",
+  "pie": "Instituto de Seguridad Social y Seguros del Chubut",
+  "diapositivas": [
+    {
+      "tipo": "portada",
+      "titulo": "Informe de<br>gestión.",
+      "subtitulo": "Sección Enlace Delegaciones",
+      "autor": "Lic. Sebastián A. Galdame",
+      "fecha": "Noviembre 2026"
+    },
+    { "tipo": "seccion", "numero": "01", "titulo": "Objetivos.", "subtitulo": "Qué nos propusimos" },
+    {
+      "tipo": "lista",
+      "titulo": "Ejes de trabajo",
+      "pasos": true,
+      "items": [
+        { "titulo": "Eje 1", "texto": "Descripción breve del primer eje." },
+        { "titulo": "Eje 2", "texto": "Descripción breve del segundo eje." },
+        { "titulo": "Eje 3", "texto": "Descripción breve del tercer eje." }
+      ]
+    },
+    {
+      "tipo": "cifras",
+      "titulo": "Resultados",
+      "subtitulo": "en números",
+      "cifras": [
+        { "valor": 0, "etiqueta": "Indicador 1" },
+        { "valor": 0, "etiqueta": "Indicador 2" },
+        { "valor": 0, "sufijo": "%", "etiqueta": "Indicador 3" }
+      ]
+    },
+    {
+      "tipo": "webapp",
+      "titulo": "Herramienta",
+      "subtitulo": "demostración en vivo",
+      "descripcion": "<p>Reemplazar la URL por la de tu app en Firebase.</p>",
+      "url": "https://TU-PROYECTO.web.app"
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Gracias.",
+      "texto": "Consultas: Sección Enlace Delegaciones",
+      "links": [ { "texto": "www.issys.gov.ar", "url": "https://www.issys.gov.ar" } ]
+    }
+  ]
+}

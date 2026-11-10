@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4657A0">
+    <link rel="icon" type="image/png" href="/shared/marca/issys-isologo.png">
+    <title>Modelador BPMN — ISSyS Sección Enlace Delegaciones</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Encode Sans Condensed (tipografía institucional) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Encode+Sans+Condensed:wght@300;400;600;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+    <!-- bpmn-js (bpmn.io) — motor de modelado BPMN 2.0 -->
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js@17.11.1/dist/assets/diagram-js.css">
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js@17.11.1/dist/assets/bpmn-js.css">
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js@17.11.1/dist/assets/bpmn-font/css/bpmn-embedded.css">
+    <script src="https://unpkg.com/bpmn-js@17.11.1/dist/bpmn-modeler.production.min.js"></script>
+    <!-- Extensiones de bpmn.io: minimapa, panel de propiedades y paleta de colores -->
+    <link rel="stylesheet" href="https://unpkg.com/diagram-js-minimap@5.2.0/assets/diagram-js-minimap.css">
+    <link rel="stylesheet" href="https://unpkg.com/@bpmn-io/properties-panel@3.24.1/dist/assets/properties-panel.css">
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js-color-picker@0.7.1/colors/color-picker.css">
+    <script src="bpmn-extensiones.js"></script>
+    <!-- Modelos BPMN compartidos con index.html -->
+    <script src="bpmn-modelos.js"></script>
+    <script src="bpmn-diagramado.js"></script>
+    <!-- Ingreso con Google y datos compartidos en Firestore -->
+    <script src="/shared/firebase-config.js"></script>
+    <script src="/shared/auth.js"></script>
+    <script src="nube.js"></script>
+    <!-- Identidad ISSyS: paleta y tipografía del manual de marca -->
+    <script src="/shared/issys-tailwind.js"></script>
+    <link rel="stylesheet" href="/shared/issys.css" data-issys-css>
+    <style>
+        body { font-size: 18px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #EDEEF1; }
+        ::-webkit-scrollbar-thumb { background: #C6C6C6; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #878787; }
+
+        /* Lienzo */
+        #canvas {
+            background-color: #ffffff;
+            background-size: 20px 20px;
+            background-image: radial-gradient(circle, #E1E2E5 1px, transparent 1px);
+        }
+        /* Paleta de bpmn-js con la identidad ISSyS */
+        .djs-palette { border-radius: 8px; border-color: #C6C6C6 !important; background: #ffffff !important; box-shadow: 0 2px 8px rgba(29, 29, 27, 0.08); top: 16px !important; left: 16px !important; }
+        .djs-palette .entry:hover { color: #4657A0; }
+        .djs-context-pad .entry:hover { background: #E3E6F1; }
+        .djs-popup { font-family: 'Encode Sans Condensed', sans-serif; font-size: 14px; }
+
+        /* Etiquetas de atributos ISSyS sobre las tareas */
+        .issys-chips { display: flex; gap: 2px; pointer-events: none; white-space: nowrap; }
+        .issys-chip { font: 600 8px/1 'Encode Sans Condensed', sans-serif; padding: 2px 4px; border-radius: 3px; border: 1px solid; letter-spacing: .02em; }
+        .issys-chip.presencial { background: #F9DEDC; color: #B3261E; border-color: #F2B8B5; }
+        .issys-chip.hipotesis { background: #FDF3D3; color: #6E5006; border-color: #F9D76B; }
+        .issys-chip.doblecarga { background: #E3E6F1; color: #36457F; border-color: #A5ADD3; }
+
+        .swatch { width: 22px; height: 22px; border-radius: 6px; border: 2px solid; cursor: pointer; transition: transform .1s; }
+        .swatch:hover { transform: scale(1.12); }
+        .tb-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 9px; border-radius: 6px; font-size: 14px; font-weight: 500; color: #363634; transition: background .15s; }
+        .tb-btn:hover:not(:disabled) { background: #EDEEF1; color: #1D1D1B; }
+        .tb-btn:disabled { opacity: .35; cursor: default; }
+        .tb-btn.active { background: #E3E6F1; color: #36457F; }
+
+        /* Salida esperada de una compuerta (camino feliz) */
+        .djs-connection.issys-expected .djs-visual > path { stroke: #2F7D50 !important; stroke-width: 2.5px !important; }
+        .djs-connection.issys-expected marker path { stroke: #2F7D50 !important; fill: #2F7D50 !important; }
+
+        /* Minimapa: abajo a la derecha del lienzo */
+        .djs-minimap { top: auto !important; bottom: 16px; right: 16px !important; border-radius: 8px; border-color: #C6C6C6 !important; box-shadow: 0 2px 8px rgba(29, 29, 27, 0.12); background: #fff; }
+        .djs-minimap .toggle { display: none; }
+        .djs-minimap .viewport-dom { border-color: #4657A0 !important; }
+        .djs-minimap .map { width: 220px; height: 130px; }
+
+        /* Panel de propiedades oficial de bpmn.io, con la tipografía de la app */
+        #props-bpmn .bio-properties-panel {
+            --text-size-base: 15px; --text-size-small: 14px; --text-size-smallest: 13px;
+            --font-family: 'Encode Sans Condensed', sans-serif;
+            --color-blue-205-100-50: #4657A0; --color-blue-205-100-45: #36457F;
+        }
+        #props-bpmn .bio-properties-panel-header { padding: 12px 14px; }
+        #props-bpmn .bio-properties-panel-placeholder-text { font-size: 15px; }
+    </style>
+</head>
+<body class="bg-issys-surface text-slate-800 font-sans h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header class="bg-white text-issys-ink h-16 border-b-4 border-issys-green flex items-center justify-between gap-4 px-4 z-30 shadow-sm flex-shrink-0">
+        <div class="flex items-center gap-4 min-w-0">
+            <a href="index.html" class="flex-shrink-0" title="Ir al listado de procesos">
+                <img src="/shared/marca/issys-logo-recorte.png" alt="ISSyS" class="issys-logo">
+            </a>
+            <div class="min-w-0 border-l border-slate-300 pl-4">
+                <div class="font-extrabold text-lg leading-tight">Modelador BPMN</div>
+                <p id="hdr-process" class="text-[13px] font-light text-slate-500 leading-tight truncate">Proceso</p>
+            </div>
+        </div>
+
+        <div class="flex bg-slate-100 rounded-lg p-1 border border-slate-200 text-xs font-semibold">
+            <button id="hdr-tab-asis" onclick="switchModel('asis')" class="px-3 py-1 rounded flex items-center gap-1.5 transition">
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>AS-IS
+            </button>
+            <button id="hdr-tab-trans" onclick="switchModel('trans')" class="px-3 py-1 rounded flex items-center gap-1.5 transition" title="Etapa intermedia: mejoras posibles con los recursos actuales">
+                <span class="w-2 h-2 rounded-full bg-sky-400"></span>Transición
+            </button>
+            <button id="hdr-tab-tobe" onclick="switchModel('tobe')" class="px-3 py-1 rounded flex items-center gap-1.5 transition">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>TO-BE
+            </button>
+        </div>
+
+        <a id="link-viewer" href="index.html" class="flex items-center gap-1.5 text-xs font-semibold text-issys-blue hover:text-issys-blue-dark hover:underline">
+            <i data-lucide="eye" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Volver al visor</span>
+        </a>
+    </header>
+
+    <!-- Toolbar -->
+    <div class="bg-white border-b border-slate-200 px-3 py-1.5 flex items-center gap-1 flex-wrap shadow-sm z-20">
+        <button class="tb-btn" onclick="newDiagram()" title="Diagrama nuevo con un pool y dos carriles">
+            <i data-lucide="file-plus" class="w-4 h-4"></i><span class="hidden lg:inline">Nuevo</span>
+        </button>
+        <button class="tb-btn" onclick="document.getElementById('file-input').click()" title="Abrir un archivo .bpmn (por ejemplo, exportado desde Bizagi)">
+            <i data-lucide="folder-open" class="w-4 h-4"></i><span class="hidden lg:inline">Abrir .bpmn</span>
+        </button>
+        <input type="file" id="file-input" accept=".bpmn,.xml" class="hidden">
+        <button id="btn-restore" class="tb-btn" onclick="restoreOriginal()" title="Volver al modelo original del relevamiento">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i><span class="hidden xl:inline">Restaurar original</span>
+        </button>
+
+        <div class="w-px h-6 bg-slate-200 mx-1"></div>
+
+        <button id="btn-undo" class="tb-btn" onclick="undo()" title="Deshacer (Ctrl+Z)">
+            <i data-lucide="undo-2" class="w-4 h-4"></i>
+        </button>
+        <button id="btn-redo" class="tb-btn" onclick="modeler.get('commandStack').redo()" title="Rehacer (Ctrl+Y)">
+            <i data-lucide="redo-2" class="w-4 h-4"></i>
+        </button>
+
+        <div class="w-px h-6 bg-slate-200 mx-1"></div>
+
+        <button class="tb-btn" onclick="zoomBy(1 / 1.2)" title="Alejar">
+            <i data-lucide="zoom-out" class="w-4 h-4"></i>
+        </button>
+        <button id="zoom-label" class="tb-btn font-mono w-14 justify-center" onclick="zoomReset()" title="Zoom 100%">100%</button>
+        <button class="tb-btn" onclick="zoomBy(1.2)" title="Acercar">
+            <i data-lucide="zoom-in" class="w-4 h-4"></i>
+        </button>
+        <button class="tb-btn" onclick="zoomFit()" title="Ajustar el diagrama a la pantalla">
+            <i data-lucide="scan" class="w-4 h-4"></i><span class="hidden lg:inline">Ajustar</span>
+        </button>
+        <button id="btn-minimap" class="tb-btn" onclick="toggleMinimap()" title="Mostrar u ocultar el minimapa">
+            <i data-lucide="map" class="w-4 h-4"></i>
+        </button>
+        <button id="btn-zoom-select" class="tb-btn" onclick="toggleZoomOnSelect()" title="Acercar la vista al elemento al hacer clic">
+            <i data-lucide="focus" class="w-4 h-4"></i>
+        </button>
+
+        <div class="w-px h-6 bg-slate-200 mx-1"></div>
+
+        <!-- Alinear / distribuir (con 2 o más elementos seleccionados) -->
+        <button class="tb-btn" data-align="left" title="Alinear a la izquierda">
+            <i data-lucide="align-start-vertical" class="w-4 h-4"></i>
+        </button>
+        <button class="tb-btn" data-align="center" title="Centrar horizontalmente">
+            <i data-lucide="align-center-vertical" class="w-4 h-4"></i>
+        </button>
+        <button class="tb-btn" data-align="right" title="Alinear a la derecha">
+            <i data-lucide="align-end-vertical" class="w-4 h-4"></i>
+        </button>
+        <button class="tb-btn" data-align="top" title="Alinear arriba">
+            <i data-lucide="align-start-horizontal" class="w-4 h-4"></i>
+        </button>
+        <button class="tb-btn" data-align="middle" title="Centrar verticalmente">
+            <i data-lucide="align-center-horizontal" class="w-4 h-4"></i>
+        </button>
+        <button class="tb-btn" data-align="bottom" title="Alinear abajo">
+            <i data-lucide="align-end-horizontal" class="w-4 h-4"></i>
+        </button>
+        <button class="tb-btn" data-distribute="horizontal" title="Distribuir horizontalmente (3 o más elementos)">
+            <i data-lucide="align-horizontal-distribute-center" class="w-4 h-4"></i>
+        </button>
+        <button class="tb-btn" data-distribute="vertical" title="Distribuir verticalmente (3 o más elementos)">
+            <i data-lucide="align-vertical-distribute-center" class="w-4 h-4"></i>
+        </button>
+        <button class="tb-btn" onclick="autoLayout()" title="Reordenar todo el diagrama a partir de la lógica del proceso, respetando los carriles">
+            <i data-lucide="wand-sparkles" class="w-4 h-4"></i><span class="hidden lg:inline">Ordenar diagrama</span>
+        </button>
+
+        <div class="w-px h-6 bg-slate-200 mx-1"></div>
+
+        <button class="tb-btn" onclick="downloadBpmn()" title="Descargar BPMN 2.0 (compatible con Bizagi, Camunda, Signavio)">
+            <i data-lucide="file-code-2" class="w-4 h-4"></i><span class="hidden lg:inline">.bpmn</span>
+        </button>
+        <button class="tb-btn" onclick="downloadSvg()" title="Descargar imagen vectorial">
+            <i data-lucide="image" class="w-4 h-4"></i><span class="hidden lg:inline">SVG</span>
+        </button>
+        <button class="tb-btn" onclick="downloadPng()" title="Descargar imagen PNG">
+            <i data-lucide="image-down" class="w-4 h-4"></i><span class="hidden lg:inline">PNG</span>
+        </button>
+
+        <div class="ml-auto flex items-center gap-2">
+            <span id="save-status" class="text-[13px] text-slate-500"></span>
+            <button onclick="saveDiagram()" class="flex items-center gap-1.5 px-3 py-1.5 bg-issys-blue hover:bg-issys-blue-dark text-white text-xs font-semibold rounded shadow transition" title="Guardar (Ctrl+S)">
+                <i data-lucide="save" class="w-3.5 h-3.5"></i>
+                <span>Guardar</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Workspace -->
+    <div class="flex-1 flex overflow-hidden">
+        <main class="flex-1 relative overflow-hidden">
+            <div id="canvas" class="absolute inset-0"></div>
+            <div id="load-error" class="hidden absolute inset-0 flex items-center justify-center bg-white/90 z-10">
+                <div class="max-w-md text-center p-6">
+                    <i data-lucide="alert-triangle" class="w-8 h-8 mx-auto mb-2 text-rose-500"></i>
+                    <p class="font-semibold text-slate-800">No se pudo cargar el modelador</p>
+                    <p class="text-sm text-slate-500 mt-1">Esta página necesita conexión a internet para descargar el motor BPMN (bpmn-js).</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Properties panel -->
+        <aside class="w-[22rem] bg-white border-l border-slate-200 flex flex-col z-20 shadow-lg flex-shrink-0">
+            <div role="tablist" class="flex border-b border-slate-200 bg-slate-50 text-xs font-semibold text-slate-600">
+                <button id="tab-props-issys" role="tab" onclick="switchPropsTab('issys')" class="flex-1 py-2.5 px-2 border-b-2 border-transparent flex items-center justify-center gap-1.5 transition">
+                    <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
+                    <span>Relevamiento</span>
+                </button>
+                <button id="tab-props-bpmn" role="tab" onclick="switchPropsTab('bpmn')" class="flex-1 py-2.5 px-2 border-b-2 border-transparent flex items-center justify-center gap-1.5 transition" title="Panel de propiedades oficial de bpmn.io">
+                    <i data-lucide="list-tree" class="w-3.5 h-3.5"></i>
+                    <span>Propiedades BPMN</span>
+                </button>
+            </div>
+            <div id="props" class="flex-1 overflow-y-auto p-4 text-xs space-y-4">
+                <!-- Rendered by JS -->
+            </div>
+            <div id="props-bpmn" class="hidden flex-1 overflow-y-auto">
+                <p id="props-bpmn-unavailable" class="hidden p-4 text-xs text-slate-500">No se pudo cargar el panel de propiedades de bpmn.io (falta el archivo bpmn-extensiones.js).</p>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-issys-navy text-white text-xs px-4 py-2.5 rounded-lg shadow-xl border border-cyan-500/30 transition-all duration-200 z-50 flex items-center gap-2 pointer-events-none opacity-0 translate-y-4">
+        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+        <span id="toast-message"></span>
+    </div>
+
+    <script>
+        /**
+         * Modelador BPMN 2.0 — ISSyS Chubut, Sección Enlace Delegaciones
+         *
+         * Uso: modelador.html?proceso=reintegros&modelo=asis|trans|tobe
+         * Cada diagrama se guarda en el navegador como XML BPMN 2.0 estándar
+         * (clave "issys-bpmn:<proceso>:<modelo>"), así se puede importar/exportar
+         * con Bizagi u otras herramientas.
+         */
+
+        const PROCESS_STORAGE_KEY = 'issys-procesos-v1';
+
+        // Paleta de colores del panel de propiedades
+        const SWATCHES = [
+            { label: 'Azul', fill: COLORS.task.fill, stroke: COLORS.task.stroke },
+            { label: 'Verde', fill: COLORS.start.fill, stroke: COLORS.start.stroke },
+            { label: 'Amarillo', fill: COLORS.gateway.fill, stroke: COLORS.gateway.stroke },
+            { label: 'Rojo', fill: COLORS.end.fill, stroke: COLORS.end.stroke },
+            { label: 'Gris', fill: COLORS.data.fill, stroke: COLORS.data.stroke },
+            { label: 'Sin color', fill: null, stroke: null }
+        ];
+
+        // ------------------------------------------------------------
+        // Traducción al español de la interfaz de bpmn-js
+        // ------------------------------------------------------------
+        const ES = {
+            'Activate hand tool': 'Herramienta mano (mover lienzo)',
+            'Activate lasso tool': 'Herramienta lazo (selección múltiple)',
+            'Activate create/remove space tool': 'Crear / quitar espacio',
+            'Activate global connect tool': 'Herramienta de conexión',
+            'Create start event': 'Evento de inicio',
+            'Create intermediate/boundary event': 'Evento intermedio / de borde',
+            'Create end event': 'Evento de fin',
+            'Create gateway': 'Compuerta',
+            'Create task': 'Tarea',
+            'Create expanded sub-process': 'Subproceso expandido',
+            'Create data object reference': 'Objeto de datos (documento)',
+            'Create data store reference': 'Almacén de datos',
+            'Create pool/participant': 'Pool / Participante',
+            'Create group': 'Grupo',
+            'Append end event': 'Agregar evento de fin',
+            'Append gateway': 'Agregar compuerta',
+            'Append task': 'Agregar tarea',
+            'Append intermediate/boundary event': 'Agregar evento intermedio',
+            'Append message intermediate catch event': 'Agregar evento de mensaje',
+            'Append timer intermediate catch event': 'Agregar evento de temporizador',
+            'Append conditional intermediate catch event': 'Agregar evento condicional',
+            'Append signal intermediate catch event': 'Agregar evento de señal',
+            'Append receive task': 'Agregar tarea de recepción',
+            'Append compensation activity': 'Agregar actividad de compensación',
+            'Add text annotation': 'Agregar anotación',
+            'Add lane above': 'Agregar carril arriba',
+            'Add lane below': 'Agregar carril abajo',
+            'Divide into two lanes': 'Dividir en dos carriles',
+            'Divide into three lanes': 'Dividir en tres carriles',
+            'Change element': 'Cambiar tipo de elemento',
+            'Connect to other element': 'Conectar con otro elemento',
+            'Connect using association': 'Conectar con asociación',
+            'Connect using data input association': 'Conectar con asociación de datos',
+            'Delete': 'Eliminar',
+            'Align elements': 'Alinear elementos',
+            'Align elements left': 'Alinear a la izquierda',
+            'Align elements right': 'Alinear a la derecha',
+            'Align elements center': 'Centrar horizontalmente',
+            'Align elements top': 'Alinear arriba',
+            'Align elements bottom': 'Alinear abajo',
+            'Align elements middle': 'Centrar verticalmente',
+            'Distribute elements horizontally': 'Distribuir horizontalmente',
+            'Distribute elements vertically': 'Distribuir verticalmente',
+            'Search in diagram': 'Buscar en el diagrama',
+            'Toggle non-interrupting': 'Alternar no interruptor',
+            'Loop': 'Bucle', 'Parallel multi-instance': 'Multi-instancia paralela',
+            'Sequential multi-instance': 'Multi-instancia secuencial', 'Collection': 'Colección',
+            'Ad-hoc': 'Ad-hoc', 'Participant multiplicity': 'Multiplicidad del participante',
+            'Open {element}': 'Abrir {element}',
+            // Menú "Cambiar tipo"
+            'Task': 'Tarea', 'User task': 'Tarea de usuario', 'Manual task': 'Tarea manual',
+            'Service task': 'Tarea de servicio', 'Send task': 'Tarea de envío', 'Receive task': 'Tarea de recepción',
+            'Script task': 'Tarea de script', 'Business rule task': 'Tarea de regla de negocio',
+            'Call activity': 'Actividad de llamada', 'Sub-process': 'Subproceso',
+            'Sub-process (collapsed)': 'Subproceso (contraído)', 'Sub-process (expanded)': 'Subproceso (expandido)',
+            'Event sub-process': 'Subproceso de evento', 'Transaction': 'Transacción',
+            'Start event': 'Evento de inicio', 'End event': 'Evento de fin',
+            'Intermediate throw event': 'Evento intermedio de lanzamiento',
+            'Message start event': 'Inicio por mensaje', 'Timer start event': 'Inicio por temporizador',
+            'Conditional start event': 'Inicio condicional', 'Signal start event': 'Inicio por señal',
+            'Error start event': 'Inicio por error', 'Escalation start event': 'Inicio por escalamiento',
+            'Compensation start event': 'Inicio por compensación',
+            'Message start event (non-interrupting)': 'Inicio por mensaje (no interruptor)',
+            'Timer start event (non-interrupting)': 'Inicio por temporizador (no interruptor)',
+            'Conditional start event (non-interrupting)': 'Inicio condicional (no interruptor)',
+            'Signal start event (non-interrupting)': 'Inicio por señal (no interruptor)',
+            'Escalation start event (non-interrupting)': 'Inicio por escalamiento (no interruptor)',
+            'Message intermediate catch event': 'Intermedio: recepción de mensaje',
+            'Message intermediate throw event': 'Intermedio: envío de mensaje',
+            'Timer intermediate catch event': 'Intermedio: temporizador',
+            'Escalation intermediate throw event': 'Intermedio: escalamiento',
+            'Conditional intermediate catch event': 'Intermedio: condicional',
+            'Link intermediate catch event': 'Intermedio: enlace (captura)',
+            'Link intermediate throw event': 'Intermedio: enlace (lanzamiento)',
+            'Compensation intermediate throw event': 'Intermedio: compensación',
+            'Signal intermediate catch event': 'Intermedio: señal (captura)',
+            'Signal intermediate throw event': 'Intermedio: señal (lanzamiento)',
+            'Message end event': 'Fin con mensaje', 'Escalation end event': 'Fin con escalamiento',
+            'Error end event': 'Fin con error', 'Cancel end event': 'Fin con cancelación',
+            'Compensation end event': 'Fin con compensación', 'Signal end event': 'Fin con señal',
+            'Terminate end event': 'Fin terminante',
+            'Message boundary event': 'Borde: mensaje', 'Timer boundary event': 'Borde: temporizador',
+            'Escalation boundary event': 'Borde: escalamiento', 'Conditional boundary event': 'Borde: condicional',
+            'Error boundary event': 'Borde: error', 'Cancel boundary event': 'Borde: cancelación',
+            'Signal boundary event': 'Borde: señal', 'Compensation boundary event': 'Borde: compensación',
+            'Message boundary event (non-interrupting)': 'Borde: mensaje (no interruptor)',
+            'Timer boundary event (non-interrupting)': 'Borde: temporizador (no interruptor)',
+            'Escalation boundary event (non-interrupting)': 'Borde: escalamiento (no interruptor)',
+            'Conditional boundary event (non-interrupting)': 'Borde: condicional (no interruptor)',
+            'Signal boundary event (non-interrupting)': 'Borde: señal (no interruptor)',
+            'Exclusive gateway': 'Compuerta exclusiva (XOR)', 'Parallel gateway': 'Compuerta paralela (AND)',
+            'Inclusive gateway': 'Compuerta inclusiva (OR)', 'Complex gateway': 'Compuerta compleja',
+            'Event-based gateway': 'Compuerta basada en eventos',
+            'Event based instantiating Gateway': 'Compuerta de eventos instanciadora',
+            'Parallel Event based instantiating Gateway': 'Compuerta de eventos paralela instanciadora',
+            'Sequence flow': 'Flujo de secuencia', 'Default flow': 'Flujo por defecto', 'Conditional flow': 'Flujo condicional',
+            'Data object reference': 'Objeto de datos', 'Data store reference': 'Almacén de datos',
+            'Expanded pool/participant': 'Pool expandido', 'Empty pool/participant': 'Pool vacío',
+            // Paleta de colores del menú contextual
+            'Set color': 'Color',
+            'Lane': 'Carril', 'Participant': 'Pool / Participante', 'Process': 'Proceso',
+            'Text Annotation': 'Anotación', 'Group': 'Grupo', 'Boundary Event': 'Evento de borde',
+            'Intermediate Catch Event': 'Evento intermedio de captura',
+            'Collapsed Sub Process': 'Subproceso (contraído)', 'Expanded Sub Process': 'Subproceso (expandido)',
+            // Panel de propiedades de bpmn.io
+            'Select an element to edit its properties.': 'Seleccioná un elemento para ver sus propiedades BPMN.',
+            'Multiple elements are selected. Select a single element to edit its properties.': 'Hay varios elementos seleccionados. Seleccioná uno solo para ver sus propiedades.',
+            'General': 'General', 'Name': 'Nombre', 'ID': 'ID', 'Documentation': 'Documentación',
+            'Element documentation': 'Documentación del elemento', 'Process documentation': 'Documentación del proceso',
+            'Executable': 'Ejecutable', 'Participant Name': 'Nombre del participante',
+            'Process name': 'Nombre del proceso', 'Process ID': 'ID del proceso',
+            'ID must not be empty.': 'El ID no puede estar vacío.', 'ID must be unique.': 'El ID debe ser único.',
+            'ID must not contain spaces.': 'El ID no puede contener espacios.',
+            'ID must not contain prefix.': 'El ID no puede contener prefijo.',
+            'ID must be a valid QName.': 'El ID debe ser un nombre válido (sin espacios ni símbolos, no empieza con número).',
+            'Multi-instance': 'Multi-instancia', 'Loop cardinality': 'Cantidad de repeticiones',
+            'Completion condition': 'Condición de finalización',
+            'Message': 'Mensaje', 'Global message reference': 'Mensaje global',
+            'Signal': 'Señal', 'Global signal reference': 'Señal global',
+            'Error': 'Error', 'Global error reference': 'Error global', 'Code': 'Código',
+            'Escalation': 'Escalamiento', 'Global escalation reference': 'Escalamiento global',
+            'Link': 'Enlace', 'Timer': 'Temporizador', 'Type': 'Tipo', 'Value': 'Valor',
+            'Date': 'Fecha', 'Duration': 'Duración', 'Cycle': 'Ciclo', 'Compensation': 'Compensación',
+            'Wait for completion': 'Esperar a que finalice', 'Activity reference': 'Actividad de referencia',
+            'Create new ...': 'Crear nuevo…', '<none>': '<ninguno>',
+            'A specific point in time defined as ISO 8601 combined date and time representation.': 'Fecha y hora puntual en formato ISO 8601.',
+            'A time duration defined as ISO 8601 durations format.': 'Duración en formato ISO 8601.',
+            'A cycle defined as ISO 8601 repeating intervals format.': 'Ciclo en formato ISO 8601 de intervalos repetidos.',
+            '15 seconds': '15 segundos', '1 hour and 30 minutes': '1 hora y 30 minutos', '14 days': '14 días',
+            'every 10 seconds, up to 5 times': 'cada 10 segundos, hasta 5 veces', 'every day, infinitely': 'todos los días, sin fin',
+            'UTC time': 'hora UTC', 'UTC plus 2 hours zone offset': 'UTC más 2 horas',
+            'Documentation: Timer events': 'Documentación: eventos de temporizador'
+        };
+
+        // Búsqueda tolerante a mayúsculas y guiones (el panel de bpmn.io usa "User Task", el menú "User task")
+        const normalizeKey = (text) => text.toLowerCase().replace(/-/g, ' ');
+        const ES_LOOSE = Object.fromEntries(Object.entries(ES).map(([k, v]) => [normalizeKey(k), v]));
+
+        function customTranslate(template, replacements) {
+            replacements = replacements || {};
+            template = ES[template] || ES_LOOSE[normalizeKey(template)] || template;
+            return template.replace(/{([^}]+)}/g, (_, key) => {
+                const value = replacements[key];
+                return value !== undefined ? (ES[value] || value) : `{${key}}`;
+            });
+        }
+
+        // ------------------------------------------------------------
+        // Estado y arranque
+        // ------------------------------------------------------------
+        const params = new URLSearchParams(location.search);
+        const processId = params.get('proceso') || 'reintegros';
+        const modelKey = parseModelKey(params.get('modelo'));
+        const storageKey = bpmnStorageKey(processId, modelKey);
+
+        let modeler = null;
+        let dirty = false;
+        let savedAt = null;
+        let overlayFrame = null;
+        let pluginsReady = false;
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            await window.nubeListo;
+            init();
+        });
+
+        async function init() {
+            lucide.createIcons();
+            renderHeader();
+
+            if (typeof BpmnJS === 'undefined') {
+                document.getElementById('load-error').classList.remove('hidden');
+                return;
+            }
+
+            const plugins = loadPlugins();
+            const modules = [{ translate: ['value', customTranslate] }, SwimlaneLabelModule];
+            if (plugins) modules.push(plugins.minimap, ...plugins.propertiesPanel, plugins.colorPicker);
+
+            modeler = new BpmnJS({
+                container: '#canvas',
+                keyboard: { bindTo: document },
+                textRenderer: {
+                    defaultStyle: { fontFamily: 'Arial, sans-serif', fontSize: 11 },
+                    externalStyle: { fontFamily: 'Arial, sans-serif', fontSize: 11 }
+                },
+                minimap: { open: readPref('minimap') !== '0' },
+                propertiesPanel: { parent: '#props-bpmn' },
+                colorPicker: { colors: SWATCHES.map(s => ({ label: s.label, fill: s.fill || undefined, stroke: s.stroke || undefined })) },
+                additionalModules: modules
+            });
+
+            pluginsReady = !!plugins;
+            document.getElementById('btn-minimap').classList.toggle('hidden', !pluginsReady);
+            document.getElementById('props-bpmn-unavailable').classList.toggle('hidden', pluginsReady);
+            switchPropsTab(readPref('propsTab') === 'bpmn' ? 'bpmn' : 'issys');
+            updateMinimapButton();
+            updateZoomSelectButton();
+
+            setupModelerEvents();
+            setupPageEvents();
+
+            const stored = readStoredBpmn(processId, modelKey);
+            savedAt = stored ? stored.savedAt : null;
+            await importXml(getBpmnXml(processId, modelKey), { fit: true });
+            dirty = false;
+            updateStatus();
+        }
+
+        // Extensiones de bpmn.io empaquetadas en bpmn-extensiones.js (si falta el archivo, se sigue sin ellas)
+        function loadPlugins() {
+            return window.bpmnExtensiones || null;
+        }
+
+        function readPref(name) {
+            try { return localStorage.getItem(`issys-modelador:${name}`); } catch (e) { return null; }
+        }
+
+        function writePref(name, value) {
+            try { localStorage.setItem(`issys-modelador:${name}`, value); } catch (e) { /* sin persistencia */ }
+        }
+
+        function switchPropsTab(tab) {
+            const active = 'flex-1 py-2.5 px-2 border-b-2 border-issys-cyan text-cyan-800 bg-white flex items-center justify-center gap-1.5 transition';
+            const idle = 'flex-1 py-2.5 px-2 border-b-2 border-transparent hover:text-slate-900 flex items-center justify-center gap-1.5 transition';
+            ['issys', 'bpmn'].forEach(t => {
+                const btn = document.getElementById(`tab-props-${t}`);
+                btn.className = t === tab ? active : idle;
+                btn.setAttribute('aria-selected', t === tab ? 'true' : 'false');
+            });
+            document.getElementById('props').classList.toggle('hidden', tab !== 'issys');
+            document.getElementById('props-bpmn').classList.toggle('hidden', tab !== 'bpmn');
+            writePref('propsTab', tab);
+        }
+
+        // ------------------------------------------------------------
+        // Minimapa, alinear / distribuir y diagramado automático
+        // ------------------------------------------------------------
+        function toggleMinimap() {
+            if (!pluginsReady) return;
+            const minimap = modeler.get('minimap');
+            minimap.toggle();
+            writePref('minimap', minimap.isOpen() ? '1' : '0');
+            updateMinimapButton();
+        }
+
+        function updateMinimapButton() {
+            const open = pluginsReady && modeler.get('minimap').isOpen();
+            document.getElementById('btn-minimap').classList.toggle('active', open);
+        }
+
+        function alignTargets() {
+            return modeler.get('selection').get().filter(el => el.type !== 'label' && !el.waypoints
+                && !el.businessObject.$instanceOf('bpmn:Lane') && !el.businessObject.$instanceOf('bpmn:Participant'));
+        }
+
+        function updateAlignButtons() {
+            const n = alignTargets().length;
+            document.querySelectorAll('[data-align]').forEach(b => { b.disabled = n < 2; });
+            document.querySelectorAll('[data-distribute]').forEach(b => { b.disabled = n < 3; });
+        }
+
+        // Respaldo para deshacer el diagramado automático (re-importar vacía el historial)
+        let layoutBackupXml = null;
+
+        async function autoLayout() {
+            const { xml: before } = await modeler.saveXML();
+            if (!ordenarDiagrama(modeler)) {
+                showToast('No hay pasos para ordenar.');
+                return;
+            }
+            const { xml } = await modeler.saveXML({ format: true });
+            if (await importXml(xml, { fit: true })) {
+                layoutBackupXml = before;
+                dirty = true;
+                updateStatus();
+                showToast('Diagrama ordenado. Con Deshacer (Ctrl+Z) volvés a la versión anterior.');
+            }
+        }
+
+        async function undo() {
+            const commandStack = modeler.get('commandStack');
+            if (commandStack.canUndo()) {
+                commandStack.undo();
+            } else if (layoutBackupXml) {
+                const xml = layoutBackupXml;
+                layoutBackupXml = null;
+                await importXml(xml, { fit: true });
+                dirty = true;
+                updateStatus();
+                showToast('Se deshizo el ordenamiento automático.');
+            }
+        }
+
+        function originalDefinition() {
+            return originalBpmnDefinition(processId, modelKey);
+        }
+
+        function processName() {
+            try {
+                const list = JSON.parse(localStorage.getItem(PROCESS_STORAGE_KEY) || '[]');
+                const proc = Array.isArray(list) && list.find(p => p.id === processId);
+                if (proc) return proc.name;
+            } catch (e) { /* sin datos del listado */ }
+            return processId === 'reintegros' ? 'Reintegros Médicos' : processId;
+        }
+
+        function renderHeader() {
+            document.getElementById('hdr-process').textContent = `${processName()} · ${MODEL_LABEL[modelKey]}`;
+            document.title = `${processName()} ${MODEL_LABEL[modelKey]} — Modelador BPMN ISSyS`;
+            const active = 'px-3 py-1 rounded flex items-center gap-1.5 transition bg-white text-issys-blue shadow-sm';
+            const idle = 'px-3 py-1 rounded flex items-center gap-1.5 transition text-slate-500 hover:text-issys-ink hover:bg-white/60';
+            MODEL_KEYS.forEach(k => { document.getElementById(`hdr-tab-${k}`).className = modelKey === k ? active : idle; });
+            // En la transición, el botón vuelve a partir del AS-IS vigente
+            const restore = document.getElementById('btn-restore');
+            restore.classList.toggle('hidden', modelKey !== 'trans' && !originalDefinition());
+            restore.title = modelKey === 'trans' ? 'Reemplazar por una copia del AS-IS actual' : 'Volver al modelo original del relevamiento';
+            restore.querySelector('span').textContent = modelKey === 'trans' ? 'Copiar AS-IS' : 'Restaurar original';
+            document.getElementById('link-viewer').href = `index.html#/p/${encodeURIComponent(processId)}/${modelKey}`;
+        }
+
+        function switchModel(key) {
+            if (key === modelKey) return;
+            const url = new URL(location.href);
+            url.searchParams.set('proceso', processId);
+            url.searchParams.set('modelo', key);
+            location.href = url.toString();
+        }
+
+        // ------------------------------------------------------------
+        // Persistencia
+        // ------------------------------------------------------------
+        async function saveDiagram() {
+            try {
+                const { xml } = await modeler.saveXML({ format: true });
+                savedAt = new Date().toISOString();
+                localStorage.setItem(storageKey, JSON.stringify({ xml, savedAt }));
+                dirty = false;
+                updateStatus();
+                showToast('Diagrama guardado.');
+            } catch (e) {
+                showToast('No se pudo guardar en este navegador.');
+            }
+        }
+
+        function updateStatus() {
+            const el = document.getElementById('save-status');
+            if (dirty) {
+                el.innerHTML = '<span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-semibold border border-amber-200">Cambios sin guardar</span>';
+            } else if (savedAt) {
+                const d = new Date(savedAt);
+                el.textContent = `Guardado ${d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' })} ${d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}`;
+            } else {
+                el.textContent = modelKey === 'trans' ? 'Copia del AS-IS (sin guardar)' : 'Versión inicial (sin guardar)';
+            }
+            const commandStack = modeler.get('commandStack');
+            document.getElementById('btn-undo').disabled = !commandStack.canUndo() && !layoutBackupXml;
+            document.getElementById('btn-redo').disabled = !commandStack.canRedo();
+        }
+
+        // ------------------------------------------------------------
+        // Importación / diagrama nuevo / restaurar
+        // ------------------------------------------------------------
+        async function importXml(xml, opts) {
+            layoutBackupXml = null;
+            try {
+                const result = await modeler.importXML(colorearConMarca(xml));
+                // Declarar el espacio de nombres de los atributos ISSyS (archivos de Bizagi no lo traen)
+                modeler.getDefinitions().$attrs['xmlns:issys'] = ISSYS_NS;
+                if (opts && opts.fit) zoomFit();
+                if (result.warnings && result.warnings.length) {
+                    console.warn('Advertencias de importación BPMN:', result.warnings);
+                }
+                return true;
+            } catch (err) {
+                console.error(err);
+                showToast('El archivo no es un BPMN 2.0 válido.');
+                return false;
+            }
+        }
+
+        function confirmDiscard(message) {
+            return !dirty || confirm(message || 'Hay cambios sin guardar. ¿Continuar y descartarlos?');
+        }
+
+        async function newDiagram() {
+            if (!confirmDiscard()) return;
+            if (await importXml(buildBpmnXml(emptyDefinition()), { fit: true })) {
+                dirty = true;
+                updateStatus();
+                renderProps();
+                showToast('Diagrama nuevo. Guardá para reemplazar el anterior.');
+            }
+        }
+
+        async function restoreOriginal() {
+            if (modelKey === 'trans') {
+                if (!confirmDiscard('¿Reemplazar la transición por una copia del AS-IS actual?')) return;
+                if (await importXml(getBpmnXml(processId, 'asis'), { fit: true })) {
+                    dirty = true;
+                    updateStatus();
+                    renderProps();
+                    showToast('AS-IS copiado. Guardá para confirmar.');
+                }
+                return;
+            }
+            const def = originalDefinition();
+            if (!def || !confirmDiscard('¿Reemplazar el diagrama actual por el modelo original del relevamiento?')) return;
+            if (await importXml(buildBpmnXml(def), { fit: true })) {
+                dirty = true;
+                updateStatus();
+                renderProps();
+                showToast('Modelo original cargado. Guardá para confirmar.');
+            }
+        }
+
+        function openFile(file) {
+            if (!file || !confirmDiscard()) return;
+            const reader = new FileReader();
+            reader.onload = async () => {
+                if (await importXml(reader.result, { fit: true })) {
+                    dirty = true;
+                    updateStatus();
+                    renderProps();
+                    showToast(`"${file.name}" importado. Guardá para conservarlo.`);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // ------------------------------------------------------------
+        // Exportación
+        // ------------------------------------------------------------
+        function fileBase() {
+            return `ISSyS_${processId}_${MODEL_LABEL[modelKey]}`;
+        }
+
+        function downloadBlob(blob, name) {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = name;
+            link.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        async function downloadBpmn() {
+            const { xml } = await modeler.saveXML({ format: true });
+            downloadBlob(new Blob([xml], { type: 'application/xml' }), `${fileBase()}.bpmn`);
+            showToast('Archivo BPMN descargado.');
+        }
+
+        async function downloadSvg() {
+            const { svg } = await modeler.saveSVG();
+            downloadBlob(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }), `${fileBase()}.svg`);
+            showToast('Imagen SVG descargada.');
+        }
+
+        async function downloadPng() {
+            const { svg } = await modeler.saveSVG();
+            const match = svg.match(/viewBox="([-\d.]+) ([-\d.]+) ([\d.]+) ([\d.]+)"/);
+            const width = match ? parseFloat(match[3]) : 1600;
+            const height = match ? parseFloat(match[4]) : 900;
+            const scale = 2;
+
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = width * scale;
+                canvas.height = height * scale;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                canvas.toBlob(blob => {
+                    downloadBlob(blob, `${fileBase()}.png`);
+                    showToast('Imagen PNG descargada.');
+                }, 'image/png');
+            };
+            img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+        }
+
+        // ------------------------------------------------------------
+        // Zoom
+        // ------------------------------------------------------------
+        function zoomBy(factor) {
+            const canvas = modeler.get('canvas');
+            canvas.zoom(Math.min(4, Math.max(0.2, canvas.zoom() * factor)));
+        }
+
+        function zoomReset() {
+            modeler.get('canvas').zoom(1);
+        }
+
+        // Ajusta el diagrama dejando margen para la paleta flotante de la izquierda
+        function zoomFit() {
+            const canvas = modeler.get('canvas');
+            const inner = canvas.viewbox().inner;
+            if (!inner.width || !inner.height) return canvas.zoom('fit-viewport', 'auto');
+            canvas.viewbox({
+                x: inner.x - 110,
+                y: inner.y - 30,
+                width: inner.width + 150,
+                height: inner.height + 60
+            });
+        }
+
+        // Zoom al elemento clickeado (igual que en el visor)
+        let zoomOnSelect = readPref('zoomSelect') !== '0';
+        let zoomSelectTimer = null;
+
+        function toggleZoomOnSelect() {
+            zoomOnSelect = !zoomOnSelect;
+            writePref('zoomSelect', zoomOnSelect ? '1' : '0');
+            updateZoomSelectButton();
+        }
+
+        function updateZoomSelectButton() {
+            document.getElementById('btn-zoom-select').classList.toggle('active', zoomOnSelect);
+        }
+
+        function cancelZoomToElement() {
+            clearTimeout(zoomSelectTimer);
+            zoomSelectTimer = null;
+            viewAnimToken++;
+        }
+
+        function onElementClick(e) {
+            const oe = e.originalEvent || {};
+            const el = e.element.labelTarget || e.element;
+            const bo = el.businessObject;
+            const zoomable = bo && (bo.$instanceOf('bpmn:FlowNode') || bo.$instanceOf('bpmn:DataObjectReference') || bo.$instanceOf('bpmn:DataStoreReference'));
+            cancelZoomToElement();
+            if (!zoomOnSelect || !zoomable || oe.shiftKey || oe.ctrlKey || oe.metaKey) return;
+            // Se espera un instante para no mover el lienzo en medio de un doble clic (edición del nombre)
+            zoomSelectTimer = setTimeout(() => {
+                zoomSelectTimer = null;
+                if (modeler.get('directEditing').isActive()) return;
+                zoomToElement(el);
+            }, 260);
+        }
+
+        // Acerca la vista al elemento, dejando algo de contexto alrededor
+        function zoomToElement(el) {
+            const canvas = modeler.get('canvas');
+            const size = canvas.getSize();
+            const scale = Math.min(1.4, size.width / (el.width + 420), size.height / (el.height + 300));
+            const width = size.width / scale;
+            const height = size.height / scale;
+            animateViewbox({
+                x: el.x + el.width / 2 - width / 2,
+                y: el.y + el.height / 2 - height / 2,
+                width,
+                height
+            });
+        }
+
+        let viewAnimToken = 0;
+        function animateViewbox(target, duration = 350) {
+            const canvas = modeler.get('canvas');
+            const from = canvas.viewbox();
+            const token = ++viewAnimToken;
+            const start = performance.now();
+            const ease = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+            const step = (now) => {
+                if (token !== viewAnimToken) return;
+                const t = Math.min(1, (now - start) / duration);
+                const k = ease(t);
+                canvas.viewbox({
+                    x: from.x + (target.x - from.x) * k,
+                    y: from.y + (target.y - from.y) * k,
+                    width: from.width + (target.width - from.width) * k,
+                    height: from.height + (target.height - from.height) * k
+                });
+                if (t < 1) requestAnimationFrame(step);
+            };
+            requestAnimationFrame(step);
+        }
+
+        // ------------------------------------------------------------
+        // Eventos
+        // ------------------------------------------------------------
+        function setupModelerEvents() {
+            const eventBus = modeler.get('eventBus');
+            const modeling = modeler.get('modeling');
+
+            eventBus.on('commandStack.changed', (e) => {
+                if (e.trigger !== 'clear') dirty = true;
+                updateStatus();
+            });
+
+            // Colores por defecto estilo Bizagi al crear elementos nuevos
+            eventBus.on('commandStack.shape.create.postExecute', (e) => {
+                const shape = e.context.shape;
+                if (!shape || shape.type === 'label' || shape.labelTarget) return;
+                const di = shape.di;
+                if (di && (di.get('color:background-color') || di.get('bioc:fill'))) return;
+                const color = defaultColorFor(shape.businessObject);
+                if (color) modeling.setColor([shape], color);
+            });
+
+            eventBus.on('selection.changed', () => {
+                renderProps();
+                updateAlignButtons();
+            });
+            eventBus.on('element.click', onElementClick);
+            // Arrastrar o editar el nombre cancela un zoom pendiente
+            eventBus.on(['element.dblclick', 'directEditing.activate', 'drag.init', 'canvas.destroy'], cancelZoomToElement);
+            eventBus.on('elements.changed', (e) => {
+                scheduleOverlays();
+                const selected = modeler.get('selection').get();
+                if (selected.length !== 1 || e.elements.some(el => el.id === selected[0].id)) renderProps();
+            });
+            eventBus.on('import.done', () => {
+                scheduleOverlays();
+                renderProps();
+            });
+            // Una sola salida esperada por compuerta: al marcar una se desmarcan las otras (mismo paso de deshacer)
+            eventBus.on('commandStack.element.updateProperties.postExecute', ({ context }) => {
+                if (context.properties['issys:esperado'] !== 'true') return;
+                const flow = context.element.businessObject;
+                const registry = modeler.get('elementRegistry');
+                seqOut(flow.sourceRef).filter(f => f !== flow && isExpectedFlow(f)).forEach(f => {
+                    modeling.updateProperties(registry.get(f.id), { 'issys:esperado': undefined });
+                });
+            });
+            eventBus.on('canvas.viewbox.changed', ({ viewbox }) => {
+                document.getElementById('zoom-label').textContent = `${Math.round(viewbox.scale * 100)}%`;
+            });
+        }
+
+        function setupPageEvents() {
+            document.getElementById('file-input').addEventListener('change', (e) => {
+                openFile(e.target.files[0]);
+                e.target.value = '';
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+                    e.preventDefault();
+                    saveDiagram();
+                }
+                // Ctrl+Z sin historial: deshacer el ordenamiento automático
+                if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'z'
+                    && layoutBackupXml && !modeler.get('commandStack').canUndo()) {
+                    e.preventDefault();
+                    undo();
+                }
+            });
+
+            window.addEventListener('beforeunload', (e) => {
+                if (dirty) {
+                    e.preventDefault();
+                    e.returnValue = '';
+                }
+            });
+
+            document.querySelectorAll('[data-align]').forEach(btn => btn.addEventListener('click', () => {
+                modeler.get('alignElements').trigger(alignTargets(), btn.dataset.align);
+            }));
+            document.querySelectorAll('[data-distribute]').forEach(btn => btn.addEventListener('click', () => {
+                modeler.get('distributeElements').trigger(alignTargets(), btn.dataset.distribute);
+            }));
+            updateAlignButtons();
+
+            // Soltar un archivo .bpmn sobre el lienzo
+            const canvasEl = document.getElementById('canvas');
+            canvasEl.addEventListener('dragover', (e) => e.preventDefault());
+            canvasEl.addEventListener('drop', (e) => {
+                const file = e.dataTransfer.files && e.dataTransfer.files[0];
+                if (file && /\.(bpmn|xml)$/i.test(file.name)) {
+                    e.preventDefault();
+                    openFile(file);
+                }
+            });
+        }
+
+        function defaultColorFor(bo) {
+            if (!bo || !bo.$instanceOf) return null;
+            if (bo.$instanceOf('bpmn:Activity')) return COLORS.task;
+            if (bo.$instanceOf('bpmn:Gateway')) return COLORS.gateway;
+            if (bo.$instanceOf('bpmn:StartEvent')) return COLORS.start;
+            if (bo.$instanceOf('bpmn:EndEvent')) return COLORS.end;
+            if (bo.$instanceOf('bpmn:Event')) return COLORS.intermediate;
+            if (bo.$instanceOf('bpmn:DataObjectReference') || bo.$instanceOf('bpmn:DataStoreReference')) return COLORS.data;
+            return null;
+        }
+
+        // ------------------------------------------------------------
+        // Marcas ISSyS sobre el diagrama (presencial / hipótesis / doble carga)
+        // ------------------------------------------------------------
+        function scheduleOverlays() {
+            cancelAnimationFrame(overlayFrame);
+            overlayFrame = requestAnimationFrame(() => {
+                drawIssysOverlays(modeler);
+                markExpectedFlows();
+            });
+        }
+
+        // Resalta en verde la salida esperada de cada compuerta
+        function markExpectedFlows() {
+            const canvas = modeler.get('canvas');
+            modeler.get('elementRegistry').filter(el => el.type === 'bpmn:SequenceFlow').forEach(el => {
+                const on = isExpectedFlow(el.businessObject) && isDecisionGateway(el.businessObject.sourceRef);
+                if (on !== canvas.hasMarker(el, 'issys-expected')) canvas.toggleMarker(el, 'issys-expected');
+            });
+        }
+
+        // Marca (o desmarca con null) la salida esperada de una compuerta
+        function setExpectedFlow(gateway, flowId) {
+            const registry = modeler.get('elementRegistry');
+            const modeling = modeler.get('modeling');
+            if (flowId) {
+                modeling.updateProperties(registry.get(flowId), { 'issys:esperado': 'true' });
+            } else {
+                const current = expectedFlowOf(gateway);
+                if (current) modeling.updateProperties(registry.get(current.id), { 'issys:esperado': undefined });
+            }
+        }
+
+        // ------------------------------------------------------------
+        // Panel de propiedades
+        // ------------------------------------------------------------
+        function escapeHtml(str) {
+            return String(str == null ? '' : str)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function nameOf(el) {
+            const bo = el.businessObject;
+            return bo.$instanceOf('bpmn:TextAnnotation') ? (bo.text || '') : (bo.name || '');
+        }
+
+        function renderProps() {
+            const panel = document.getElementById('props');
+            if (!modeler) return;
+            const selected = modeler.get('selection').get().filter(el => el.type !== 'label');
+
+            if (!selected.length) {
+                panel.innerHTML = overviewHtml();
+            } else if (selected.length > 1) {
+                panel.innerHTML = `
+                    <div class="pb-2 border-b border-slate-200">
+                        <p class="font-bold text-slate-800">${selected.length} elementos seleccionados</p>
+                        <p class="text-[13px] text-slate-500 mt-0.5">Usá los botones de alinear y distribuir de la barra superior.</p>
+                    </div>
+                    ${colorSectionHtml()}
+                `;
+            } else {
+                panel.innerHTML = elementHtml(selected[0]);
+            }
+            bindProps(selected);
+            lucide.createIcons();
+        }
+
+        function overviewHtml() {
+            const elements = modeler.get('elementRegistry').filter(el => el.type !== 'label' && el.businessObject);
+            const count = (fn) => elements.filter(el => fn(el.businessObject)).length;
+            const flag = (key) => count(bo => bo.$attrs && bo.$attrs[`issys:${key}`] === 'true');
+            const unmarked = count(bo => isDecisionGateway(bo) && !expectedFlowOf(bo));
+            const stats = [
+                ['Tareas', count(bo => bo.$instanceOf('bpmn:Activity'))],
+                ['Compuertas', count(bo => bo.$instanceOf('bpmn:Gateway'))],
+                ['Eventos', count(bo => bo.$instanceOf('bpmn:Event'))],
+                ['Carriles', count(bo => bo.$instanceOf('bpmn:Lane'))]
+            ];
+            return `
+                <div>
+                    <p class="font-bold text-slate-800">${escapeHtml(processName())} · ${MODEL_LABEL[modelKey]}</p>
+                    <p class="text-[13px] text-slate-500 mt-0.5">Seleccioná un elemento del diagrama para editarlo.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-2 text-center">
+                    ${stats.map(([label, n]) => `
+                        <div class="p-2 rounded bg-slate-50 border border-slate-200">
+                            <span class="block text-lg font-extrabold text-slate-800">${n}</span>
+                            <span class="text-[12px] text-slate-500">${label}</span>
+                        </div>`).join('')}
+                </div>
+                <div class="space-y-1.5">
+                    <p class="font-semibold text-slate-700">Relevamiento ISSyS</p>
+                    <div class="flex justify-between p-2 rounded bg-rose-50 border border-rose-200 text-rose-900"><span>Pasos presenciales</span><strong>${flag('presencial')}</strong></div>
+                    <div class="flex justify-between p-2 rounded bg-amber-50 border border-amber-200 text-amber-900"><span>Hipótesis a validar</span><strong>${flag('hipotesis')}</strong></div>
+                    <div class="flex justify-between p-2 rounded bg-indigo-50 border border-indigo-200 text-indigo-900"><span>Doble carga</span><strong>${flag('doblecarga')}</strong></div>
+                    ${unmarked ? `<div class="flex justify-between p-2 rounded bg-white border border-dashed border-emerald-400 text-emerald-900" title="Seleccioná cada compuerta y elegí su salida esperada"><span>Compuertas sin camino esperado</span><strong>${unmarked}</strong></div>` : ''}
+                </div>
+                <div class="p-2.5 rounded bg-slate-50 border border-slate-200 text-[13px] text-slate-600 leading-relaxed space-y-1">
+                    <p class="font-semibold text-slate-700 flex items-center gap-1"><i data-lucide="keyboard" class="w-3.5 h-3.5"></i> Cómo editar</p>
+                    <p>Arrastrá elementos desde la <strong>paleta</strong> (izquierda). Al seleccionar uno aparece el <strong>menú contextual</strong> para agregar el siguiente paso, conectar, o cambiar el tipo (ícono de llave).</p>
+                    <p><strong>Doble clic</strong> edita el texto · <strong>Supr</strong> elimina · <strong>Ctrl+Z / Ctrl+Y</strong> deshacer/rehacer · <strong>Ctrl+F</strong> buscar · <strong>Ctrl+S</strong> guardar · <strong>Espacio + arrastrar</strong> mueve el lienzo.</p>
+                    <p><strong>Ordenar diagrama</strong> reacomoda todo según el flujo, respetando los carriles. El ícono de <strong>pincel</strong> del menú contextual cambia el color.</p>
+                </div>
+            `;
+        }
+
+        function colorSectionHtml() {
+            return `
+                <div class="space-y-1.5">
+                    <p class="font-semibold text-slate-700">Color</p>
+                    <div class="flex flex-wrap gap-1.5">
+                        ${SWATCHES.map((s, i) => s.fill
+                            ? `<button class="swatch" data-swatch="${i}" title="${s.label}" style="background:${s.fill};border-color:${s.stroke}"></button>`
+                            : `<button class="swatch flex items-center justify-center bg-white border-slate-300 text-slate-400" data-swatch="${i}" title="${s.label}"><i data-lucide="x" class="w-3 h-3"></i></button>`
+                        ).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function elementHtml(el) {
+            const bo = el.businessObject;
+            const isFlowNode = bo.$instanceOf('bpmn:FlowNode');
+            const isActivity = bo.$instanceOf('bpmn:Activity');
+            const hasColor = !bo.$instanceOf('bpmn:Participant') && !bo.$instanceOf('bpmn:Lane') && !bo.$instanceOf('bpmn:Group');
+            const docText = (bo.documentation && bo.documentation[0] && bo.documentation[0].text) || '';
+            const nameLabel = bo.$instanceOf('bpmn:Activity') ? 'Nombre (Verbo + Objeto)'
+                : bo.$instanceOf('bpmn:Lane') || bo.$instanceOf('bpmn:Participant') ? 'Nombre del rol / área'
+                : bo.$instanceOf('bpmn:TextAnnotation') ? 'Texto' : 'Nombre';
+
+            let html = `
+                <div class="flex items-center justify-between gap-2 pb-2 border-b border-slate-200">
+                    <span class="px-2 py-0.5 rounded text-[12px] font-semibold bg-cyan-50 text-cyan-800 border border-cyan-200">${escapeHtml(bpmnTypeLabel(bo))}</span>
+                    <span class="font-mono text-[12px] text-slate-400 truncate" title="${escapeHtml(bo.id)}">${escapeHtml(bo.id)}</span>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1" for="prop-name">${nameLabel}</label>
+                    <textarea id="prop-name" rows="2" class="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-cyan-500 focus:outline-none">${escapeHtml(nameOf(el))}</textarea>
+                </div>
+            `;
+
+            if (isActivity || bo.$instanceOf('bpmn:Event')) {
+                html += `
+                    <div class="flex items-center justify-between gap-2 p-2 rounded bg-slate-50 border border-slate-200">
+                        <span class="text-[13px] text-slate-600">Tipo de ${isActivity ? 'tarea' : 'evento'}</span>
+                        <button id="prop-change-type" class="text-[13px] font-semibold text-cyan-700 hover:underline flex items-center gap-1">
+                            <i data-lucide="wrench" class="w-3 h-3"></i> Cambiar
+                        </button>
+                    </div>
+                `;
+            }
+
+            if (isFlowNode) {
+                html += `
+                    <div class="space-y-2 pt-2 border-t border-slate-200">
+                        <p class="font-semibold text-slate-700">Atributos de relevamiento ISSyS</p>
+                        ${ISSYS_FLAGS.map(f => `
+                            <label class="flex items-start gap-2 p-2 rounded bg-${f.tone}-50 border border-${f.tone}-200 cursor-pointer">
+                                <input type="checkbox" data-flag="${f.key}" class="mt-0.5 rounded" ${bo.$attrs[`issys:${f.key}`] === 'true' ? 'checked' : ''}>
+                                <span>
+                                    <span class="font-bold text-${f.tone}-900 block leading-tight">${f.label}</span>
+                                    <span class="text-[12px] text-${f.tone}-700 leading-tight">${f.hint}</span>
+                                </span>
+                            </label>`).join('')}
+                    </div>
+                `;
+            }
+
+            if (isDecisionGateway(bo)) {
+                const expected = expectedFlowOf(bo);
+                const option = (id, label, checked) => `
+                    <label class="flex items-start gap-2 p-2 rounded border cursor-pointer ${checked && id ? 'bg-emerald-50 border-emerald-300 text-emerald-900' : 'bg-white border-slate-200 text-slate-700'}">
+                        <input type="radio" name="prop-expected" data-expected="${id}" class="mt-0.5" ${checked ? 'checked' : ''}>
+                        <span class="leading-tight">${escapeHtml(label)}</span>
+                    </label>`;
+                html += `
+                    <div class="space-y-1.5 pt-2 border-t border-slate-200">
+                        <p class="font-semibold text-slate-700 flex items-center gap-1.5"><i data-lucide="route" class="w-3.5 h-3.5 text-emerald-600"></i> Camino esperado</p>
+                        <p class="text-[12px] text-slate-500 leading-snug">¿Por cuál salida debería seguir el trámite cuando todo sale bien? Define el camino feliz que se ve en el visor.</p>
+                        ${seqOut(bo).map(f => option(f.id, flowChoiceLabel(f), f === expected)).join('')}
+                        ${option('', 'Sin definir', !expected)}
+                    </div>
+                `;
+            }
+
+            if (bo.$instanceOf('bpmn:SequenceFlow') && isDecisionGateway(bo.sourceRef)) {
+                html += `
+                    <div class="pt-2 border-t border-slate-200">
+                        <label class="flex items-start gap-2 p-2 rounded border cursor-pointer ${isExpectedFlow(bo) ? 'bg-emerald-50 border-emerald-300' : 'bg-white border-slate-200'}">
+                            <input type="checkbox" id="prop-flow-expected" class="mt-0.5 rounded" ${isExpectedFlow(bo) ? 'checked' : ''}>
+                            <span>
+                                <span class="font-bold text-emerald-900 block leading-tight">Camino esperado</span>
+                                <span class="text-[12px] text-emerald-700 leading-tight">Es la salida de «${escapeHtml(bo.sourceRef.name || 'la compuerta')}» cuando todo sale bien.</span>
+                            </span>
+                        </label>
+                    </div>
+                `;
+            }
+
+            html += `
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1" for="prop-doc">Documentación / Notas y normativa</label>
+                    <textarea id="prop-doc" rows="4" class="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-cyan-500 focus:outline-none" placeholder="ej. Tope delegacional $200.000 (Trámite N° 28811/2026)">${escapeHtml(docText)}</textarea>
+                </div>
+            `;
+
+            if (hasColor) html += colorSectionHtml();
+            return html;
+        }
+
+        function bindProps(selected) {
+            const modeling = modeler.get('modeling');
+            const el = selected.length === 1 ? selected[0] : null;
+
+            const nameInput = document.getElementById('prop-name');
+            if (nameInput && el) {
+                nameInput.addEventListener('change', () => {
+                    if (nameInput.value !== nameOf(el)) modeling.updateLabel(el, nameInput.value);
+                });
+            }
+
+            const docInput = document.getElementById('prop-doc');
+            if (docInput && el) {
+                docInput.addEventListener('change', () => {
+                    const text = docInput.value.trim();
+                    const docs = text ? [modeler.get('bpmnFactory').create('bpmn:Documentation', { text })] : [];
+                    modeling.updateProperties(el, { documentation: docs });
+                });
+            }
+
+            document.querySelectorAll('#props [data-flag]').forEach(cb => {
+                cb.addEventListener('change', () => {
+                    modeling.updateProperties(el, { [`issys:${cb.dataset.flag}`]: cb.checked ? 'true' : undefined });
+                });
+            });
+
+            document.querySelectorAll('#props [data-expected]').forEach(radio => {
+                radio.addEventListener('change', () => setExpectedFlow(el.businessObject, radio.dataset.expected || null));
+            });
+
+            const flowExpected = document.getElementById('prop-flow-expected');
+            if (flowExpected && el) {
+                flowExpected.addEventListener('change', () => {
+                    if (flowExpected.checked) setExpectedFlow(el.businessObject.sourceRef, el.id);
+                    else setExpectedFlow(el.businessObject.sourceRef, null);
+                });
+            }
+
+            document.querySelectorAll('#props [data-swatch]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const s = SWATCHES[Number(btn.dataset.swatch)];
+                    const targets = selected.filter(t => !t.businessObject.$instanceOf('bpmn:Lane'));
+                    modeling.setColor(targets, s.fill ? { fill: s.fill, stroke: s.stroke } : null);
+                });
+            });
+
+            const changeBtn = document.getElementById('prop-change-type');
+            if (changeBtn && el) {
+                changeBtn.addEventListener('click', (e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    modeler.get('popupMenu').open(el, 'bpmn-replace', { x: rect.left - 240, y: rect.bottom + 4 });
+                });
+            }
+        }
+
+        // ------------------------------------------------------------
+        // Toast
+        // ------------------------------------------------------------
+        let toastTimer = null;
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = msg;
+            toast.classList.remove('opacity-0', 'translate-y-4');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.add('opacity-0', 'translate-y-4'), 2800);
+        }
+    </script>
+</body>
+</html>
