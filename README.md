@@ -351,8 +351,9 @@ paso 7 de la Etapa 2.
 ### Pasos
 
 Estado (11/11/2026): hechos los pasos 1, 2 y 5 (sitio publicado, datos migrados, workflow desactivado y redirección 302
-publicada en `issys-eer`; nadie editó en el sistema viejo después de migrar) y los pasos 3, 4, 4b y 6; faltan los pasos 7
-y 8. Todos los
+publicada en `issys-eer`; nadie editó en el sistema viejo después de migrar) y los pasos 3, 4, 4b, 6 y 7 (ramas unidas
+en `main` el 11/11/2026, `unificacion` borrada, redirección de `issys-eer` en 301). Falta el paso 8 y borrar el secreto
+`FIREBASE_SERVICE_ACCOUNT_ISSYS_EER` en GitHub. Todos los
 comandos se corren en `D:\issys`.
 
 **Antes de empezar:**
