@@ -11,6 +11,8 @@ Responsable: administrador de los Sistemas ISSyS.
 
 - **Obliga a:** toda aplicación web del Instituto publicada en los Sistemas ISSyS (`public/<sistema>/`). El resumen
   obligatorio está en [CLAUDE.md](../CLAUDE.md).
+  - El checklist (§8) se exige completo a los sistemas nuevos y a las pantallas que se modifiquen. Lo que los sistemas
+    actuales todavía no cumplen está en §9.
 - **Cubre:** la interfaz en pantalla (colores, tipografía, logo, encabezado, componentes y estados).
 - **No cubre:**
   - impresos, cartelería y piezas de comunicación: ver el BrandBook;
@@ -98,7 +100,8 @@ Los valores están en [issys.css](../public/shared/issys.css).
 | Turismo | Turismo ISSyS | `--issys-turismo` [Derivado, **provisorio**: valor muestreado, a confirmar (§9)] |
 
 Una aplicación de un área puede usar su acento **dentro del contenido** (destacados, gráficos, fondos). El encabezado no
-cambia: borde verde siempre (§5). Para texto o botones, el acento debe cumplir §1.4; si no, usar `ink` o `blue`.
+cambia: borde verde siempre (§5). Para texto o botones, el acento debe cumplir §1.4; si no, usar su gemelo de texto (§1.4)
+o `ink`.
 
 ### 1.4 Contraste [WCAG]
 
@@ -121,10 +124,13 @@ Pares permitidos para **texto normal** (contraste calculado):
 
 Sobre fondos de color: texto `white` sobre `blue` (6.71) o sobre `green-dark` (5.04); texto `ink` sobre `green` (6.70).
 
+Valores calculados con los colores de `issys.css` al 11/11/2026. Si cambia un token, hay que recalcular la tabla (§9).
+
 **Reglas:**
 - Los colores [BrandBook] `green`, `yellow`, `gray` y `gray-light` **no deben** usarse para texto: van en fondos, bordes,
   íconos decorativos y acentos. Para texto se usa su gemelo: `green-dark` o `green-deep`, `yellow-ink`, `muted`.
-- Botón verde: texto `ink`. Botón azul: texto `white`. Amarillo: siempre fondo, con texto `ink` o `yellow-ink`.
+- Fondo `green` (por ejemplo, los íconos del lanzador): contenido en `ink`. Botón azul: texto `white`. Amarillo: siempre
+  fondo, con texto `ink` o `yellow-ink`.
 
 ### 1.5 Fusión, degradados y transparencia
 
@@ -164,8 +170,8 @@ Están en [`public/shared/marca/`](../public/shared/marca/) y se usan con ruta a
 
 | Archivo | Versión | Uso |
 | --- | --- | --- |
-| `issys-logo-recorte.png` | Isologo + logotipo, sin bajada, recortado | **Encabezado común** y barras compactas |
-| `issys-logo-completo-recorte.png` | Con bajada, recortado | Pantalla de ingreso, portadas, reportes |
+| `issys-logo-recorte.png` | Isologo + logotipo, sin bajada, recortado | **Encabezado común**, barras compactas y pantalla de ingreso (la arma `auth.js`, con el nombre del Instituto al pie) |
+| `issys-logo-completo-recorte.png` | Con bajada, recortado | Portadas y reportes |
 | `issys-logo-blanco-recorte.png` | Blanco, recortado | Sobre fondos oscuros (`blue`, `ink`, fotos oscuras) |
 | `issys-logo.png`, `issys-logo-completo.png`, `issys-logo-blanco.png` | Las mismas, con margen original | Cuando el margen lo da la imagen |
 | `issys-isologo.png` | Isologo solo | Favicon, ícono de aplicación, avatar |
@@ -185,8 +191,10 @@ Si el logo con bajada mide menos de 120 px de ancho, se debe usar la versión si
 
 ### 3.3 Zona de seguridad [BrandBook]
 
-Margen libre en los cuatro lados igual a la altura de la "S" de ISSyS, que en pantalla se toma como **25 % de la altura del
-logo**. La clase `.issys-logo` lo aplica (32 px de alto + 8 px de margen): usar esa clase en lugar de CSS propio.
+Margen libre en los cuatro lados igual a la altura de la "S" de ISSyS.
+
+[Derivado] En pantalla se toma como **25 % de la altura del logo**. En el encabezado, la clase `.issys-logo` lo aplica
+(32 px de alto + 8 px de margen): usar esa clase en lugar de CSS propio.
 
 ### 3.4 Fondos y usos prohibidos [BrandBook]
 
@@ -198,11 +206,12 @@ logo**. La clase `.issys-logo` lo aplica (32 px de alto + 8 px de margen): usar 
 **No debe:**
 - poner el logo dentro de un recuadro blanco sobre un fondo de color;
 - poner el logo a color sobre azul u otro color de marca;
-- deformarlo: expandir, condensar, estirar, rotar o inclinar. En CSS: fijar sólo `height` y dejar `width: auto`;
+- deformarlo: expandir, condensar, estirar, rotar o inclinar ([Derivado] en CSS: fijar sólo `height` y dejar
+  `width: auto`);
 - cambiar sus proporciones, colores o elementos, ni aplicarlo sólo en contorno;
 - agregarle sombras, brillos u otros efectos.
 
-### 3.5 Favicon e ícono de aplicación
+### 3.5 Favicon e ícono de aplicación [Regla interna]
 
 ```html
 <link rel="icon" type="image/png" href="/shared/marca/issys-isologo.png">
@@ -262,27 +271,37 @@ Clases de [issys.css](../public/shared/issys.css), con prefijo para no pisar los
 
 No hay botón verde: la acción principal es azul.
 
-### 6.2 Estados
+### 6.2 Estados [Regla interna]
 
 | Estado | Regla |
 | --- | --- |
-| Foco | Contorno visible de 2 px en `blue` (`:focus-visible` de `issys.css`). **No debe** quitarse. |
-| Deshabilitado | Opacidad 0,5 y cursor normal (`.issys-btn[disabled]`). El texto no se usa para información importante. |
+| Foco | **Debe** verse: contorno de 2 px en `blue` (`:focus-visible` de `issys.css`) o, en campos de texto, borde `blue` más un anillo `blue-tint`. Quitar el contorno sólo si se reemplaza por uno de estos. |
+| Deshabilitado | Opacidad 0,5 y cursor normal (`.issys-btn[disabled]`). Conviene explicar el motivo con un texto de ayuda. |
 | Error | Texto en `danger` con un mensaje que diga qué corregir; nunca sólo el borde rojo. |
-| Guardado | Punto sobre la foto (verde guardado, amarillo guardando, rojo error) **más** el texto en el menú de cuenta. |
+| Guardado | Punto sobre la foto (`green`, `yellow`, `danger`) **más** el texto en el menú de cuenta. El punto todavía distingue los estados sólo por color (§9). |
 | Movimiento | Respetar `prefers-reduced-motion` en animaciones de más de 0,2 s. |
 
 ---
 
-## 7. Sistema nuevo
+## 7. Sistema nuevo [Regla interna]
 
-1. Cargar en el `<head>` `/shared/firebase-config.js` y después `/shared/auth.js`. `auth.js` agrega `issys.css` y la
-   fuente.
-2. Armar el encabezado según §5 y el [README](../README.md#encabezado-común-regla-general).
-3. Si el sistema usa Tailwind: cargar `/shared/issys-tailwind.js` **antes** del CDN de Tailwind.
-   - Las escalas `slate`, `blue`, `emerald`, `amber`, `rose`, etc. ya apuntan a la paleta de marca.
-   - **Debe:** 500 o menos sólo para fondos y decoración, 600 o más para texto.
-4. Usar las clases de §6 antes de crear estilos propios. Si hace falta un color, usar un token de §1.
+1. Seguir [README → Cómo se integra un sistema](../README.md#cómo-se-integra-un-sistema): carga de archivos,
+   `ISSyS.iniciar`, alta en `firebase-config.js` y encabezado (§5). Para la marca, además:
+2. Si el sistema usa Tailwind: cargar `/shared/issys-tailwind.js` **antes** del CDN de Tailwind. Las escalas `slate`,
+   `blue`, `emerald`, `amber`, `rose`, etc. ya apuntan a la paleta de marca. Para texto, **debe** usarse uno de estos tonos
+   o uno más oscuro, y sólo sobre los fondos que permite §1.4:
+
+   | Escala | Token |
+   | --- | --- |
+   | `slate-500` / `gray-500` | `muted` |
+   | `slate-900` | `ink` |
+   | `blue-600` / `blue-700` | `blue` / `blue-dark` |
+   | `emerald-600` | `green-dark` (no sobre `*-50`/`*-100`: ahí `emerald-700`) |
+   | `emerald-700` | `green-deep` |
+   | `amber-700` | `yellow-ink` |
+   | `rose-600` | `danger` |
+
+3. Usar las clases de §6 antes de crear estilos propios. Si hace falta un color, usar un token de §1.
 
 ---
 
@@ -291,8 +310,12 @@ No hay botón verde: la acción principal es azul.
 - [ ] El encabezado sigue §5 y usa `ISSyS.ponerEncabezado`.
 - [ ] Toda la interfaz usa `Encode Sans Condensed`.
 - [ ] Sólo colores de §1 (tokens de `issys.css` o escalas de `issys-tailwind.js`).
-- [ ] Ningún texto en `green`, `yellow`, `gray` ni `gray-light`. En Tailwind, buscar
-  `text-(green|emerald|teal|amber|yellow|orange)-(50|100|200|300|400|500)` y `text-(gray|slate)-(50|100|200|300)`.
+- [ ] Ningún texto en `green`, `yellow`, `gray` ni `gray-light`. En Tailwind, la búsqueda no debe encontrar nada:
+  - `text-(green|emerald|teal|amber|yellow|orange)-(50|100|200|300|400|500)`;
+  - `text-(gray|slate|zinc|cyan|sky|blue|indigo|rose|red)-(50|100|200|300|400)`;
+  - `text-issys-(green|yellow|gray|gray-light)` sin sufijo `-dark`/`-deep`.
+
+  Además, `text-emerald-600` no va sobre fondos `*-50` ni `*-100`.
 - [ ] Todo par de texto y fondo figura como permitido en §1.4.
 - [ ] Ninguna información se indica sólo con color.
 - [ ] El logo usa `.issys-logo` (altura fija, ancho automático y zona de seguridad).
@@ -313,5 +336,7 @@ No hay botón verde: la acción principal es azul.
 | Fuente por Google Fonts | Si no carga, el respaldo (`Arial Narrow`, Arial) es más ancho y recorta títulos; cada visita informa la IP a Google. Alternativa: servirla desde `/shared/` (licencia OFL). |
 | Tailwind por CDN | Versión de desarrollo, sin versión fija. |
 | Paleta copiada en `issys-tailwind.js` | Las escalas repiten valores de `issys.css`; si cambia un color, cambiarlo en los dos. |
+| Matriz de contraste (§1.4) | Depende de los HEX de `issys.css`; si cambia un token, recalcularla. |
+| Sistemas actuales que todavía no cumplen | Textos de 11 px (Estatuto: `estatuto-marca.css`; Procesos: `text-[11px]`). Botones de navegación de Estatuto deshabilitados con opacidad 0,3. Procesos oculta todo el título por debajo de 640 px. Pares fuera de §1.4: `#767676` sobre `surface` en Estatuto y `text-slate-400` en Procesos. Se corrigen al tocar esas pantallas. |
 | Estado de guardado | El punto sobre la foto distingue los estados sólo por color; el texto está en el menú. Pendiente: forma o `title`. |
 | Spinner de ingreso | Gira aunque se pida movimiento reducido. |

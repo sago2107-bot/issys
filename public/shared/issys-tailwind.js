@@ -8,7 +8,7 @@
  *   teal/emerald/green → Verde ISSyS #59B57E (500) y verde oscuro accesible #2F7D50 (600)
  *   amber/yellow/orange → Amarillo #F9D76B (300); los tonos de texto (600+) son oscuros y accesibles
  *   rose/red → rojo de error #B3261E (600)
- * Los 500 hacia abajo son fondos o decoración; para texto sobre blanco usar 600 o más.
+ * Para texto, ver la tabla de tonos de la guía de marca (§7) y los pares permitidos (§1.4).
  */
 (function () {
     const neutro = { 50: '#F5F6F8', 100: '#EDEEF1', 200: '#E1E2E5', 300: '#C6C6C6', 400: '#767676', 500: '#5F5F5F', 600: '#4B4B49', 700: '#363634', 800: '#262624', 900: '#1D1D1B', 950: '#121211' };

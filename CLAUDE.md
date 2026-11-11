@@ -5,7 +5,7 @@ Portal único (issys-sistemas.web.app) con varios sistemas en `public/<id>/`. Le
 ## Reglas generales (obligatorias)
 
 1. **Identidad visual:** sólo la paleta, tipografía (Encode Sans Condensed) y componentes de `docs/ISSyS-brand-guidelines.md`
-   y `public/shared/issys.css`. Sin degradados, sin encabezados azules/oscuros, sin fuentes con serifa.
+   y `public/shared/issys.css`. Sin degradados suaves (sólo cortes netos, guía §1.5), sin encabezados azules/oscuros, sin fuentes con serifa.
 2. **Encabezado común en todos los sistemas** (README → "Encabezado común"):
    - Barra blanca, borde inferior verde de 4 px, logo a color + línea gris + nombre (900) y bajada (300).
    - Arriba a la derecha, siempre al final y en este orden: lanzador de sistemas (⋮⋮⋮) y foto de perfil.
