@@ -337,6 +337,8 @@ No hay botón verde: la acción principal es azul.
 | Tailwind por CDN | Versión de desarrollo, sin versión fija. |
 | Paleta copiada en `issys-tailwind.js` | Las escalas repiten valores de `issys.css`; si cambia un color, cambiarlo en los dos. |
 | Matriz de contraste (§1.4) | Depende de los HEX de `issys.css`; si cambia un token, recalcularla. |
-| Sistemas actuales que todavía no cumplen | Textos de 11 px (Estatuto: `estatuto-marca.css`; Procesos: `text-[11px]`). Botones de navegación de Estatuto deshabilitados con opacidad 0,3. Procesos oculta todo el título por debajo de 640 px. Pares fuera de §1.4: `#767676` sobre `surface` en Estatuto y `text-slate-400` en Procesos. Se corrigen al tocar esas pantallas. |
+| Excepciones al mínimo de 12 px | En Estatuto quedan más chicos sólo los símbolos de adorno dentro de círculos (flechas de `.section-tgl` y `.cap-tgl`, cruz de `.ref-chip-del`) y las etiquetas del grafo de `mapa.html`, que se agrandan con el zoom. |
+| Colores de categorías del mapa de Estatuto | Pasados a la paleta el 11/11/2026 (`mapa.html` migra los colores de fábrica viejos al cargar). Con 7 categorías y 5 colores de marca, algunas se parecen (Normativa y Organismo, dos azules): el nombre del nodo y la leyenda las distinguen. |
+| Impresión de Estatuto | La vista de impresión usa Times New Roman en negro: es un documento impreso, fuera del alcance de esta guía (§0.1). |
 | Estado de guardado | El punto sobre la foto distingue los estados sólo por color; el texto está en el menú. Pendiente: forma o `title`. |
 | Spinner de ingreso | Gira aunque se pida movimiento reducido. |

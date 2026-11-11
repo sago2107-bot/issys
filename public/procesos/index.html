@@ -87,7 +87,7 @@
             <img src="/shared/marca/issys-logo-recorte.png" alt="ISSyS" class="issys-logo">
             <div class="hidden sm:block min-w-0 border-l border-slate-300 pl-4">
                 <div class="font-extrabold text-lg leading-tight">Procesos BPMN</div>
-                <p class="text-[13px] font-light text-slate-500 leading-tight truncate">Sección Enlace Delegaciones · Modelado y optimización de procesos</p>
+                <p class="hidden min-[900px]:block text-[14px] font-light text-slate-500 leading-tight truncate">Sección Enlace Delegaciones · Modelado y optimización de procesos</p>
             </div>
         </a>
 
@@ -139,7 +139,7 @@
             <div class="min-w-0 flex-1">
                 <div class="flex items-center gap-1 min-w-0">
                     <h2 id="viewer-process-name" class="font-bold text-sm text-issys-navy truncate">Proceso</h2>
-                    <button onclick="openProcessForm(state.processId)" class="text-slate-400 hover:text-issys-blue p-1 rounded flex-shrink-0" title="Editar nombre, área y descripción del proceso">
+                    <button onclick="openProcessForm(state.processId)" class="text-slate-500 hover:text-issys-blue p-1 rounded flex-shrink-0" title="Editar nombre, área y descripción del proceso">
                         <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
                     </button>
                 </div>
@@ -216,11 +216,11 @@
                 <div id="viewer-scroll" class="absolute inset-0 overflow-auto p-6">
                     <div class="mb-3 flex items-baseline gap-2 flex-wrap">
                         <h3 id="viewer-model-title" class="font-semibold text-slate-800 text-sm"></h3>
-                        <span id="viewer-model-updated" class="text-[13px] text-slate-400"></span>
+                        <span id="viewer-model-updated" class="text-[13px] text-slate-500"></span>
                     </div>
 
                     <div id="viewer-empty" class="hidden mb-3 p-4 bg-white border border-dashed border-slate-300 rounded-xl text-center">
-                        <i data-lucide="pen-tool" class="w-7 h-7 mx-auto mb-2 text-slate-400"></i>
+                        <i data-lucide="pen-tool" class="w-7 h-7 mx-auto mb-2 text-slate-500"></i>
                         <p class="text-sm font-semibold text-slate-700">Este diagrama todavía no tiene elementos</p>
                         <p class="text-xs text-slate-500 mt-0.5 mb-3">Abrí el editor para empezar a modelar el circuito.</p>
                         <button onclick="openEditor()" class="px-3 py-1.5 bg-issys-blue hover:bg-issys-blue-dark text-white text-xs font-semibold rounded shadow transition">Abrir editor</button>
@@ -233,13 +233,13 @@
                 <div id="viewer-bpmn-wrap" class="hidden absolute inset-0 p-6 flex-col">
                     <div class="mb-3 flex items-baseline gap-2 flex-wrap">
                         <h3 id="viewer-bpmn-title" class="font-semibold text-slate-800 text-sm"></h3>
-                        <span id="viewer-bpmn-updated" class="text-[13px] text-slate-400"></span>
+                        <span id="viewer-bpmn-updated" class="text-[13px] text-slate-500"></span>
                         <span class="ml-auto hidden lg:flex items-center gap-1">
                             <span class="issys-chip presencial">PRESENCIAL</span>
                             <span class="issys-chip hipotesis">HIPÓTESIS</span>
                             <span class="issys-chip doblecarga">DOBLE CARGA</span>
                         </span>
-                        <span class="text-[13px] text-slate-400 hidden md:inline">Rueda: zoom · Arrastrar: mover · Clic: detalle</span>
+                        <span class="text-[13px] text-slate-500 hidden md:inline">Rueda: zoom · Arrastrar: mover · Clic: detalle</span>
                     </div>
                     <div id="viewer-bpmn-empty" class="hidden mb-3 p-3 bg-white border border-dashed border-slate-300 rounded-xl text-center text-xs text-slate-600">
                         Este diagrama todavía no tiene tareas.
@@ -268,7 +268,7 @@
                                 <i data-lucide="chevron-right" class="w-6 h-6"></i>
                             </button>
                         </div>
-                        <div class="flex items-center justify-between gap-3 px-4 pb-3 text-[13px] text-slate-400">
+                        <div class="flex items-center justify-between gap-3 px-4 pb-3 text-[13px] text-slate-500">
                             <span id="present-path-name" class="truncate"></span>
                             <span class="hidden md:inline flex-shrink-0">← → avanzar · Esc salir</span>
                             <button onclick="stopPresentation()" class="flex-shrink-0 px-2.5 py-1 rounded border border-slate-300 text-slate-600 hover:bg-slate-50 font-medium">Salir</button>
@@ -291,7 +291,7 @@
                         <i data-lucide="info" class="w-4 h-4 text-cyan-700"></i>
                         <span>Detalle del elemento</span>
                     </h4>
-                    <button onclick="hideNodeInfo(true)" class="text-slate-400 hover:text-slate-700 p-0.5 rounded" title="Cerrar y volver a la vista completa (Esc)">
+                    <button onclick="hideNodeInfo(true)" class="text-slate-500 hover:text-slate-700 p-0.5 rounded" title="Cerrar y volver a la vista completa (Esc)">
                         <i data-lucide="x" class="w-4 h-4"></i>
                     </button>
                 </div>
@@ -304,7 +304,7 @@
                     <p id="node-info-lane" class="text-xs text-slate-500"></p>
                     <div id="node-info-flags" class="flex flex-wrap gap-1"></div>
                     <div id="node-info-notes-wrap" class="pt-3 border-t border-slate-100">
-                        <h5 class="text-[13px] font-bold uppercase tracking-wider text-slate-400 mb-1">Notas</h5>
+                        <h5 class="text-[13px] font-bold uppercase tracking-wider text-slate-500 mb-1">Notas</h5>
                         <p id="node-info-notes" class="text-xs text-slate-600 leading-relaxed whitespace-pre-line"></p>
                     </div>
                 </div>
@@ -317,7 +317,7 @@
                         <i data-lucide="route" class="w-4 h-4 text-emerald-600"></i>
                         <span>Caminos del proceso</span>
                     </h4>
-                    <button onclick="togglePathsPanel(false)" class="text-slate-400 hover:text-slate-700 p-0.5 rounded" title="Cerrar panel">
+                    <button onclick="togglePathsPanel(false)" class="text-slate-500 hover:text-slate-700 p-0.5 rounded" title="Cerrar panel">
                         <i data-lucide="x" class="w-4 h-4"></i>
                     </button>
                 </div>
@@ -335,7 +335,7 @@
                         <i data-lucide="arrow-left-right" class="w-3.5 h-3.5 text-emerald-600"></i>
                         <span>Matriz TO-BE</span>
                     </button>
-                    <button onclick="toggleAnalysisPanel(false)" class="px-3 text-slate-400 hover:text-slate-700" title="Cerrar panel">
+                    <button onclick="toggleAnalysisPanel(false)" class="px-3 text-slate-500 hover:text-slate-700" title="Cerrar panel">
                         <i data-lucide="x" class="w-4 h-4"></i>
                     </button>
                 </div>
@@ -453,7 +453,7 @@
                 <!-- Elements Palette -->
                 <div class="p-3 overflow-y-auto flex-1 space-y-4">
                     <div>
-                        <h3 class="text-[13px] font-bold uppercase tracking-wider text-slate-400 mb-2">Elementos BPMN 2.0</h3>
+                        <h3 class="text-[13px] font-bold uppercase tracking-wider text-slate-500 mb-2">Elementos BPMN 2.0</h3>
                         <div class="grid grid-cols-2 gap-1.5">
                             <button onclick="addNodeFromPalette('start')" class="p-2 bg-slate-50 border border-slate-200 rounded hover:border-emerald-500 hover:bg-emerald-50 text-left transition group">
                                 <div class="w-5 h-5 rounded-full border-2 border-emerald-600 bg-emerald-100 flex items-center justify-center mb-1 group-hover:scale-110 transition">
@@ -485,7 +485,7 @@
                             </button>
                             <button onclick="addNodeFromPalette('gateway-xor')" class="p-2 bg-slate-50 border border-slate-200 rounded hover:border-indigo-500 hover:bg-indigo-50 text-left transition group">
                                 <div class="w-4 h-4 border-2 border-indigo-600 bg-indigo-50 rotate-45 flex items-center justify-center mb-1">
-                                    <span class="-rotate-45 text-[11px] font-bold text-indigo-700 leading-none">✕</span>
+                                    <span class="-rotate-45 text-[12px] font-bold text-indigo-700 leading-none">✕</span>
                                 </div>
                                 <span class="text-[13px] font-medium text-slate-700 block">Compuerta XOR</span>
                             </button>
@@ -494,12 +494,12 @@
 
                     <!-- Connect tool -->
                     <div>
-                        <h3 class="text-[13px] font-bold uppercase tracking-wider text-slate-400 mb-2">Herramienta de Flujo</h3>
+                        <h3 class="text-[13px] font-bold uppercase tracking-wider text-slate-500 mb-2">Herramienta de Flujo</h3>
                         <button id="btn-toggle-connect" class="w-full py-2 px-3 rounded border text-xs font-medium flex items-center justify-center gap-2 transition bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200">
                             <i data-lucide="arrow-right" class="w-4 h-4"></i>
                             <span id="connect-tool-text">Conectar Nodos</span>
                         </button>
-                        <p class="text-[12px] text-slate-400 mt-1 italic leading-tight text-center">
+                        <p class="text-[12px] text-slate-500 mt-1 italic leading-tight text-center">
                             Hacé clic en nodo origen y luego en nodo destino para unir con flecha.
                         </p>
                     </div>
@@ -507,7 +507,7 @@
                     <!-- Swimlanes management -->
                     <div>
                         <div class="flex items-center justify-between mb-1.5">
-                            <h3 class="text-[13px] font-bold uppercase tracking-wider text-slate-400">Carriles (Roles)</h3>
+                            <h3 class="text-[13px] font-bold uppercase tracking-wider text-slate-500">Carriles (Roles)</h3>
                             <button onclick="addNewLane()" class="text-[13px] text-cyan-700 hover:underline flex items-center gap-0.5 font-medium">
                                 <i data-lucide="plus" class="w-3 h-3"></i> Agregar
                             </button>
@@ -561,7 +561,7 @@
 
                 <div class="flex-1 overflow-y-auto p-4 text-xs">
                     <div id="tab-content-properties" class="space-y-4">
-                        <div id="no-selection-notice" class="text-center py-10 text-slate-400">
+                        <div id="no-selection-notice" class="text-center py-10 text-slate-500">
                             <i data-lucide="mouse-pointer-click" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
                             <p class="font-medium text-slate-600">Ningún elemento seleccionado</p>
                             <p class="text-[13px] mt-1">Hacé clic sobre un nodo en el diagrama para modificar sus parámetros.</p>
@@ -585,7 +585,7 @@
                             <div>
                                 <label class="block font-semibold text-slate-700 mb-1">Etiqueta (Verbo + Objeto)</label>
                                 <textarea id="prop-input-label" rows="2" class="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-cyan-500 focus:outline-none" placeholder="ej. Reúne comprobantes y se traslada a Delegación"></textarea>
-                                <p class="text-[12px] text-slate-400 mt-0.5">Mantener regla de redacción: Verbo activo + Objeto directo.</p>
+                                <p class="text-[12px] text-slate-500 mt-0.5">Mantener regla de redacción: Verbo activo + Objeto directo.</p>
                             </div>
 
                             <!-- Swimlane / Actor Assignment -->
@@ -685,7 +685,7 @@
                     <i data-lucide="file-pen-line" class="w-5 h-5 text-cyan-700"></i>
                     <h3 id="process-form-title" class="font-bold text-slate-800 text-sm">Datos del proceso</h3>
                 </div>
-                <button type="button" onclick="closeProcessForm()" class="text-slate-400 hover:text-slate-700 p-1 rounded" title="Cerrar">
+                <button type="button" onclick="closeProcessForm()" class="text-slate-500 hover:text-slate-700 p-1 rounded" title="Cerrar">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
@@ -722,7 +722,7 @@
                     <i data-lucide="code" class="w-5 h-5 text-cyan-700"></i>
                     <h3 id="modal-export-title" class="font-bold text-slate-800 text-sm">Exportación BPMN / Código</h3>
                 </div>
-                <button onclick="closeModalExport()" class="text-slate-400 hover:text-slate-700 p-1 rounded">
+                <button onclick="closeModalExport()" class="text-slate-500 hover:text-slate-700 p-1 rounded">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
@@ -772,7 +772,7 @@
                     </div>
                     <div class="text-right">
                         <span class="inline-block bg-slate-100 text-slate-800 px-2 py-0.5 rounded font-mono text-[12px] font-bold">EXP: REF-2026-ENLACE</span>
-                        <p class="text-[12px] text-slate-400 mt-1">Fecha de Emisión: 01/11/2026</p>
+                        <p class="text-[12px] text-slate-500 mt-1">Fecha de Emisión: 01/11/2026</p>
                     </div>
                 </div>
 
@@ -1221,7 +1221,7 @@
         function renderBreadcrumb(items) {
             const nav = document.getElementById('breadcrumb');
             nav.innerHTML = items.map((item, i) => {
-                const sep = i > 0 ? '<i data-lucide="chevron-right" class="w-3 h-3 text-slate-400 flex-shrink-0"></i>' : '';
+                const sep = i > 0 ? '<i data-lucide="chevron-right" class="w-3 h-3 text-slate-500 flex-shrink-0"></i>' : '';
                 const label = escapeHtml(item.label);
                 return item.href
                     ? `${sep}<a href="${item.href}" class="hover:text-issys-blue hover:underline truncate">${label}</a>`
@@ -1324,11 +1324,11 @@
                             </div>
                         </div>
                         <div class="flex items-center flex-shrink-0">
-                            <button data-edit class="text-slate-400 hover:text-issys-blue p-1 rounded opacity-0 group-hover:opacity-100 focus:opacity-100 transition" title="Editar datos del proceso">
+                            <button data-edit class="text-slate-500 hover:text-issys-blue p-1 rounded opacity-0 group-hover:opacity-100 focus:opacity-100 transition" title="Editar datos del proceso">
                                 <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
                             </button>
                             ${!removable ? '' : `
-                            <button data-delete class="text-slate-400 hover:text-rose-600 p-1 rounded opacity-0 group-hover:opacity-100 focus:opacity-100 transition" title="Eliminar proceso">
+                            <button data-delete class="text-slate-500 hover:text-rose-600 p-1 rounded opacity-0 group-hover:opacity-100 focus:opacity-100 transition" title="Eliminar proceso">
                                 <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                             </button>`}
                         </div>
@@ -1355,7 +1355,7 @@
                         </div>
                     </div>
                     <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-[13px]">
-                        <span class="text-slate-400">${updated ? 'Modificado ' + formatDate(updated) : escapeHtml(proc.reference || 'Relevamiento base')}</span>
+                        <span class="text-slate-500">${updated ? 'Modificado ' + formatDate(updated) : escapeHtml(proc.reference || 'Relevamiento base')}</span>
                         <span class="flex items-center gap-1 font-semibold text-cyan-700 group-hover:gap-1.5 transition-all">Abrir <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></span>
                     </div>
                 `;
@@ -1379,7 +1379,7 @@
             add.innerHTML = `
                 <i data-lucide="plus-circle" class="w-7 h-7"></i>
                 <span class="text-sm font-semibold">Nuevo proceso</span>
-                <span class="text-[13px] text-slate-400">Crea un AS-IS y un TO-BE vacíos para relevar</span>
+                <span class="text-[13px] text-slate-500">Crea un AS-IS y un TO-BE vacíos para relevar</span>
             `;
             add.addEventListener('click', createProcess);
             grid.appendChild(add);
@@ -1999,7 +1999,7 @@
             const combined = d.alternatives.filter(p => p.deviations.length > 1);
             if (simple.length) {
                 html += `<div class="space-y-2">
-                    <h5 class="text-[13px] font-bold uppercase tracking-wider text-orange-700">Caminos alternativos <span class="font-normal text-slate-400 normal-case tracking-normal">· ${simple.length}</span></h5>
+                    <h5 class="text-[13px] font-bold uppercase tracking-wider text-orange-700">Caminos alternativos <span class="font-normal text-slate-500 normal-case tracking-normal">· ${simple.length}</span></h5>
                     ${simple.map(p => pathCardHtml(p, d.happy)).join('')}
                 </div>`;
             }
@@ -2033,10 +2033,10 @@
             const stat = (key, label) => {
                 const v = p.metrics[key];
                 const diff = base ? v - base.metrics[key] : 0;
-                const delta = diff ? `<span class="text-[11px] font-semibold ${diff > 0 ? 'text-rose-600' : 'text-emerald-600'}">${diff > 0 ? '+' : ''}${diff}</span>` : '';
+                const delta = diff ? `<span class="text-[12px] font-semibold ${diff > 0 ? 'text-rose-600' : 'text-emerald-600'}">${diff > 0 ? '+' : ''}${diff}</span>` : '';
                 return `<div class="p-1.5 rounded bg-white border border-slate-200 text-center">
                     <span class="block text-base font-extrabold text-slate-800 leading-tight">${v} ${delta}</span>
-                    <span class="text-[11px] text-slate-500 leading-tight">${label}</span>
+                    <span class="text-[12px] text-slate-500 leading-tight">${label}</span>
                 </div>`;
             };
             const title = happy ? 'Todo sale según lo esperado' : escapeHtml(p.name);
@@ -2044,7 +2044,7 @@
                 <div data-path="${p.id}" class="path-card cursor-pointer p-3 rounded-lg border space-y-2 ${happy ? 'bg-emerald-50 border-emerald-200 hover:border-emerald-400' : 'bg-orange-50/60 border-orange-200 hover:border-orange-400'}" style="--card-color:${color}">
                     <div class="flex items-start justify-between gap-2">
                         <p class="font-semibold text-slate-800 leading-snug">${title}</p>
-                        ${p.rework ? '<span class="flex-shrink-0 px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 text-[11px] font-semibold">Retrabajo</span>' : ''}
+                        ${p.rework ? '<span class="flex-shrink-0 px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 text-[12px] font-semibold">Retrabajo</span>' : ''}
                     </div>
                     <div class="grid grid-cols-4 gap-1.5">
                         ${stat('tasks', 'Tareas')}
@@ -2061,7 +2061,7 @@
                     <details class="path-steps">
                         <summary class="cursor-pointer text-[12px] font-semibold text-cyan-700">Ver pasos</summary>
                         <ol class="mt-1.5 space-y-0.5 list-decimal pl-5 text-[12px] text-slate-700">
-                            ${p.tasks.map(t => `<li>${escapeHtml(t.name)}${t.lane ? ` <span class="text-slate-400">· ${escapeHtml(t.lane)}</span>` : ''}${t.presencial ? ' <span class="issys-chip presencial">PRESENCIAL</span>' : ''}</li>`).join('')}
+                            ${p.tasks.map(t => `<li>${escapeHtml(t.name)}${t.lane ? ` <span class="text-slate-500">· ${escapeHtml(t.lane)}</span>` : ''}${t.presencial ? ' <span class="issys-chip presencial">PRESENCIAL</span>' : ''}</li>`).join('')}
                         </ol>
                     </details>
                 </div>`;
@@ -2922,7 +2922,7 @@
                 item.className = "flex items-center justify-between p-1.5 rounded bg-slate-50 border border-slate-200 text-xs";
                 item.innerHTML = `
                     <span class="font-medium text-slate-700 truncate">${escapeHtml(lane.name)}</span>
-                    <button class="text-slate-400 hover:text-cyan-700 p-0.5" title="Renombrar carril">
+                    <button class="text-slate-500 hover:text-cyan-700 p-0.5" title="Renombrar carril">
                         <i data-lucide="edit-3" class="w-3 h-3"></i>
                     </button>
                 `;
@@ -3078,7 +3078,7 @@
             const items = (proc && proc.opportunities) || [];
 
             if (!items.length) {
-                container.innerHTML = '<p class="text-[13px] text-slate-400 text-center py-6">Todavía no hay oportunidades de mejora cargadas para este proceso.</p>';
+                container.innerHTML = '<p class="text-[13px] text-slate-500 text-center py-6">Todavía no hay oportunidades de mejora cargadas para este proceso.</p>';
                 return;
             }
 
@@ -3088,7 +3088,7 @@
                 card.innerHTML = `
                     <div class="flex items-center justify-between">
                         <span class="font-mono font-bold text-xs text-slate-800">${escapeHtml(item.step)}</span>
-                        <span class="text-[11px] font-semibold px-1.5 py-0.5 rounded bg-teal-100 text-teal-800">${escapeHtml(item.badge)}</span>
+                        <span class="text-[12px] font-semibold px-1.5 py-0.5 rounded bg-teal-100 text-teal-800">${escapeHtml(item.badge)}</span>
                     </div>
                     <div class="text-[13px] text-slate-700">
                         <span class="font-semibold text-cyan-900">Propuesta TO-BE:</span> ${escapeHtml(item.change)}

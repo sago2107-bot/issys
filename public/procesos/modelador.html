@@ -64,7 +64,7 @@
         .swatch:hover { transform: scale(1.12); }
         .tb-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 9px; border-radius: 6px; font-size: 14px; font-weight: 500; color: #363634; transition: background .15s; }
         .tb-btn:hover:not(:disabled) { background: #EDEEF1; color: #1D1D1B; }
-        .tb-btn:disabled { opacity: .35; cursor: default; }
+        .tb-btn:disabled { opacity: .5; cursor: default; }
         .tb-btn.active { background: #E3E6F1; color: #36457F; }
 
         /* Salida esperada de una compuerta (camino feliz) */
@@ -97,7 +97,7 @@
             </a>
             <div class="hidden sm:block min-w-0 border-l border-slate-300 pl-4">
                 <div class="font-extrabold text-lg leading-tight">Modelador BPMN</div>
-                <p id="hdr-process" class="text-[13px] font-light text-slate-500 leading-tight truncate">Proceso</p>
+                <p id="hdr-process" class="hidden min-[900px]:block text-[14px] font-light text-slate-500 leading-tight truncate">Proceso</p>
             </div>
         </div>
 
@@ -1083,7 +1083,7 @@
                     <div class="flex flex-wrap gap-1.5">
                         ${SWATCHES.map((s, i) => s.fill
                             ? `<button class="swatch" data-swatch="${i}" title="${s.label}" style="background:${s.fill};border-color:${s.stroke}"></button>`
-                            : `<button class="swatch flex items-center justify-center bg-white border-slate-300 text-slate-400" data-swatch="${i}" title="${s.label}"><i data-lucide="x" class="w-3 h-3"></i></button>`
+                            : `<button class="swatch flex items-center justify-center bg-white border-slate-300 text-slate-500" data-swatch="${i}" title="${s.label}"><i data-lucide="x" class="w-3 h-3"></i></button>`
                         ).join('')}
                     </div>
                 </div>
@@ -1103,7 +1103,7 @@
             let html = `
                 <div class="flex items-center justify-between gap-2 pb-2 border-b border-slate-200">
                     <span class="px-2 py-0.5 rounded text-[12px] font-semibold bg-cyan-50 text-cyan-800 border border-cyan-200">${escapeHtml(bpmnTypeLabel(bo))}</span>
-                    <span class="font-mono text-[12px] text-slate-400 truncate" title="${escapeHtml(bo.id)}">${escapeHtml(bo.id)}</span>
+                    <span class="font-mono text-[12px] text-slate-500 truncate" title="${escapeHtml(bo.id)}">${escapeHtml(bo.id)}</span>
                 </div>
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1" for="prop-name">${nameLabel}</label>

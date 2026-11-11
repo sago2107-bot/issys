@@ -34,17 +34,17 @@ body{font-family:var(--font-sans);font-weight:300;background:var(--bg);color:var
 /* HEADER */
 .hdr{background:var(--navy);color:#fff;padding:0 24px;height:66px;display:flex;align-items:center;gap:18px;box-shadow:0 2px 20px rgba(70,87,160,.45);flex-shrink:0;position:sticky;top:0;z-index:100;border-bottom:1.5px solid rgba(89,181,126,.2);user-select:none}
 .hdr input,.hdr-search-input{user-select:text}
-.hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent 0%,rgba(89,181,126,.6) 30%,rgba(89,181,126,.6) 70%,transparent 100%);pointer-events:none}
+.hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1.5px;background:var(--accent);pointer-events:none}
 .hdr-logo{width:44px;height:44px;object-fit:contain;flex-shrink:0}
 .hdr-info{flex:1}
 .hdr-title{font-family:var(--font-sans);font-size:15px;font-weight:900;letter-spacing:.4px;color:#fff;line-height:1.2}
-.hdr-sub{font-size:11px;opacity:.55;margin-top:3px;font-weight:400;letter-spacing:.1px}
+.hdr-sub{font-size:12px;opacity:.55;margin-top:3px;font-weight:400;letter-spacing:.1px}
 .hdr-btns{display:flex;align-items:center;gap:6px;margin-left:auto}
 .hdr-btn{position:relative;width:40px;height:40px;padding:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:rgba(255,255,255,.8);cursor:pointer;transition:all .18s;flex-shrink:0}
 .hdr-btn:hover{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.22);color:#fff;transform:translateY(-1px)}
 .hdr-btn.accent{background:rgba(89,181,126,.18);border-color:rgba(89,181,126,.35);color:var(--accent2)}
 .hdr-btn.accent:hover{background:rgba(89,181,126,.28);color:#fff}
-.hdr-btn::after{content:attr(data-tooltip);position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);background:var(--navy);border:1px solid rgba(255,255,255,.1);color:#fff;padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .18s;z-index:1000}
+.hdr-btn::after{content:attr(data-tooltip);position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);background:var(--navy);border:1px solid rgba(255,255,255,.1);color:#fff;padding:5px 10px;border-radius:6px;font-size:12px;font-weight:600;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .18s;z-index:1000}
 .hdr-btn:hover::after{opacity:1}
 .hdr-sep{width:1px;height:28px;background:rgba(255,255,255,.12);margin:0 2px}
 
@@ -92,11 +92,11 @@ body{font-family:var(--font-sans);font-weight:300;background:var(--bg);color:var
 .gc-pad-center{grid-area:2/2;color:var(--navy)}
 .gc-pad-right{grid-area:2/3}
 .gc-pad-down{grid-area:3/2}
-.gc-btn::after{content:attr(data-tooltip);position:absolute;right:calc(100% + 8px);top:50%;transform:translateY(-50%);background:var(--navy);color:#fff;padding:4px 9px;border-radius:6px;font-size:11px;font-weight:600;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s}
+.gc-btn::after{content:attr(data-tooltip);position:absolute;right:calc(100% + 8px);top:50%;transform:translateY(-50%);background:var(--navy);color:#fff;padding:4px 9px;border-radius:6px;font-size:12px;font-weight:600;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s}
 .gc-btn:hover::after{opacity:1}
 
 .node{transition:opacity .2s}
-.node circle{cursor:pointer;stroke:#fff;stroke-width:2px}
+.node circle{cursor:pointer;stroke:var(--cat,var(--muted));stroke-width:2px}
 .node text{pointer-events:none;user-select:none;font-size:10.5px;font-weight:600;fill:var(--text)}
 .node.selected circle{stroke:var(--navy);stroke-width:3px}
 .node.related circle{stroke:#E8821E;stroke-width:2.5px;stroke-opacity:.85}
@@ -106,16 +106,16 @@ body{font-family:var(--font-sans);font-weight:300;background:var(--bg);color:var
 .edge{transition:opacity .2s}
 .edge.dim{opacity:.08}
 .edge-line{stroke:var(--navy);stroke-opacity:.45;stroke-width:1.8px;cursor:pointer}
-.edge-line:hover{stroke:#D32F2F;stroke-opacity:.9}
+.edge-line:hover{stroke:var(--red);stroke-opacity:.9}
 .edge-label{font-size:10.5px;font-weight:600;fill:#555;paint-order:stroke;stroke:#F4F4F4;stroke-width:4px;stroke-linejoin:round;pointer-events:none;user-select:none}
 
 /* RELATIONS LIST */
-.rel-sec-title{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin:14px 0 7px;padding-bottom:4px;border-bottom:1px solid #eee}
+.rel-sec-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin:14px 0 7px;padding-bottom:4px;border-bottom:1px solid var(--border)}
 .rel-item{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:6px;background:#f8f9fc;margin-bottom:5px;font-size:14px}
 .rel-item-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rel-item-edit,.rel-item-del{flex-shrink:0;width:18px;height:18px;display:flex;align-items:center;justify-content:center;border-radius:4px;cursor:pointer;color:var(--muted);font-size:13px;background:none;border:none}
 .rel-item-edit:hover{background:var(--blue-bg);color:var(--navy)}
-.rel-item-del:hover{background:#fdf0ee;color:#D32F2F}
+.rel-item-del:hover{background:var(--red-bg);color:var(--red)}
 .rel-empty{font-size:13.5px;color:var(--muted);margin-bottom:8px}
 
 /* CATEGORÍAS */
@@ -130,11 +130,11 @@ body{font-family:var(--font-sans);font-weight:300;background:var(--bg);color:var
 .detail-pnl.open{transform:translateX(0)}
 .detail-pnl-header{padding:16px 18px 12px;border-bottom:1px solid var(--border);position:relative}
 .detail-close{position:absolute;top:12px;right:12px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;background:#eef0fa;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:12px}
-.detail-cat-badge{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;padding:2px 8px;border-radius:10px;display:inline-block;color:#fff}
+.detail-cat-badge{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;padding:2px 8px;border-radius:10px;display:inline-block;color:#fff}
 .detail-title{font-size:16px;font-weight:900;color:var(--navy);padding-right:20px;margin-bottom:6px}
 .detail-body{flex:1;overflow-y:auto;padding:14px 18px;font-size:15px;line-height:1.6;color:var(--text)}
 .detail-actions{padding:12px 18px;border-top:1px solid var(--border)}
-.detail-btn-red{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:8px 14px;border-radius:6px;font-size:14.5px;font-weight:600;cursor:pointer;background:#fdf0ee;color:#D32F2F;border:1px solid #e8a8a0}
+.detail-btn-red{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:8px 14px;border-radius:6px;font-size:14.5px;font-weight:600;cursor:pointer;background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd)}
 .detail-btn-red:hover{background:#fae0dd}
 
 /* MODAL */
@@ -143,7 +143,7 @@ body{font-family:var(--font-sans);font-weight:300;background:var(--bg);color:var
 .modal-box{background:#fff;border-radius:14px;padding:26px 30px;width:420px;max-width:95vw;box-shadow:0 16px 48px rgba(70,87,160,.25)}
 .modal-title{font-size:16px;font-weight:900;color:var(--navy);margin-bottom:18px}
 .modal-field{margin-bottom:14px}
-.modal-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:5px;display:block}
+.modal-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:5px;display:block}
 .modal-input,.modal-select,.modal-textarea{width:100%;font-family:var(--font-sans);font-size:13px;padding:9px 12px;border:1px solid var(--border);border-radius:7px;outline:none;color:var(--text)}
 .modal-input:focus,.modal-select:focus,.modal-textarea:focus{border-color:var(--navy2);box-shadow:0 0 0 3px rgba(70,87,160,.08)}
 .modal-textarea{font-family:var(--font-mono);font-size:12.5px;line-height:1.6;min-height:180px;resize:vertical}
@@ -168,24 +168,24 @@ body{font-family:var(--font-sans);font-weight:300;background:var(--bg);color:var
 
 
 /* AUTH OVERLAY */
-.auth-overlay{position:fixed;inset:0;background:linear-gradient(145deg,var(--navy) 0%,#3a4a88 50%,#2d3a70 100%);z-index:9999;display:flex;align-items:center;justify-content:center}
-.boot-loader{position:fixed;inset:0;background:linear-gradient(145deg,var(--navy) 0%,#3a4a88 50%,#2d3a70 100%);z-index:9998;display:flex;align-items:center;justify-content:center}
+.auth-overlay{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center}
+.boot-loader{position:fixed;inset:0;background:var(--bg);z-index:9998;display:flex;align-items:center;justify-content:center}
 .boot-spinner{width:38px;height:38px;border:4px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:boot-spin .8s linear infinite}
 @keyframes boot-spin{to{transform:rotate(360deg)}}
 .auth-box{background:#fff;border-radius:16px;width:380px;max-width:95vw;box-shadow:0 20px 60px rgba(70,87,160,.5);overflow:hidden}
 .auth-header{background:var(--navy);padding:32px 40px 24px;text-align:center;border-bottom:2px solid rgba(89,181,126,.25)}
 .auth-header img{width:54px}
 .auth-title{font-size:16px;font-weight:900;color:#fff;margin-top:12px;line-height:1.25}
-.auth-sub{font-size:11px;color:rgba(255,255,255,.5);margin-top:5px}
+.auth-sub{font-size:12px;color:rgba(255,255,255,.5);margin-top:5px}
 .auth-body{padding:28px 40px 36px;background:#fff}
 .auth-field{margin-bottom:16px}
-.auth-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:6px;display:block}
+.auth-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:6px;display:block}
 .auth-input{width:100%;font-family:var(--font-sans);font-size:14px;padding:11px 14px;border:1px solid var(--border);border-radius:8px;outline:none;color:var(--text);background:#fff;transition:all .15s}
 .auth-input:focus{border-color:var(--navy2);box-shadow:0 0 0 3px rgba(70,87,160,.1)}
 .auth-btn{width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:7px;font-family:var(--font-sans);font-size:14px;font-weight:600;cursor:pointer;transition:background .15s;margin-top:4px}
-.auth-btn:hover{background:#4a9a6a}
+.auth-btn:hover{background:var(--accent2)}
 .auth-btn:disabled{opacity:.45;cursor:not-allowed}
-.auth-error{background:#fdf0ee;color:#D32F2F;border:1px solid #e8a8a0;border-radius:8px;padding:9px 14px;font-size:12px;font-weight:600;margin-bottom:14px;display:none}
+.auth-error{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd);border-radius:8px;padding:9px 14px;font-size:12px;font-weight:600;margin-bottom:14px;display:none}
 .auth-error.visible{display:block}
 
 /* LECTOR/REVISOR: ocultar controles de edición */
@@ -238,7 +238,6 @@ body[data-role="revisor"] .role-edit-only{display:none!important}
 <div class="canvas-wrap" id="canvasWrap">
   <svg id="graphSvg">
     <defs>
-      <!-- Los degradés grad-cat-* se generan dinámicamente en JS (ensureCategoryGradients), uno por categoría -->
       <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
         <path d="M0,0 L10,5 L0,10 z" fill="var(--navy)" fill-opacity=".7"/>
       </marker>
@@ -343,7 +342,7 @@ body[data-role="revisor"] .role-edit-only{display:none!important}
     </div>
     <div class="modal-field" id="linkTargetReadonly" style="display:none">
       <label class="modal-label">Concepto vinculado</label>
-      <div class="modal-input" style="background:#f8f9fc;color:var(--muted)" id="linkTargetReadonlyText"></div>
+      <div class="modal-input" style="background:var(--bg);color:var(--muted)" id="linkTargetReadonlyText"></div>
     </div>
     <div class="modal-field">
       <label class="modal-label">Etiqueta de la relación</label>
@@ -482,11 +481,11 @@ const CATEGORIES_KEY = 'eerGraphCategories';
 // del panel de detalle usa el color sólido tal cual.
 const DEFAULT_CATEGORIES = [
   { id: 'normativa', label: 'Normativa', color: '#4657A0' },
-  { id: 'organismo', label: 'Organismo', color: '#6a309a' },
+  { id: 'organismo', label: 'Organismo', color: '#36457F' },
   { id: 'concepto', label: 'Concepto', color: '#59B57E' },
-  { id: 'persona', label: 'Persona', color: '#b88a00' },
-  { id: 'instrumento', label: 'Instrumento', color: '#2d8f8f' },
-  { id: 'entidad_colectiva', label: 'Entidad Colectiva', color: '#c2410c' },
+  { id: 'persona', label: 'Persona', color: '#8A6508' },
+  { id: 'instrumento', label: 'Instrumento', color: '#276843' },
+  { id: 'entidad_colectiva', label: 'Entidad Colectiva', color: '#1D1D1B' },
   { id: 'otro', label: 'Otro', color: '#878787' }
 ];
 function getCategory(id) {
@@ -502,21 +501,9 @@ function lightenColor(hex, pct) {
   const b = Math.round((num & 255) + (255 - (num & 255)) * pct);
   return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
 }
-// (Re)crea en <defs> el degradé radial de cada categoría — necesario porque las
-// categorías son dinámicas (el usuario puede agregar/editar color en cualquier momento)
-function ensureCategoryGradients() {
-  const defs = d3.select('#graphSvg defs');
-  categories.forEach(cat => {
-    const gradId = 'grad-cat-' + cat.id;
-    let grad = defs.select('#' + gradId);
-    if (grad.empty()) {
-      grad = defs.append('radialGradient').attr('id', gradId).attr('cx', '35%').attr('cy', '32%').attr('r', '68%');
-    }
-    grad.selectAll('stop').remove();
-    grad.append('stop').attr('offset', '0%').attr('stop-color', lightenColor(cat.color, 0.82));
-    grad.append('stop').attr('offset', '100%').attr('stop-color', cat.color);
-  });
-}
+// Nodos con el estilo de los diagramas de Procesos: fondo claro del color de la categoría,
+// borde del color pleno y texto oscuro (sin degradados).
+const tinteCategoria = color => lightenColor(color, 0.85);
 function populateCategorySelect(selectId, selectedCatId) {
   const sel = document.getElementById(selectId);
   sel.innerHTML = categories.map(c => `<option value="${c.id}">${escapeHtml(c.label)}</option>`).join('');
@@ -569,10 +556,22 @@ function persistLinks() {
   localStorage.setItem(LINKS_KEY, JSON.stringify(links));
   pushLinksToFirebase();
 }
+// Colores de fábrica anteriores (fuera de la paleta ISSyS) → su reemplazo de marca.
+// Sólo se cambian las categorías que conservan el color viejo; las personalizadas no se tocan.
+const COLORES_VIEJOS = { '#6a309a': '#36457F', '#2d8f8f': '#276843', '#b88a00': '#8A6508', '#c2410c': '#1D1D1B' };
+function migrarColoresCategorias(lista) {
+  let cambio = false;
+  for (const c of lista) {
+    const nuevo = COLORES_VIEJOS[String(c.color || '').toLowerCase()];
+    if (nuevo) { c.color = nuevo; cambio = true; }
+  }
+  return cambio;
+}
 function loadCategories() {
   try {
     const saved = JSON.parse(localStorage.getItem(CATEGORIES_KEY));
-    return Array.isArray(saved) && saved.length ? saved : DEFAULT_CATEGORIES.slice();
+    if (Array.isArray(saved) && saved.length) { migrarColoresCategorias(saved); return saved; }
+    return DEFAULT_CATEGORIES.slice();
   } catch(e) { return DEFAULT_CATEGORIES.slice(); }
 }
 function persistCategories() {
@@ -639,6 +638,7 @@ async function loadGraphFromFirebase() {
     }
     if (categoriesSnap.exists() && Array.isArray(categoriesSnap.data().items) && categoriesSnap.data().items.length) {
       categories = categoriesSnap.data().items;
+      if (migrarColoresCategorias(categories) && canEdit()) await pushCategoriesToFirebase();
     }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(concepts));
     localStorage.setItem(LINKS_KEY, JSON.stringify(links));
@@ -1073,7 +1073,7 @@ function renderCategoryList() {
   const box = document.getElementById('categoryList');
   box.innerHTML = categories.map(c => `
     <div class="cat-item">
-      <span class="cat-swatch" style="background:${c.color}"></span>
+      <span class="cat-swatch" style="background:${tinteCategoria(c.color)};border:2px solid ${c.color}"></span>
       <span class="cat-item-label">${escapeHtml(c.label)}</span>
       <button class="rel-item-edit" title="Editar" onclick="showEditCategoryForm('${c.id}')">✎</button>
       <button class="rel-item-del" title="Eliminar" onclick="deleteCategory('${c.id}')">✕</button>
@@ -1249,7 +1249,6 @@ function renderGraph() {
   g   = d3.select('#graphRoot');
   const nodeLayer = d3.select('#nodeLayer');
   const edgeLayer = d3.select('#edgeLayer');
-  ensureCategoryGradients();
 
   if (!zoomBehavior) {
     zoomBehavior = d3.zoom()
@@ -1309,8 +1308,10 @@ function renderGraph() {
   nodeEnter.append('text').attr('text-anchor', 'middle');
 
   const allNodeSel = nodeLayer.selectAll('g.node');
-  allNodeSel.select('circle').attr('r', d => d.r).attr('fill', d => `url(#grad-cat-${getCategory(d.category).id})`);
-  allNodeSel.select('text').attr('fill', '#fff').each(function(d) {
+  allNodeSel.select('circle').attr('r', d => d.r)
+    .attr('fill', d => tinteCategoria(getCategory(d.category).color))
+    .style('--cat', d => getCategory(d.category).color);
+  allNodeSel.select('text').attr('fill', 'var(--text)').each(function(d) {
     const lines = wrapNodeLabel(d.label, d.r);
     const lineHeight = 11;
     const startDy = -((lines.length - 1) / 2) * lineHeight + 4;
