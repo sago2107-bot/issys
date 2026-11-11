@@ -125,7 +125,6 @@ Los paneles cuelgan del `body` (posición fija), así que el encabezado del sist
 ## Riesgos aceptados
 
 - Las credenciales web son públicas: **las reglas son la única barrera**. Se prueban a mano (ver "System Verification").
-- Hasta el paso 9 de la Etapa 1, el bloque LEGADO también da acceso: suspender a alguien en el portal no alcanza.
 - Estatuto: el rol sobre el texto (`eerEditor`) lo aplica sólo el navegador; las reglas lo aplican sólo al mapa (`eerGraph`).
   Dos personas que guardan a la vez se pisan (se guarda el documento entero). Se revisa si hay más de un editor habitual.
 - `eerEditor/state` es un solo documento con el límite de 1 MiB de Firestore. Si lo supera, el guardado falla y el
@@ -155,7 +154,8 @@ sistemas viven en `usuarios/{email}` y los aplica `firestore.rules`. La raíz no
   - `public/shared`: [./public/shared/README.md](./public/shared/README.md) — `ISSYS_CONFIG` (credenciales, `dueno`, catálogo `sistemas`), `window.ISSyS` (login, encabezado común, roles), tokens y componentes de marca.
   - `public/procesos`: [./public/procesos/README.md](./public/procesos/README.md) — visor y modelador BPMN; `nube.js` sincroniza `localStorage` con `datos/{clave}`.
   - `public/presentaciones`: [./public/presentaciones/README.md](./public/presentaciones/README.md) — editor de presentaciones institucionales; modo local (IndexedDB) y en la nube con `presentaciones/{id}` + `presentacionesImagenes/{hash}`.
-  - `public/estatuto`: [./public/estatuto/README.md](./public/estatuto/README.md) — editor del Estatuto y mapa de conceptos; `eerEditor/state`, `eerGraph/*`; roles admin/editor/revisor/lector.- `docs`: manual de marca (`ISSyS-brand-guidelines.md`), sin código.
+  - `public/estatuto`: [./public/estatuto/README.md](./public/estatuto/README.md) — editor del Estatuto y mapa de conceptos; `eerEditor/state`, `eerGraph/*`; roles admin/editor/revisor/lector.
+- `docs`: manual de marca (`ISSyS-brand-guidelines.md`), sin código.
 - `recursos`: material que no se publica (temas JSON de ejemplo), sin código.
 - `eer`: copia de referencia del repo anterior de Estatuto; está en `.gitignore`.
 
@@ -167,21 +167,21 @@ sistemas viven en `usuarios/{email}` y los aplica `firestore.rules`. La raíz no
   `habilitado('<id>')` en `firestore.rules`; los tres tienen que coincidir.
 - El administrador fijo (`dueno`) está repetido en `public/shared/firebase-config.js` y en `firestore.rules` (`dueno()`):
   si cambia, se cambia en los dos.
-- `usuarios/{email}` usa el correo en minúsculas. `activo: false` o la falta del documento implica sin acceso, con dos
-  excepciones: el administrador fijo entra sin documento y, mientras exista el bloque LEGADO, las listas viejas también dan
-  acceso. `admin: true` da todos los sistemas.
+- `usuarios/{email}` usa el correo en minúsculas. `activo: false` o la falta del documento implica sin acceso, salvo para
+  el administrador fijo, que entra sin documento. `admin: true` da todos los sistemas.
 - Roles de Estatuto: `ISSyS.rolEn` (cliente) y `editaEstatuto()` (reglas) coinciden para el mapa (`eerGraph`): sin rol, un
   administrador global es `admin` y el resto `lector`. El texto (`eerEditor`) lo puede escribir cualquiera con Estatuto;
   ahí el rol lo aplica sólo el navegador (ver "Riesgos aceptados").
 - `firestore.rules` se publica sólo desde este repo; publicarlo desde `D:\issys-procesos` borra la regla de `usuarios`. Por
-  eso el `firebase.json` de esa carpeta deja de tener `"firestore"` (Etapa 1, paso 1).
-- El bloque LEGADO de `firestore.rules` (`acceso`, `presentacionesAcceso`) se mantiene hasta el paso 9 de la Etapa 1.
+  eso el `firebase.json` de esa carpeta ya no tiene `"firestore"` (Etapa 1, paso 1).
+- `issys-procesos.web.app`, `issys-presentaciones.web.app` e `issys-eer.web.app` sólo redirigen al portal (301): se
+  publican desde este repo (`hosting:procesos-viejo`, `hosting:presentaciones-viejo`) o, `issys-eer`, desde una carpeta
+  aparte con sólo `hosting`.
 
 ### Global Side Effects
 
 - Firebase Auth (Google) en el proyecto `issys-procesos`: ventana emergente; si el navegador la bloquea, redirección.
-- Firestore `issys-procesos`: `usuarios`, `datos`, `presentaciones`, `presentacionesImagenes`, `eerEditor`, `eerGraph`
-  (más `acceso` y `presentacionesAcceso` hasta el paso 9 de la Etapa 1).
+- Firestore `issys-procesos`: `usuarios`, `datos`, `presentaciones`, `presentacionesImagenes`, `eerEditor`, `eerGraph`.
 - Almacenamiento del navegador: persistencia de Firestore, `localStorage` (Procesos, Presentaciones, Estatuto), IndexedDB
   (Presentaciones).
 - Scripts de CDN: SDK de Firebase (gstatic), Tailwind/Lucide/bpmn-js (Procesos), D3 y Paged.js (Estatuto), Google Fonts.
@@ -215,7 +215,11 @@ sistemas viven en `usuarios/{email}` y los aplica `firestore.rules`. La raíz no
 
 ### Pasos
 
-Estado (10/11/2026): hecho el paso 2; los demás, pendientes. Todos los comandos se corren en `D:\issys`.
+Estado (11/11/2026): **Etapa 1 terminada.** Como Procesos y Presentaciones los usaba sólo el administrador fijo, no se
+esperaron los 7 días del paso 7. `acceso` y `presentacionesAcceso` ya estaban vacías (respaldo en
+`respaldos/listas-viejas-2026-11-11.json`); las redirecciones quedaron en 301. Falta sólo archivar `D:\issys-procesos` y
+`D:\issys-presentaciones` (no son repos de Git: es la única copia del código viejo). Todos los comandos se corren en
+`D:\issys`.
 
 1. **Proteger las reglas** (obligatorio, antes de publicar nada): borrar la clave `"firestore"` de
    `D:\issys-procesos\firebase.json`. No archivar esa carpeta hasta el paso 8. A partir de este paso, `firestore.rules` se

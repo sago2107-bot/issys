@@ -35,7 +35,7 @@ El archivo que genera "Descargar" es el mismo `index.html` con la presentación 
   `abrirBiblioteca`, `guardarYa`, `programarGuardado`, `descargarHTML`, `exportarJSON`.
 - **Capa de guardado intercambiable**: `leerDoc`, `listarDocs`, `borrarDoc`, `ponerDoc` delegan en `NUBE`
   si existe y si no en IndexedDB (`abrirDB`, base `issys-presentaciones`, almacén `decks`).
-- **Selección de modo**: `ES_NUBE` es verdadero sólo para los hosts `issys-sistemas` / `issys-presentaciones`
+- **Selección de modo**: `ES_NUBE` es verdadero sólo para el host `issys-sistemas`
   (`.web.app` / `.firebaseapp.com`) y `localhost`; en ese caso `cargarNube()` inyecta `nube.js` y espera
   `window.nubeListo`.
 
@@ -72,7 +72,7 @@ El archivo que genera "Descargar" es el mismo `index.html` con la presentación 
   una versión guardada por otra persona o pestaña.
 - Las reglas (`/firestore.rules`) exigen `deck` string y `rev` int en `presentaciones/{id}`, y hash
   `^[0-9a-f]{64}$` con `data` string en `presentacionesImagenes/{hash}`; acceso con
-  `habilitado('presentaciones')` (o la lista legada `presentacionesAcceso`).
+  `habilitado('presentaciones')`.
 
 ## Side Effects
 

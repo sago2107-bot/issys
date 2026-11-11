@@ -112,7 +112,6 @@ footer{border-top:1px solid var(--issys-line);padding:18px 24px;font-size:13px;c
         <h2 id="t-usuarios">Usuarios y permisos</h2>
         <p class="nota">Cada persona ingresa con su cuenta de Google y ve sólo los sistemas que tiene habilitados. Un administrador ve todos y gestiona esta lista.</p>
       </div>
-      <button class="issys-btn chico" type="button" id="importar" title="Copia a esta lista los usuarios de las listas propias que tenían Procesos y Presentaciones">⇣ Importar accesos anteriores</button>
     </div>
 
     <form class="alta" id="alta" autocomplete="off">
@@ -247,35 +246,6 @@ footer{border-top:1px solid var(--issys-line);padding:18px 24px;font-size:13px;c
         if (e.target.matches('[data-activo]')) await ref.update({ activo: li.classList.contains('inactivo'), actualizadoPor: usuario.email, actualizado: ahora() });
         if (e.target.matches('[data-quitar]') && confirm(`¿Quitar a ${li.dataset.mail} de los Sistemas ISSyS?`)) await ref.delete();
       } catch (err) { console.error(err); avisar('No se pudo modificar el usuario.'); }
-    };
-
-    // Migración de permisos: acceso (Procesos) y presentacionesAcceso (Presentaciones) → usuarios
-    $('importar').onclick = async () => {
-      const fuentes = [['acceso', 'procesos'], ['presentacionesAcceso', 'presentaciones']];
-      const porMail = new Map();
-      try {
-        for (const [coleccion, sistema] of fuentes) {
-          const snap = await db.collection(coleccion).get();
-          snap.forEach(d => {
-            const mail = d.id.toLowerCase();
-            if (mail === CFG.dueno) return;
-            if (!porMail.has(mail)) porMail.set(mail, new Set());
-            porMail.get(mail).add(sistema);
-          });
-        }
-      } catch (err) { console.error(err); return avisar('No se pudieron leer las listas anteriores.'); }
-      if (!porMail.size) return avisar('Las listas anteriores no tienen usuarios para importar (el administrador fijo no hace falta).');
-      const detalle = [...porMail].map(([m, s]) => `• ${m}: ${[...s].map(nombreDe).join(', ')}`).join('\n');
-      if (!confirm(`Se van a agregar estos permisos (no se quita nada de lo que ya exista):\n\n${detalle}\n\nNadie queda como administrador: eso se marca a mano. ¿Continuar?`)) return;
-      try {
-        const lote = db.batch();
-        porMail.forEach((s, mail) => lote.set(col.doc(mail), {
-          sistemas: firebase.firestore.FieldValue.arrayUnion(...s), activo: true,
-          importado: ahora(), actualizadoPor: usuario.email, actualizado: ahora()
-        }, { merge: true }));
-        await lote.commit();
-        avisar(`Listo: ${porMail.size} usuario(s) importados.`);
-      } catch (err) { console.error(err); avisar('No se pudo completar la importación.'); }
     };
   }
 })();

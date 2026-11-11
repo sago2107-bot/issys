@@ -12,9 +12,8 @@ rules_version = '2';
 //   Presentaciones  → presentaciones/{id}, presentacionesImagenes/{hash}
 //   Estatuto        → eerEditor/state (texto, comentarios, marcas), eerGraph/{concepts|links|positions|categories}
 //
-// TRANSICIÓN: acceso/{email} y presentacionesAcceso/{email} son las listas anteriores de cada sistema.
-// Se mantienen para que los sitios viejos (issys-procesos.web.app / issys-presentaciones.web.app)
-// sigan andando mientras se pasa al portal. Cuando se den de baja, borrar el bloque "LEGADO".
+// Las listas anteriores (acceso, presentacionesAcceso) se retiraron el 11/11/2026: no hay ninguna regla para ellas,
+// así que nadie puede leerlas ni escribirlas.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -54,33 +53,9 @@ service cloud.firestore {
       allow delete: if adminGlobal();
     }
 
-    // ---------- LEGADO (listas de acceso anteriores) ----------
-    function legadoProcesos() {
-      return logueado() && exists(/databases/$(database)/documents/acceso/$(email()));
-    }
-    function legadoAdminProcesos() {
-      return legadoProcesos() && get(/databases/$(database)/documents/acceso/$(email())).data.admin == true;
-    }
-    function legadoPres() {
-      return logueado() && exists(/databases/$(database)/documents/presentacionesAcceso/$(email()));
-    }
-    function legadoAdminPres() {
-      return legadoPres() && get(/databases/$(database)/documents/presentacionesAcceso/$(email())).data.admin == true;
-    }
-
-    match /acceso/{mail} {
-      allow read: if logueado() && (mail == email() || adminGlobal() || legadoAdminProcesos());
-      allow write: if (adminGlobal() || legadoAdminProcesos()) && mail == mail.lower();
-    }
-    match /presentacionesAcceso/{mail} {
-      allow read: if logueado() && (mail == email() || adminGlobal() || legadoAdminPres());
-      allow write: if (adminGlobal() || legadoAdminPres()) && mail == mail.lower();
-    }
-    // ---------- fin LEGADO ----------
-
     // ---------- Procesos ----------
     function puedeProcesos() {
-      return habilitado('procesos') || legadoProcesos();
+      return habilitado('procesos');
     }
     match /datos/{clave} {
       allow read, write: if puedeProcesos();
@@ -88,7 +63,7 @@ service cloud.firestore {
 
     // ---------- Presentaciones ----------
     function puedePresentaciones() {
-      return habilitado('presentaciones') || legadoPres();
+      return habilitado('presentaciones');
     }
     match /presentaciones/{id} {
       allow read, delete: if puedePresentaciones();

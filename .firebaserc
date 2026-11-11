@@ -5,7 +5,9 @@
   "targets": {
     "issys-procesos": {
       "hosting": {
-        "sistemas": ["issys-sistemas"]
+        "sistemas": ["issys-sistemas"],
+        "procesos-viejo": ["issys-procesos"],
+        "presentaciones-viejo": ["issys-presentaciones"]
       }
     }
   }

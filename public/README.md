@@ -17,8 +17,7 @@ desde `shared/`.
   - `pintarSistemas(u)`: muestra `ISSYS_CONFIG.sistemas` con `estado === 'activo'` incluidos en `u.sistemas`; los
     `proximamente` sólo a administradores, en gris y sin enlace.
   - `iniciarAdmin(ses)` (sólo si `u.admin`): alta (`#alta`), lista en vivo (`#lista`, `onSnapshot`), cambio de sistemas, rol
-    por sistema (`select[data-rol]`, sólo sistemas con `roles`), `admin`, Suspender/Reactivar (`activo`), Quitar, e
-    **Importar accesos anteriores** (`#importar`).
+    por sistema (`select[data-rol]`, sólo sistemas con `roles`), `admin`, Suspender/Reactivar (`activo`) y Quitar.
   - `#usuarios` en la URL desplaza a la sección de usuarios (sólo administradores).
 - Subcarpetas:
   - [shared](./shared/README.md): `firebase-config.js` (`ISSYS_CONFIG`), `auth.js` (`window.ISSyS`), `issys.css`,
@@ -27,6 +26,7 @@ desde `shared/`.
   - [presentaciones](./presentaciones/README.md): motor y editor de presentaciones; `presentaciones/{id}`,
     `presentacionesImagenes/{hash}`.
   - [estatuto](./estatuto/README.md): editor del Estatuto y mapa de conceptos; `eerEditor/state`, `eerGraph/*`.
+
 ## Invariants
 
 - Carga de `/shared/firebase-config.js` antes de `/shared/auth.js` en todas las páginas.
@@ -34,17 +34,14 @@ desde `shared/`.
 - `CFG.dueno` (administrador fijo) no se puede dar de alta ni aparece editable: se muestra fijo como "Administrador fijo".
 - Los correos se guardan en minúsculas (`toLowerCase()`), igual que exige `firestore.rules` (`mail == mail.lower()`).
 - El alta usa `set(..., { merge: true })`: no borra campos existentes del usuario.
-- La importación sólo **agrega** (`arrayUnion`) los sistemas `procesos` / `presentaciones` desde `acceso` y
-  `presentacionesAcceso`; nunca marca `admin` y omite `CFG.dueno`.
 - La UI de usuarios es una comodidad: quien autoriza es `firestore.rules` (`adminGlobal()` para escribir `usuarios`).
 
 ## Side Effects
 
 - Firestore `usuarios/{email}`: `set` (alta), `update` (`sistemas`, `roles`, `admin`, `activo`), `delete` (Quitar); siempre con
   `actualizadoPor` y `actualizado: serverTimestamp()`.
-- Lectura de `acceso` y `presentacionesAcceso` y escritura en lote (`db.batch()`) a `usuarios` al importar (campo `importado`).
 - Escucha en vivo de toda la colección `usuarios` mientras un administrador tiene el portal abierto.
-- Diálogos `confirm()` antes de Quitar e Importar.
+- Diálogo `confirm()` antes de Quitar.
 
 ## Verification
 

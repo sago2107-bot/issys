@@ -2489,7 +2489,7 @@ function exportarJSON(){
 /* =================== Carga =================== */
 const QS = new URLSearchParams(location.search);
 // Publicado en Sistemas ISSyS (issys-sistemas.web.app/presentaciones/), en el sitio anterior o en los emuladores: usa la nube
-const ES_NUBE = /^((issys-sistemas|issys-presentaciones)\.(web\.app|firebaseapp\.com)|localhost)$/.test(location.hostname);
+const ES_NUBE = /^((issys-sistemas)\.(web\.app|firebaseapp\.com)|localhost)$/.test(location.hostname);
 let NUBE = null, FUENTE = '';
 async function boot(){
   const p = QS.get('deck');

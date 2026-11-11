@@ -2,21 +2,39 @@
   "firestore": {
     "rules": "firestore.rules"
   },
-  "hosting": {
-    "target": "sistemas",
-    "public": "public",
-    "ignore": [
-      "**/.*",
-      "**/node_modules/**",
-      "**/*.md"
-    ],
-    "headers": [
-      {
-        "source": "**/*.@(html|js|css)",
-        "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
-      }
-    ]
-  },
+  "hosting": [
+    {
+      "target": "sistemas",
+      "public": "public",
+      "ignore": [
+        "**/.*",
+        "**/node_modules/**",
+        "**/*.md"
+      ],
+      "headers": [
+        {
+          "source": "**/*.@(html|js|css)",
+          "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+        }
+      ]
+    },
+    {
+      "target": "procesos-viejo",
+      "public": "public",
+      "ignore": ["**/.*", "**/node_modules/**", "**/*.md"],
+      "redirects": [
+        { "source": "**", "destination": "https://issys-sistemas.web.app/procesos/", "type": 301 }
+      ]
+    },
+    {
+      "target": "presentaciones-viejo",
+      "public": "public",
+      "ignore": ["**/.*", "**/node_modules/**", "**/*.md"],
+      "redirects": [
+        { "source": "**", "destination": "https://issys-sistemas.web.app/presentaciones/", "type": 301 }
+      ]
+    }
+  ],
   "emulators": {
     "auth": { "port": 9099 },
     "firestore": { "port": 8080 },
