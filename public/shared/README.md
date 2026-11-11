@@ -77,7 +77,7 @@ Reglas generales del proyecto: [README del repositorio](/README.md) (sección "E
 
 ## Side Effects
 
-- Al cargar `auth.js`: inserta un `<style>` de bloqueo, `<link>` a `/shared/issys.css` (si falta) y a Google Fonts (Encode Sans Condensed). También registra listeners globales de `click`, `keydown` y `resize`.
+- Al cargar `auth.js`: inserta un `<style>` de bloqueo, `<link>` a `/shared/issys.css` (si falta) y a `/shared/fuentes/fuentes.css` (Encode Sans Condensed y JetBrains Mono, servidas desde el sitio). También registra listeners globales de `click`, `keydown` y `resize`.
 - Red: descarga el SDK de Firebase desde `gstatic.com`, inicia sesión con Google (`signInWithPopup` y, si el popup se bloquea, `signInWithRedirect`) y lee `usuarios/{email}` en Firestore.
 - Activa la persistencia offline de Firestore (`enablePersistence({ synchronizeTabs: true })`).
 - En `localhost`, con `emuladoresEnLocalhost`, conecta Auth y Firestore a los emuladores locales.

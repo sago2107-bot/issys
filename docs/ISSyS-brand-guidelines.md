@@ -54,7 +54,7 @@ coincidir con ellos.
 - **Isologo:** el símbolo verde y azul solo.
 - **Logotipo:** la palabra "ISSyS".
 - **Bajada:** "Instituto de Seguridad Social y Seguros del Chubut" (en el logo). En el encabezado, "bajada" es la segunda
-  línea, debajo del nombre del sistema.
+  línea de cada sistema en el lanzador.
 - **Logo de área:** SEROS Chubut ISSyS, Previsión ISSyS, Turismo ISSyS.
 
 ---
@@ -142,13 +142,13 @@ Valores calculados con los colores de `issys.css` al 11/11/2026. Si cambia un to
 
 ## 2. Tipografía
 
-- [BrandBook] **Familia única:** `Encode Sans Condensed`. La carga [auth.js](../public/shared/auth.js) (Google Fonts, pesos
+- [BrandBook] **Familia única:** `Encode Sans Condensed`. La carga [auth.js](../public/shared/auth.js) (desde `/shared/fuentes/`, pesos
   300, 400, 600 y 900); no hace falta agregarla a mano.
 - [BrandBook] **Pesos:** Black 900 (títulos principales, cifras destacadas), Semibold 600 (subtítulos, botones, rótulos,
   encabezados de tabla), Light 300 (texto corrido y bajadas, en el estilo editorial).
 - [Derivado] **Regular 400** para el cuerpo de texto en pantalla (tablas, formularios): Light pierde legibilidad por debajo
   de 16 px. Light 300 sólo desde 16 px.
-  - Excepción [Regla interna]: la bajada del encabezado y del lanzador va en 300 a 14 px, en `muted`. Repite información
+  - Excepción [Regla interna]: la bajada de cada sistema en el lanzador va en 300 a 14 px, en `muted`. Repite información
     que ya está en el nombre del sistema.
 - [Derivado] Los pesos 500 y 700 no se cargan: en Tailwind, `font-medium` y `font-bold` equivalen a 600 y `font-extrabold`
   a 900.
@@ -239,16 +239,21 @@ Toda aplicación de los Sistemas ISSyS **debe** usar el encabezado común. Uso y
 [README → Encabezado común](../README.md#encabezado-común-regla-general).
 
 - **Barra:** blanca, borde inferior `--issys-green` de 4 px, sombra `--issys-shadow`. Nunca azul ni oscura.
-- **Izquierda:** logo (`.issys-logo`, `issys-logo-recorte.png`), línea vertical `--issys-gray-light`, nombre del sistema
-  (900) y bajada (300, `muted`, ver §2).
+- **Izquierda:** logo (`.issys-logo`, `issys-logo-recorte.png`), línea vertical `--issys-gray-light` y nombre del sistema
+  (900). **No debe** llevar subtítulo.
 - **Derecha, siempre en este orden:**
   1. herramientas propias del sistema;
   2. lanzador de sistemas;
   3. foto de perfil.
 
   El lanzador y la foto los arma `ISSyS.ponerEncabezado()`: **no deben** dibujarse a mano.
-- **Pantallas chicas:** por debajo de 900 px se oculta la bajada; por debajo de 640 px, el nombre del sistema. El logo, el
-  lanzador y la foto quedan siempre.
+- **Herramientas:** sólo ícono, con su nombre en `title` y `aria-label`. No se repite el nombre del sistema (por ejemplo,
+  una miga de pan de un solo nivel).
+- **Estado de guardado:** en el punto sobre la foto (§6.2), nunca como texto en la barra. En texto sólo los problemas que
+  piden una acción (sin conexión, error al guardar, otra versión).
+- **Pantallas chicas:** por debajo de 640 px se oculta el nombre del sistema. El logo, el lanzador y la foto quedan siempre.
+- **Editores de documentos (Presentaciones, modelador de Procesos):** después del nombre del sistema va el título del
+  documento.
 
 ---
 
@@ -278,7 +283,7 @@ No hay botón verde: la acción principal es azul.
 | Foco | **Debe** verse: contorno de 2 px en `blue` (`:focus-visible` de `issys.css`) o, en campos de texto, borde `blue` más un anillo `blue-tint`. Quitar el contorno sólo si se reemplaza por uno de estos. |
 | Deshabilitado | Opacidad 0,5 y cursor normal (`.issys-btn[disabled]`). Conviene explicar el motivo con un texto de ayuda. |
 | Error | Texto en `danger` con un mensaje que diga qué corregir; nunca sólo el borde rojo. |
-| Guardado | Punto sobre la foto (`green`, `yellow`, `danger`) **más** el texto en el menú de cuenta. El punto todavía distingue los estados sólo por color (§9). |
+| Guardado | Punto sobre la foto, con color **y** forma: `green` lleno (guardado), anillo `yellow-ink` hueco (guardando), `danger` con "!" (error). El texto del estado está en el menú de cuenta y al pasar el mouse sobre la foto. |
 | Movimiento | Respetar `prefers-reduced-motion` en animaciones de más de 0,2 s. |
 
 ---
@@ -333,12 +338,9 @@ No hay botón verde: la acción principal es azul.
 | `ink` (#1D1D1B) | Marcado [Derivado]; confirmar con Comunicaciones si figura en el BrandBook. |
 | Logo vertical, en negro, botón/ícono y SVG | No hay archivos; pedirlos a Comunicaciones. |
 | BrandBook | No está en el repo; conviene guardar una copia en `docs/`. |
-| Fuente por Google Fonts | Si no carga, el respaldo (`Arial Narrow`, Arial) es más ancho y recorta títulos; cada visita informa la IP a Google. Alternativa: servirla desde `/shared/` (licencia OFL). |
-| Tailwind por CDN | Versión de desarrollo, sin versión fija. |
+| Tailwind por CDN | Versión de desarrollo (3.4.17, fija). Para producción, Tailwind recomienda compilar el CSS; con un solo sistema que lo usa, se acepta. |
 | Paleta copiada en `issys-tailwind.js` | Las escalas repiten valores de `issys.css`; si cambia un color, cambiarlo en los dos. |
 | Matriz de contraste (§1.4) | Depende de los HEX de `issys.css`; si cambia un token, recalcularla. |
 | Excepciones al mínimo de 12 px | En Estatuto quedan más chicos sólo los símbolos de adorno dentro de círculos (flechas de `.section-tgl` y `.cap-tgl`, cruz de `.ref-chip-del`) y las etiquetas del grafo de `mapa.html`, que se agrandan con el zoom. |
 | Colores de categorías del mapa de Estatuto | Pasados a la paleta el 11/11/2026 (`mapa.html` migra los colores de fábrica viejos al cargar). Con 7 categorías y 5 colores de marca, algunas se parecen (Normativa y Organismo, dos azules): el nombre del nodo y la leyenda las distinguen. |
 | Impresión de Estatuto | La vista de impresión usa Times New Roman en negro: es un documento impreso, fuera del alcance de esta guía (§0.1). |
-| Estado de guardado | El punto sobre la foto distingue los estados sólo por color; el texto está en el menú. Pendiente: forma o `title`. |
-| Spinner de ingreso | Gira aunque se pida movimiento reducido. |

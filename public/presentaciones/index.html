@@ -43,7 +43,7 @@
 
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;overflow:hidden}
-body{background:#EEF0F4;font-family:var(--font);color:var(--ink);-webkit-font-smoothing:antialiased}
+body{background:#EDEEF1;font-family:var(--font);color:var(--ink);-webkit-font-smoothing:antialiased}
 a{color:var(--blue)}
 
 /* ---------- Cámara / mundo ---------- */
@@ -265,7 +265,7 @@ font[color="#010203"]{color:inherit}font[color]:not([color="#010203"]) :is(b,str
 .m-total span{display:block;font-size:20px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
 .m-total b{display:block;font-size:58px;font-weight:900;color:var(--blue);line-height:1.05}
 .m-rank{list-style:none;margin:12px 0 0;padding:0}
-.m-rank li{padding:4px 0 5px;border-top:1px solid #E2E2E2}
+.m-rank li{padding:4px 0 5px;border-top:1px solid #E1E2E5}
 .m-rank div{display:flex;justify-content:space-between;gap:12px;font-size:22px;line-height:1.2}
 .m-rank span{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .m-rank b{font-weight:900;white-space:nowrap}
@@ -353,7 +353,7 @@ font[color="#010203"]{color:inherit}font[color]:not([color="#010203"]) :is(b,str
 #help div{margin:8px 0}
 
 /* ---------- Editor: estructura ---------- */
-#editor{display:none;position:fixed;inset:0;z-index:10;background:#EEF0F4;font-size:16px;
+#editor{display:none;position:fixed;inset:0;z-index:10;background:#EDEEF1;font-size:16px;
   grid-template:"top top top" auto "rail centro panel" minmax(0,1fr) / 232px minmax(0,1fr) 320px}
 body.editando #editor{display:grid}
 body.editando #world,body.editando #progress,body.editando #ctrl,body.editando #notes{display:none}
@@ -362,6 +362,8 @@ body.editando #world,body.editando #progress,body.editando #ctrl,body.editando #
 
 #e-top{grid-area:top;display:flex;align-items:center;gap:10px;padding:10px 16px;background:#fff;border-bottom:4px solid var(--green);flex-wrap:wrap}
 #e-top .marca{display:block;height:30px;width:auto;margin:4px 14px 4px 4px}
+#e-sistema{font-weight:900;font-size:18px;line-height:1.1;color:var(--ink);border-left:1px solid var(--gray-light);padding:6px 16px 6px 14px;white-space:nowrap}
+@media (max-width:640px){#e-sistema{display:none}}
 #e-titulo{flex:1 1 200px;min-width:120px;border:1px solid transparent;border-radius:6px;padding:7px 10px;font-weight:600;font-size:20px!important;background:transparent}
 #e-titulo:hover{border-color:var(--gray-light)}
 #e-estado{font-size:14px;color:var(--muted);white-space:nowrap}
@@ -372,7 +374,7 @@ body.editando #world,body.editando #progress,body.editando #ctrl,body.editando #
 .ub{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;padding:0 14px;border:1.5px solid var(--gray-light);border-radius:6px;
   background:#fff;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s;text-decoration:none;color:var(--ink)}
 .ub:hover{background:var(--surface);border-color:var(--gray)}
-.ub:disabled{opacity:.4;cursor:default;background:#fff;border-color:var(--gray-light)}
+.ub:disabled{opacity:.5;cursor:default;background:#fff;border-color:var(--gray-light)}
 .ub.pri{background:var(--blue);border-color:var(--blue);color:#fff!important}
 .ub.pri:hover{background:var(--blue-dark);border-color:var(--blue-dark)}
 .ub.ico{padding:0;width:40px}
@@ -486,7 +488,7 @@ body.editando #world,body.editando #progress,body.editando #ctrl,body.editando #
 
 /* ---------- Editor: panel derecho ---------- */
 #e-panel{grid-area:panel;background:#fff;border-left:1px solid var(--gray-light);overflow:auto;padding:4px 16px 24px}
-.e-grupo{border-bottom:1px solid #E7E7E7;padding:14px 0 16px}
+.e-grupo{border-bottom:1px solid #E1E2E5;padding:14px 0 16px}
 .e-grupo:last-child{border-bottom:0}
 .e-grupo h3{margin:0 0 10px;font-size:18px;font-weight:600;color:var(--blue)}
 .e-campo{display:block;margin:0 0 10px}
@@ -499,7 +501,7 @@ body.editando #world,body.editando #progress,body.editando #ctrl,body.editando #
 .e-tonos{display:flex;gap:8px}
 .e-tono{width:44px;height:44px;border-radius:8px;border:1.5px solid var(--gray-light);cursor:pointer;padding:0;position:relative}
 .e-tono[aria-pressed=true]{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--blue);border-color:transparent}
-.e-tarjeta{border:1px solid #E2E2E2;border-radius:8px;padding:8px 10px 10px;margin-bottom:10px;background:var(--surface)}
+.e-tarjeta{border:1px solid #E1E2E5;border-radius:8px;padding:8px 10px 10px;margin-bottom:10px;background:var(--surface)}
 .e-tarjeta header{display:flex;align-items:center;gap:3px;margin-bottom:6px}
 .e-tarjeta header b{flex:1;font-size:14px;font-weight:600}
 .e-tarjeta header:last-child{margin-bottom:0}
@@ -520,7 +522,7 @@ body.editando #world,body.editando #progress,body.editando #ctrl,body.editando #
 .e-ejemplo button{margin-top:6px;background:#fff}
 .e-hoja{overflow-x:auto;margin:0 0 8px;border:1px solid var(--gray-light);border-radius:6px;background:#fff}
 .e-hoja table{border-collapse:collapse}
-.e-hoja th,.e-hoja td{border:1px solid #E2E2E2;padding:0;vertical-align:middle}
+.e-hoja th,.e-hoja td{border:1px solid #E1E2E5;padding:0;vertical-align:middle}
 .e-hoja tr>:first-child{border-left:0}
 .e-hoja input{display:block;width:62px;min-height:32px;border:0;padding:4px 7px;background:transparent;font-size:14px!important;text-align:right}
 .e-hoja .cat input{width:80px;text-align:left;font-weight:600}
@@ -536,7 +538,7 @@ body.editando #world,body.editando #progress,body.editando #ctrl,body.editando #
 /* ---------- Editor: diálogos ---------- */
 dialog{border:0;border-radius:16px;padding:0;width:min(1040px,calc(100vw - 32px));max-height:calc(100vh - 48px);font-family:var(--font);color:var(--ink);box-shadow:0 20px 60px rgba(29,29,27,.3)}
 dialog::backdrop{background:rgba(29,29,27,.55)}
-dialog header.d{position:sticky;top:0;z-index:2;background:#fff;display:flex;align-items:center;gap:10px;padding:16px 22px;border-bottom:1px solid #E7E7E7;flex-wrap:wrap}
+dialog header.d{position:sticky;top:0;z-index:2;background:#fff;display:flex;align-items:center;gap:10px;padding:16px 22px;border-bottom:1px solid #E1E2E5;flex-wrap:wrap}
 dialog header.d h2{margin:0 auto 0 0;font-size:26px;font-weight:900}
 .d-tipos{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px;padding:20px 22px 24px}
 .d-tipo{display:block;width:100%;border:0;background:none;padding:0;text-align:left;cursor:pointer;border-radius:8px}
@@ -545,7 +547,7 @@ dialog header.d h2{margin:0 auto 0 0;font-size:26px;font-weight:900}
 .d-tipo b{display:block;font-size:18px;font-weight:600;margin-top:8px}
 .d-tipo small{display:block;font-size:15px;color:var(--muted);line-height:1.25}
 .d-lista{padding:8px 22px 20px}
-.d-doc{display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid #E7E7E7}
+.d-doc{display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid #E1E2E5}
 .d-doc:last-child{border-bottom:0}
 .d-doc.actual .d-nom::after{content:"Abierta";margin-left:9px;font-size:13px;font-weight:600;padding:2px 8px;border-radius:5px;background:var(--green-tint);color:var(--green-dark);vertical-align:middle}
 .d-doc .d-prev{width:142px;flex:none}
@@ -601,14 +603,15 @@ dialog header.d h2{margin:0 auto 0 0;font-size:26px;font-weight:900}
 <main id="editor" aria-label="Editor de presentaciones">
   <header id="e-top">
     <img class="marca" id="e-logo" alt="ISSyS">
+    <span id="e-sistema">Presentaciones</span>
     <input id="e-titulo" aria-label="Título de la presentación" maxlength="120" spellcheck="true">
     <button id="e-avisos" title="Ir a la primera diapositiva con observaciones"></button>
     <span id="e-estado" role="status"></span>
     <button class="ub ico" id="e-undo" title="Deshacer (Ctrl+Z)" aria-label="Deshacer"><svg class="i" viewBox="0 0 24 24"><path d="M3 7v6h6M3 13a9 9 0 1 1 3 6.7"/></svg></button>
     <button class="ub ico" id="e-redo" title="Rehacer (Ctrl+Y)" aria-label="Rehacer"><svg class="i" viewBox="0 0 24 24"><path d="M21 7v6h-6M21 13a9 9 0 1 0-3 6.7"/></svg></button>
-    <button class="ub" id="e-biblio-b"><svg class="i" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 3h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Mis presentaciones</button>
-    <button class="ub" id="e-bajar" title="Descarga un único archivo .html para compartir: se abre y se presenta sin instalar nada"><svg class="i" viewBox="0 0 24 24"><path d="M12 4v12M7 11l5 5 5-5M4 20h16"/></svg>Descargar</button>
-    <button class="ub pri" id="e-presentar" title="Presentar desde esta diapositiva (F5)"><svg class="i" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg>Presentar</button>
+    <button class="ub ico" id="e-biblio-b" title="Mis presentaciones" aria-label="Mis presentaciones"><svg class="i" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 3h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></button>
+    <button class="ub ico" id="e-bajar" title="Descargar: un único archivo .html para compartir, que se abre y se presenta sin instalar nada" aria-label="Descargar"><svg class="i" viewBox="0 0 24 24"><path d="M12 4v12M7 11l5 5 5-5M4 20h16"/></svg></button>
+    <button class="ub pri ico" id="e-presentar" title="Presentar desde esta diapositiva (F5)" aria-label="Presentar"><svg class="i" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg></button>
   </header>
   <aside id="e-rail" aria-label="Diapositivas">
     <div id="e-lista"></div>
@@ -883,7 +886,7 @@ function svgGrafico(g,W,H){
     const fsC=24, padL=Math.min(380,Math.max(...g.filas.map(f=>largo(etq(f),fsC)))+24);
     const padR=g.mostrarValores?Math.max(...vals.map(v=>largo(fmtG(v,g),24)))+20:24, padT=6, padB=44;
     const pw=W-padL-padR, ph=H-padT-padB, x=v=>padL+pw*(v-e.t0)/(e.t1-e.t0), x0=x(0);
-    o+=e.ticks.map(t=>`<line x1="${x(t)}" x2="${x(t)}" y1="${padT}" y2="${padT+ph}" stroke="${t===0?'#878787':'#E2E2E2'}" stroke-width="${t===0?2:1.5}"/>${txt(x(t),H-10,fmtG(t,g,e.dec),'text-anchor="middle" font-size="20" fill="#5F5F5F"')}`).join('');
+    o+=e.ticks.map(t=>`<line x1="${x(t)}" x2="${x(t)}" y1="${padT}" y2="${padT+ph}" stroke="${t===0?'#878787':'#E1E2E5'}" stroke-width="${t===0?2:1.5}"/>${txt(x(t),H-10,fmtG(t,g,e.dec),'text-anchor="middle" font-size="20" fill="#5F5F5F"')}`).join('');
     const gh=ph/n, bh=Math.min(58,gh*.72/ns), gap=ns>1?4:0, bloque=bh*ns+gap*(ns-1);
     g.filas.forEach((f,k)=>{
       const yc=padT+gh*k+gh/2, yb=yc-bloque/2;
@@ -904,7 +907,7 @@ function svgGrafico(g,W,H){
   const e=ejeNum(lo,hi);
   const padL=Math.max(...e.ticks.map(t=>largo(fmtG(t,g,e.dec),22)))+20, padR=linea?30:6, padT=44, padB=52;
   const pw=W-padL-padR, ph=H-padT-padB, y=v=>padT+ph*(1-(v-e.t0)/(e.t1-e.t0)), y0=y(Math.max(e.t0,Math.min(0,e.t1)));
-  o+=e.ticks.map(t=>`<line x1="${padL}" x2="${W-padR}" y1="${y(t)}" y2="${y(t)}" stroke="${t===0?'#878787':'#E2E2E2'}" stroke-width="${t===0?2:1.5}"/>${txt(padL-14,y(t)+7,fmtG(t,g,e.dec),'text-anchor="end" font-size="22" fill="#5F5F5F"')}`).join('');
+  o+=e.ticks.map(t=>`<line x1="${padL}" x2="${W-padR}" y1="${y(t)}" y2="${y(t)}" stroke="${t===0?'#878787':'#E1E2E5'}" stroke-width="${t===0?2:1.5}"/>${txt(padL-14,y(t)+7,fmtG(t,g,e.dec),'text-anchor="end" font-size="22" fill="#5F5F5F"')}`).join('');
   const gw=pw/n, xc=k=>padL+gw*k+gw/2;
   const fsC=Math.max(15,Math.min(24,gw/(Math.max(...g.filas.map(f=>etq(f).length),1)*.55)));
   o+=g.filas.map((f,k)=>txt(xc(k),H-padB+38,etq(f),`text-anchor="middle" font-size="${fsC.toFixed(1)}" font-weight="600" fill="#1D1D1B"`)).join('');
@@ -1466,7 +1469,11 @@ const borrarDoc = id => NUBE ? NUBE.borrar(id) : tx_('readwrite',s=>s.delete(id)
 const ponerDoc = deck => NUBE ? NUBE.poner(deck) : tx_('readwrite',s=>s.put({id:deck.id,titulo:deck.titulo,actualizado:deck.actualizado,deck}));
 const LUGAR = () => NUBE ? 'en la nube' : 'en este equipo';
 
-function estado(txt,mal=false){ const e=$('e-estado'); e.textContent=txt; e.classList.toggle('mal',mal); }
+// El estado normal (guardando / guardado) va en el punto sobre la foto del encabezado común; en texto sólo los problemas
+function estado(txt,mal=false){
+  const e=$('e-estado'); e.textContent=mal?txt:''; e.classList.toggle('mal',mal);
+  const enc=NUBE&&NUBE.encabezado; if(enc&&txt) enc.estado(mal?'error':/^Guardando/.test(txt)?'guardando':'ok');
+}
 async function guardarYa(){
   clearTimeout(guardT); if(!pendiente) return; pendiente=false;
   if(!DB&&!NUBE){ estado('Sin guardado en este navegador: usá Descargar',true); return; }
@@ -2501,7 +2508,7 @@ async function boot(){
   if(!D){ D = normalizar(JSON.parse(document.getElementById('deck').textContent)); esPlantilla = !D.id; }
   $('e-logo').src = MARCA.compacto;
   let h_ = NaN; try{ h_ = parseInt(location.hash.slice(1),10); }catch(e){}
-  if(NUBE){ $('e-bi-t').textContent='Presentaciones'; $('e-biblio-b').lastChild.textContent='Presentaciones'; }
+  if(NUBE){ $('e-bi-t').textContent='Presentaciones'; $('e-biblio-b').title='Presentaciones'; $('e-biblio-b').setAttribute('aria-label','Presentaciones'); }
   if(QS.has('editar')||NUBE){ await abrirEditor(); return; }
   build();
   go(isNaN(h_)?0:h_-1, {animate:false});

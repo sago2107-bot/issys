@@ -13,32 +13,70 @@
       ],
       "headers": [
         {
-          "source": "**/*.@(html|js|css)",
-          "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+          "source": "**",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            }
+          ]
+        },
+        {
+          "source": "**/*.@(png|jpg|jpeg|gif|svg|ico|woff2)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=86400"
+            }
+          ]
         }
       ]
     },
     {
       "target": "procesos-viejo",
       "public": "public",
-      "ignore": ["**/.*", "**/node_modules/**", "**/*.md"],
+      "ignore": [
+        "**/.*",
+        "**/node_modules/**",
+        "**/*.md"
+      ],
       "redirects": [
-        { "source": "**", "destination": "https://issys-sistemas.web.app/procesos/", "type": 301 }
+        {
+          "source": "**",
+          "destination": "https://issys-sistemas.web.app/procesos/",
+          "type": 301
+        }
       ]
     },
     {
       "target": "presentaciones-viejo",
       "public": "public",
-      "ignore": ["**/.*", "**/node_modules/**", "**/*.md"],
+      "ignore": [
+        "**/.*",
+        "**/node_modules/**",
+        "**/*.md"
+      ],
       "redirects": [
-        { "source": "**", "destination": "https://issys-sistemas.web.app/presentaciones/", "type": 301 }
+        {
+          "source": "**",
+          "destination": "https://issys-sistemas.web.app/presentaciones/",
+          "type": 301
+        }
       ]
     }
   ],
   "emulators": {
-    "auth": { "port": 9099 },
-    "firestore": { "port": 8080 },
-    "hosting": { "port": 5000 },
-    "ui": { "enabled": true }
+    "auth": {
+      "port": 9099
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "hosting": {
+      "port": 5000
+    },
+    "ui": {
+      "enabled": true
+    }
   }
 }

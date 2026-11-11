@@ -28,7 +28,7 @@
 
     const BASE = '/shared/';
     const LOGO = `${BASE}marca/issys-logo-recorte.png`;
-    const FUENTES = 'https://fonts.googleapis.com/css2?family=Encode+Sans+Condensed:wght@300;400;600;900&display=swap';
+    const FUENTES = `${BASE}fuentes/fuentes.css`; // servidas desde el sitio (sin Google Fonts)
     const DUENO = CFG.dueno.toLowerCase();
     const IDS = CFG.sistemas.map(s => s.id);
 
@@ -44,7 +44,7 @@
         l.dataset.issysCss = '';
         document.head.appendChild(l);
     }
-    if (!document.querySelector('link[href*="Encode+Sans+Condensed"]')) {
+    if (!document.querySelector('link[href*="fuentes/fuentes.css"]')) {
         const f = document.createElement('link');
         f.rel = 'stylesheet';
         f.href = FUENTES;
@@ -431,6 +431,7 @@
         // ---- Menú de cuenta ----
         const items = (opciones.items || []).slice();
         const avatar = caja.querySelector('.issys-avatar');
+        const tituloAvatar = avatar.title;
         avatar.onclick = e => {
             e.stopPropagation();
             alternarPanel(avatar, () => {
@@ -481,6 +482,9 @@
                 const punto = avatar.querySelector('.punto');
                 punto.hidden = false;
                 punto.className = `punto ${e}`;
+                // El estado también en texto: al pasar el mouse y para lectores de pantalla
+                avatar.title = `${tituloAvatar}\n${ESTADOS[e] || ''}`;
+                avatar.setAttribute('aria-label', `Cuenta de ${usuario.email}. ${ESTADOS[e] || ''}`);
                 if (abierto && abierto.boton === avatar) pintarEstado(abierto.panel);
             }
         };

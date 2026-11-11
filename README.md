@@ -59,13 +59,16 @@ extremo derecho lo arma `shared/auth.js` para que sea idéntico en todos los sis
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────┐
 │ [logo ISSyS] │ Nombre del sistema          [buscador / herramientas propias]   ⋮⋮⋮  (foto) │
-│              │ bajada                                                                     │
 └══════════════════════════════════════ borde verde 4px ════════════════════════════════════┘
 ```
 
 - Barra blanca con borde inferior verde de 4 px; nunca azul ni oscura.
-- Logo a color, línea vertical gris, nombre (peso 900) y bajada (peso 300).
-- Las herramientas propias del sistema van entre el título y el lanzador.
+- Logo a color, línea vertical gris y nombre del sistema (peso 900). **Sin subtítulo.** En los editores (Presentaciones,
+  modelador de Procesos), después del nombre va el título del documento.
+- Las herramientas propias del sistema van entre el título y el lanzador, **sólo con ícono** (y su descripción en `title`).
+- El estado de guardado va en el punto sobre la foto (`enc.estado(...)`), nunca en texto en la barra; en texto sólo los
+  problemas que piden una acción (sin conexión, error, conflicto).
+- No se repite el nombre del sistema en la barra (por ejemplo, una miga de pan de un solo nivel).
 - Siempre al final y en este orden: lanzador ⋮⋮⋮ (Inicio, sistemas habilitados, "Usuarios y permisos" para administradores)
   y foto de perfil (menú de cuenta y "Cerrar sesión").
 
@@ -184,7 +187,7 @@ sistemas viven en `usuarios/{email}` y los aplica `firestore.rules`. La raíz no
 - Firestore `issys-procesos`: `usuarios`, `datos`, `presentaciones`, `presentacionesImagenes`, `eerEditor`, `eerGraph`.
 - Almacenamiento del navegador: persistencia de Firestore, `localStorage` (Procesos, Presentaciones, Estatuto), IndexedDB
   (Presentaciones).
-- Scripts de CDN: SDK de Firebase (gstatic), Tailwind/Lucide/bpmn-js (Procesos), D3 y Paged.js (Estatuto), Google Fonts.
+- Scripts de CDN: SDK de Firebase (gstatic), Tailwind/Lucide/bpmn-js (Procesos), D3 y Paged.js (Estatuto). Las fuentes se sirven desde `/shared/fuentes/` (sin Google Fonts).
 
 ### System Verification
 

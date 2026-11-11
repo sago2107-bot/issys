@@ -92,11 +92,12 @@ html.issys-bloqueada body > *:not(#issys-gate) { visibility: hidden; }
 .issys-spin { width: 28px; height: 28px; border: 3px solid var(--issys-blue-tint); border-top-color: var(--issys-blue); border-radius: 50%;
     margin: 18px auto 0; animation: issys-giro .8s linear infinite; }
 @keyframes issys-giro { to { transform: rotate(360deg); } }
+@keyframes issys-pulso { from { opacity: 1; } to { opacity: .35; } }
 
 /* ==========================================================================
    ENCABEZADO COMÚN — regla general de los Sistemas ISSyS (README → "Encabezado común")
    Barra: blanca, 64-66px, borde inferior verde de 4px, sombra suave.
-   [logo] | [nombre del sistema (900) / bajada (300)] ··· [herramientas del sistema] [⋮⋮⋮ lanzador] [foto]
+   [logo] | [nombre del sistema (900), sin subtítulo] ··· [herramientas del sistema] [⋮⋮⋮ lanzador] [foto]
    El extremo derecho lo arma ISSyS.ponerEncabezado() (shared/auth.js): no se dibuja a mano.
    ========================================================================== */
 .issys-encabezado { display: flex; align-items: center; gap: 6px; flex: none; margin-left: 4px; font-family: var(--issys-font);
@@ -118,11 +119,13 @@ html.issys-bloqueada body > *:not(#issys-gate) { visibility: hidden; }
 .issys-avatar .foto, .issys-cuenta .foto-grande { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;
     border-radius: 50%; overflow: hidden; background: var(--issys-blue); color: #fff !important; font-weight: 600; font-size: 17px; }
 .issys-avatar img, .issys-cuenta .foto-grande img { width: 100%; height: 100%; object-fit: cover; display: block; }
-/* Punto de estado de guardado (verde ok · amarillo guardando · rojo error) */
+/* Punto de estado de guardado. Además del color, cambia la forma (para no depender sólo del color):
+   ok = punto verde lleno · guardando = anillo amarillo hueco · error = rojo con "!" */
 .issys-avatar .punto { position: absolute; right: 1px; bottom: 1px; width: 13px; height: 13px; border-radius: 50%; border: 2px solid #fff;
     background: var(--issys-green); }
-.issys-avatar .punto.guardando { background: var(--issys-yellow); }
-.issys-avatar .punto.error { background: var(--issys-danger); }
+.issys-avatar .punto.guardando { background: #fff; box-shadow: inset 0 0 0 3px var(--issys-yellow-ink); }
+.issys-avatar .punto.error { background: var(--issys-danger); width: 15px; height: 15px; right: 0; bottom: 0; }
+.issys-avatar .punto.error::after { content: "!"; display: block; color: #fff; font: 900 10px/11px var(--issys-font); text-align: center; }
 
 /* Paneles desplegables (lanzador y cuenta) */
 .issys-panel { position: fixed; right: 12px; top: 72px; z-index: 9000; width: min(340px, calc(100vw - 24px));
@@ -130,7 +133,11 @@ html.issys-bloqueada body > *:not(#issys-gate) { visibility: hidden; }
     box-shadow: 0 4px 8px rgba(29, 29, 27, .12), 0 18px 44px rgba(29, 29, 27, .18); padding: 10px; color: var(--issys-ink);
     font-family: var(--issys-font); font-size: 15px; animation: issys-aparece .14s ease-out; }
 @keyframes issys-aparece { from { opacity: 0; transform: translateY(-6px); } }
-@media (prefers-reduced-motion: reduce) { .issys-panel { animation: none; } }
+@media (prefers-reduced-motion: reduce) {
+    .issys-panel { animation: none; }
+    /* Sin giro: el indicador de carga sólo late suave */
+    .issys-spin { animation: issys-pulso 1.2s ease-in-out infinite alternate; border-top-color: var(--issys-blue-tint); border-color: var(--issys-blue); }
+}
 .issys-panel a { text-decoration: none; color: inherit; }
 
 /* Lanzador */
