@@ -17,3 +17,6 @@ desktop.ini
 
 # Copia de referencia del repo de Estatuto (tiene su propio .git): no versionar
 eer/
+
+# Carpeta de referencia con el sistema anterior de Consultorios (issys-consultorios); el código vive en public/consultorios/
+issys consultorios/

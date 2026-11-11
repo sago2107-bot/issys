@@ -1,15 +1,16 @@
 # Sistemas ISSyS
 
 Portal único con ingreso de Google y selector de sistemas del Instituto de Seguridad Social y Seguros del Chubut.
-Reemplaza tres sitios con ingresos y listas de acceso separadas (Procesos, Presentaciones y Estatuto) por un solo ingreso y
-una sola lista de permisos. Delegaciones y Consultorios todavía no están incluidos (ver "Próximas etapas").
+Reemplaza cuatro sitios con ingresos y listas de acceso separadas (Procesos, Presentaciones, Estatuto y Consultorios) por un
+solo ingreso y una sola lista de permisos. Delegaciones todavía no está incluido (ver "Próximas etapas").
 
 - **Proyecto Firebase:** `issys-procesos` (Firestore + Auth + Hosting)
 - **Sitio de Hosting:** `issys-sistemas` → https://issys-sistemas.web.app
 - **Repo:** https://github.com/sago2107-bot/issys
 - **Carpeta local:** `D:\issys`
 - **Sistemas anteriores:** `D:\issys-procesos` (repo viejo de Procesos, del que se publicaban las reglas),
-  `issys-presentaciones` (sitio) e `issys-eer` (proyecto Firebase aparte de Estatuto). Se retiran con el plan de migración.
+  `issys-presentaciones` (sitio), `issys-eer` (proyecto Firebase aparte de Estatuto) e `issys-consultorios` (proyecto Firebase
+  aparte de Consultorios). Se retiran con el plan de migración.
 
 ## Estructura
 
@@ -31,8 +32,9 @@ issys/
     │   └── marca/               logos oficiales
     ├── procesos/          index.html, modelador.html, bpmn-*.js, nube.js
     ├── presentaciones/    index.html, nube.js
-    └── estatuto/          index.html (editor), mapa.html (mapa de conceptos), nube.js,
-                           estatuto-marca.css (identidad común: se carga después de los estilos propios)
+    ├── estatuto/          index.html (editor), mapa.html (mapa de conceptos), nube.js,
+    │                      estatuto-marca.css (identidad común: se carga después de los estilos propios)
+    └── consultorios/      index.html (cronograma, croquis y requisitos de habilitación; una sola página)
 ```
 
 ## Cómo se integra un sistema
@@ -158,6 +160,7 @@ sistemas viven en `usuarios/{email}` y los aplica `firestore.rules`. La raíz no
   - `public/procesos`: [./public/procesos/README.md](./public/procesos/README.md) — visor y modelador BPMN; `nube.js` sincroniza `localStorage` con `datos/{clave}`.
   - `public/presentaciones`: [./public/presentaciones/README.md](./public/presentaciones/README.md) — editor de presentaciones institucionales; modo local (IndexedDB) y en la nube con `presentaciones/{id}` + `presentacionesImagenes/{hash}`.
   - `public/estatuto`: [./public/estatuto/README.md](./public/estatuto/README.md) — editor del Estatuto y mapa de conceptos; `eerEditor/state`, `eerGraph/*`; roles admin/editor/revisor/lector.
+  - `public/consultorios`: [./public/consultorios/README.md](./public/consultorios/README.md) — cronograma de consultorios de Mitre 837, croquis y requisitos de la Res. 461/11; `consultoriosCronogramas/mitre837` + `profesionales/{id}`; roles editor/lector.
 - `docs`: manual de marca (`ISSyS-brand-guidelines.md`), sin código.
 - `recursos`: material que no se publica (temas JSON de ejemplo), sin código.
 - `eer`: copia de referencia del repo anterior de Estatuto; está en `.gitignore`.
@@ -175,6 +178,8 @@ sistemas viven en `usuarios/{email}` y los aplica `firestore.rules`. La raíz no
 - Roles de Estatuto: `ISSyS.rolEn` (cliente) y `editaEstatuto()` (reglas) coinciden para el mapa (`eerGraph`): sin rol, un
   administrador global es `admin` y el resto `lector`. El texto (`eerEditor`) lo puede escribir cualquiera con Estatuto;
   ahí el rol lo aplica sólo el navegador (ver "Riesgos aceptados").
+- Roles de Consultorios: `ISSyS.rolEn` y `editaConsultorios()` coinciden: sin rol, un administrador global es `editor` y el
+  resto `lector`; sólo el editor escribe `consultoriosCronogramas`.
 - `firestore.rules` se publica sólo desde este repo; publicarlo desde `D:\issys-procesos` borra la regla de `usuarios`. Por
   eso el `firebase.json` de esa carpeta ya no tiene `"firestore"` (Etapa 1, paso 1).
 - `issys-procesos.web.app`, `issys-presentaciones.web.app` e `issys-eer.web.app` sólo redirigen al portal (301): se
@@ -184,7 +189,8 @@ sistemas viven en `usuarios/{email}` y los aplica `firestore.rules`. La raíz no
 ### Global Side Effects
 
 - Firebase Auth (Google) en el proyecto `issys-procesos`: ventana emergente; si el navegador la bloquea, redirección.
-- Firestore `issys-procesos`: `usuarios`, `datos`, `presentaciones`, `presentacionesImagenes`, `eerEditor`, `eerGraph`.
+- Firestore `issys-procesos`: `usuarios`, `datos`, `presentaciones`, `presentacionesImagenes`, `eerEditor`, `eerGraph`,
+  `consultoriosCronogramas`.
 - Almacenamiento del navegador: persistencia de Firestore, `localStorage` (Procesos, Presentaciones, Estatuto), IndexedDB
   (Presentaciones).
 - Scripts de CDN: SDK de Firebase (gstatic), Tailwind/Lucide/bpmn-js (Procesos), D3 y Paged.js (Estatuto). Las fuentes se sirven desde `/shared/fuentes/` (sin Google Fonts).
@@ -458,10 +464,47 @@ editado en el sistema nuevo y vuelve a fijar roles y `activo: true`. Después re
 
 ---
 
+## Plan de migración — Etapa 3: Consultorios
+
+### Hallazgos del relevamiento (11/11/2026)
+
+- Estaba en el proyecto Firebase `issys-consultorios` (sitio `issys-consultorios.web.app`), con el código en
+  `D:\issys\issys consultorios\consultorios\` (igual al publicado). Una sola página, sin compilación.
+- Datos: `cronogramas/mitre837` (9 consultorios, establecimiento, equipamiento compartido) y su subcolección
+  `profesionales` (15). Accesos propios en `acceso/mitre837`: un administrador (el administrador fijo) y ningún editor.
+- Lectura pública (cualquiera con el enlace); para editar, ingreso con Google.
+- Diseño propio: fuente Archivo, paleta y colores por especialidad propios, modo oscuro, barra con subtítulo y botón "Salir".
+
+### Decisiones
+
+- **Sin lectura pública** (opción A, 11/11/2026): igual que los demás sistemas, hay que ingresar y tener `consultorios`
+  habilitado. Quien miraba el cronograma sin cuenta tiene que pedir el alta.
+- Roles `editor` y `lector` en `usuarios.roles.consultorios`. La pestaña Accesos se eliminó: los permisos se dan en el
+  portal. No hubo personas que migrar (la lista de editores estaba vacía).
+- Colección con prefijo: `consultoriosCronogramas/mitre837` (+ `profesionales/{id}`), con la misma forma que antes.
+- Marca: Encode Sans Condensed, tokens de `issys.css`, sin modo oscuro, encabezado común. Especialidades con tinte + borde
+  de color + texto `ink` (como Procesos y el mapa de Estatuto).
+
+### Pasos
+
+1. **Hecho (11/11/2026):** código adaptado en `public/consultorios/`, alta en `firebase-config.js` (`activo`, roles) y
+   reglas (`editaConsultorios()`).
+2. **Hecho (11/11/2026):** datos copiados de `issys-consultorios` a `issys-procesos` con la API REST de Firestore y la
+   sesión de `firebase-tools` (sólo lectura del origen) y verificados campo por campo: documento igual, 15/15 profesionales.
+3. **Hecho (11/11/2026):** reglas publicadas y prueba en el canal `prueba`.
+4. **Hecho (11/11/2026):** publicado `hosting:sistemas`. Falta dar de alta en el portal a quien use Consultorios.
+5. **Retirar el sitio viejo:** publicar en `issys-consultorios` (desde una carpeta aparte con sólo `hosting`) una redirección
+   301 a `https://issys-sistemas.web.app/consultorios/`, como se hizo con `issys-eer`. Antes, repetir el paso 2 si alguien
+   editó el sitio viejo (pisa lo copiado).
+
+**Vuelta atrás:** hasta el paso 5, el sitio viejo sigue funcionando con sus datos. Después, Firebase Console (proyecto
+`issys-consultorios`) → Hosting → historial de versiones → **Revertir**.
+
+---
+
 ## Próximas etapas
 
 - **Delegaciones** (`issys-delegaciones`): está en **otro proyecto Firebase**, así que hay migración de datos. Antes de migrar, revisar nombres de colección: Procesos usa `datos`, un nombre genérico que podría chocar. Si Delegaciones también usa `datos`, renombrar el suyo con prefijo (ej. `delegacionesDatos`).
-- **Consultorios Mitre 837:** relevar primero.
 - **Celular:** Procesos y Estatuto no están adaptados a pantallas chicas. Falta definir el criterio (por ejemplo, usables
   en 360 px de ancho sin desplazamiento horizontal).
 

@@ -1,0 +1,2084 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Consultorios Comodoro Rivadavia · ISSyS</title>
+<link rel="icon" type="image/png" href="/shared/marca/issys-isologo.png">
+<link rel="stylesheet" href="/shared/issys.css" data-issys-css>
+<link rel="stylesheet" href="/shared/fuentes/fuentes.css">
+<script src="/shared/firebase-config.js"></script>
+<script src="/shared/auth.js"></script>
+<style>
+/* Planilla horaria: una franja por día con eje horario y una fila por consultorio.
+   Colores: sólo tokens de la guía de marca (docs/ISSyS-brand-guidelines.md §1). Sin modo oscuro (guía §0.1). */
+:root{
+  --bg:var(--issys-surface); --surface:var(--issys-white); --ink:var(--issys-ink); --muted:var(--issys-muted); --line:var(--issys-line);
+  --borde:var(--issys-gray-light); --accent:var(--issys-blue); --on-accent:#fff;
+  --warn-bg:var(--issys-yellow-tint); --warn-ink:var(--issys-yellow-ink);
+  --bad-bg:var(--issys-surface); --bad-ink:var(--issys-danger); --bad:var(--issys-danger);
+  --ok-bg:var(--issys-green-tint); --ok-ink:var(--issys-green-deep);
+  /* Especialidades: tinte de fondo + borde de color + texto ink, como los elementos de Procesos y el mapa de Estatuto.
+     Hay más especialidades que colores de marca: se combinan fondo y borde, y el nombre siempre acompaña al color. */
+  --cli-bg:var(--issys-blue-tint);   --cli-bd:var(--issys-blue);
+  --ped-bg:var(--issys-yellow-tint); --ped-bd:var(--issys-yellow-ink);
+  --nut-bg:var(--issys-green-tint);  --nut-bd:var(--issys-green);
+  --psi-bg:var(--issys-line);        --psi-bd:var(--issys-blue-dark);
+  --pin-bg:var(--issys-yellow-tint); --pin-bd:var(--issys-blue-dark);
+  --car-bg:var(--issys-yellow-tint); --car-bd:var(--issys-ink);
+  --gin-bg:var(--issys-green-tint);  --gin-bd:var(--issys-green-deep);
+  --kin-bg:var(--issys-line);        --kin-bd:var(--issys-gray);
+  --odo-bg:var(--issys-blue-tint);   --odo-bd:var(--issys-ink);
+  --x1-bg:var(--issys-green-tint);   --x1-bd:var(--issys-blue);
+  --x2-bg:var(--issys-yellow-tint);  --x2-bd:var(--issys-green-deep);
+  --x3-bg:var(--issys-blue-tint);    --x3-bd:var(--issys-green-deep);
+  --x4-bg:var(--issys-line);         --x4-bd:var(--issys-yellow-ink);
+  --f-text:var(--issys-font);
+  --f-data:var(--issys-font);
+}
+
+/* Encabezado común (guía §5): logo, línea gris y nombre del sistema; a la derecha, lanzador y foto (ISSyS.ponerEncabezado). */
+.enc{display:flex;align-items:center;gap:8px;min-height:66px;padding:8px 20px;background:#fff;border-bottom:4px solid var(--issys-green);box-shadow:var(--issys-shadow);position:relative;z-index:5}
+.enc-nombre{font-weight:900;font-size:18px;line-height:1.1;color:var(--ink);border-left:1px solid var(--issys-gray-light);padding:6px 16px 6px 14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.enc-esp{flex:1}
+@media (max-width:640px){ .enc{padding-inline:12px} .enc-nombre{display:none} }
+.titulo-imp{display:none}
+.sobre{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent)}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-text);font-size:16px;line-height:1.5}
+h1,h2,h3,p,ol,ul{margin:0}
+[hidden]{display:none!important}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.ancho{max-width:1160px;margin:0 auto;padding-inline:20px}
+.estado{font-family:var(--f-data);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding:3px 8px;border-radius:3px;background:var(--bg);color:var(--muted);white-space:nowrap}
+.estado.ok{background:var(--ok-bg);color:var(--ok-ink)}
+.estado.local{background:var(--warn-bg);color:var(--warn-ink)}
+
+.tabs{background:var(--surface);border-bottom:1px solid var(--line)}
+.tabs .ancho{display:flex;gap:4px;overflow-x:auto}
+.tab{appearance:none;background:none;border:0;border-bottom:3px solid transparent;padding:10px 12px 8px;font-family:var(--f-data);font-size:15px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--issys-green)}
+
+main{padding-block:26px 56px;display:flex;flex-direction:column;gap:30px}
+section{display:flex;flex-direction:column;gap:16px;min-width:0}
+h2{font-size:20px;font-weight:900;letter-spacing:0}
+.caja h2,.dlg h2,.panel h2{font-weight:600}
+h3{font-family:var(--f-data);font-size:15px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--accent)}
+.fila-tit{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 20px}
+.acciones{display:flex;flex-wrap:wrap;gap:8px}
+.muted{color:var(--muted)}
+.cargando{color:var(--muted);padding-block:40px}
+
+.btn{appearance:none;border:1.5px solid var(--accent);background:var(--surface);color:var(--accent);border-radius:8px;padding:7px 13px;font-family:var(--f-data);font-size:14.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--issys-blue-tint)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.pri:hover{background:var(--issys-blue-dark);border-color:var(--issys-blue-dark);color:var(--on-accent)}
+.btn.mal{color:var(--bad);border-color:var(--bad)}
+.btn.mal:hover{background:var(--bad-bg)}
+.btn.chico{padding:4px 9px;font-size:13.5px}
+.btn:disabled{opacity:.5;cursor:default}
+
+.aviso-local{background:var(--warn-bg);color:var(--warn-ink);border-radius:4px;padding:10px 14px;font-size:14px;display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;justify-content:space-between}
+.aviso-local button{appearance:none;background:none;border:0;padding:0;color:inherit;text-decoration:underline;cursor:pointer;font-size:13.5px}
+
+.leyenda{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-block;font-family:var(--f-data);font-size:13px;font-weight:600;padding:2px 9px;border-radius:3px;white-space:nowrap}
+.s-cli{--e-bg:var(--cli-bg);--e-bd:var(--cli-bd)} .s-ped{--e-bg:var(--ped-bg);--e-bd:var(--ped-bd)} .s-nut{--e-bg:var(--nut-bg);--e-bd:var(--nut-bd)} .s-psi{--e-bg:var(--psi-bg);--e-bd:var(--psi-bd)} .s-pin{--e-bg:var(--pin-bg);--e-bd:var(--pin-bd)} .s-car{--e-bg:var(--car-bg);--e-bd:var(--car-bd)} .s-gin{--e-bg:var(--gin-bg);--e-bd:var(--gin-bd)} .s-kin{--e-bg:var(--kin-bg);--e-bd:var(--kin-bd)} .s-odo{--e-bg:var(--odo-bg);--e-bd:var(--odo-bd)} .s-x1{--e-bg:var(--x1-bg);--e-bd:var(--x1-bd)} .s-x2{--e-bg:var(--x2-bg);--e-bd:var(--x2-bd)} .s-x3{--e-bg:var(--x3-bg);--e-bd:var(--x3-bd)} .s-x4{--e-bg:var(--x4-bg);--e-bd:var(--x4-bd)}
+.chip,.b{background:var(--e-bg,var(--bg));color:var(--ink);box-shadow:inset 0 0 0 2px var(--e-bd,var(--borde))}
+
+.avisos{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:12px}
+.caja{border-radius:4px;padding:14px 18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px;min-width:0}
+.caja h2{font-size:15px}
+.caja ul{padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.caja.mal{background:var(--bad-bg);color:var(--ink);box-shadow:inset 4px 0 0 var(--bad)}
+.caja.mal h2{color:var(--bad-ink)}
+.caja.ojo{background:var(--warn-bg);color:var(--ink);box-shadow:inset 4px 0 0 var(--issys-yellow)}
+.caja.ojo h2{color:var(--warn-ink)}
+.caja.bien{background:var(--ok-bg);color:var(--ok-ink)}
+
+.saltos{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--f-data);font-size:14px;font-weight:600}
+.saltos a{color:var(--accent);text-decoration:none;border-bottom:1px solid transparent}
+.saltos a:hover{border-bottom-color:currentColor}
+.dia{gap:8px;scroll-margin-top:12px}
+.desliza{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:4px}
+.plan{padding:10px 22px 12px 0}
+.fila{display:grid;grid-template-columns:132px 1fr;align-items:stretch}
+.fila+.fila .pista{border-top:1px solid var(--line)}
+.fila.corte{margin-top:10px}
+.fila.corte .pista{border-top:1px solid var(--line)}
+.fila.fin .pista,.fila:last-child .pista{border-bottom:1px solid var(--line)}
+.sala{padding:0 12px 0 16px;display:flex;flex-direction:column;justify-content:center;font-family:var(--f-data);font-size:14px;font-weight:600;line-height:1.15;overflow-wrap:anywhere}
+.sala small{font-weight:400;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.eje .sala{font-size:12px;font-weight:400;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.horas{position:relative;height:22px}
+.horas span{position:absolute;top:2px;transform:translateX(-50%);font-family:var(--f-data);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.pista{position:relative;min-height:42px;border-left:1px solid var(--line);border-right:1px solid var(--line);
+  background-image:linear-gradient(to right,var(--line) 1px,transparent 1px);background-size:calc(100% / var(--n,12)) 100%;background-position:-1px 0}
+.pista.sobre-drop{background-color:var(--issys-blue-tint)}
+.fila.sin .sala{color:var(--bad)}
+.b{position:absolute;height:36px;padding:2px 7px;border-radius:3px;overflow:hidden;display:flex;flex-direction:column;justify-content:center;
+  font-family:var(--f-data);line-height:1.12;white-space:nowrap}
+.b b{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.b i{font-style:normal;font-size:12px;font-variant-numeric:tabular-nums;opacity:.85}
+.b.conf{background:var(--surface);box-shadow:none;border:2px dashed var(--e-bd,var(--borde))}
+.b.choque{box-shadow:inset 0 0 0 2px var(--bad)}
+.b.edita{cursor:pointer}
+.b.edita:hover{box-shadow:inset 0 0 0 3px var(--accent)}
+.vacio{position:absolute;inset:3px;display:flex;align-items:center;padding-left:10px;font-family:var(--f-data);font-size:13px;color:var(--muted);pointer-events:none;
+  background:repeating-linear-gradient(135deg,transparent 0 7px,var(--line) 7px 8px);border-radius:3px}
+
+.tabla{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:4px}
+table{width:100%;min-width:640px;border-collapse:collapse;font-size:14.5px}
+thead th{font-family:var(--f-data);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);text-align:left;padding:10px 14px;border-bottom:1px solid var(--line)}
+tbody th,tbody td{padding:9px 14px;text-align:left;vertical-align:top}
+tbody th{font-family:var(--f-data);font-size:15px;font-weight:600;border-right:1px solid var(--line);white-space:nowrap}
+tbody th small{display:block;font-weight:400;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+tr.g>*{border-top:1px solid var(--line)}
+tbody tr:first-child>*{border-top:0}
+.num{font-variant-numeric:tabular-nums}
+.pend{color:var(--muted);font-style:italic}
+td.der{text-align:right;white-space:nowrap}
+.pie{color:var(--muted);font-size:13.5px}
+
+input[type=text],input[type=email],input[type=search],input[type=time],select{border:1px solid var(--issys-gray);background:var(--surface);border-radius:4px;padding:7px 10px;min-width:0;max-width:100%}
+input:disabled,select:disabled{opacity:.5}
+.campo{display:flex;flex-direction:column;gap:4px;min-width:0}
+.campo>span{font-family:var(--f-data);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.campo small{color:var(--muted);font-size:13px}
+
+.lista-salas{display:flex;flex-direction:column;gap:8px}
+.sala-fila{display:grid;grid-template-columns:minmax(140px,1.3fr) 96px 140px minmax(140px,1fr) auto;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:10px 12px}
+.sala-fila .mov{display:flex;gap:4px;justify-content:flex-end}
+@media (max-width:720px){ .sala-fila{grid-template-columns:1fr 1fr} }
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.panel ul{list-style:none;padding:0;display:flex;flex-direction:column;gap:6px}
+.panel li{display:flex;align-items:center;justify-content:space-between;gap:10px;overflow-wrap:anywhere}
+.panel form{display:flex;gap:8px}
+.panel form input{flex:1}
+
+dialog{border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);padding:0;width:min(720px,calc(100vw - 24px));max-height:calc(100vh - 24px)}
+dialog::backdrop{background:rgba(29,29,27,.55)}
+.dlg{display:flex;flex-direction:column;gap:18px;padding:22px 24px}
+.dlg h2{font-size:20px}
+.dos{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:14px}
+.horarios{display:flex;flex-direction:column;gap:8px}
+.hrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;border:1px solid var(--line);border-radius:4px;padding:8px 10px}
+.dias{display:flex;gap:3px}
+.dias label{position:relative;cursor:pointer}
+.dias input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.dias span{display:block;min-width:30px;text-align:center;padding:5px 4px;border:1px solid var(--borde);border-radius:3px;font-family:var(--f-data);font-size:13px;font-weight:600;color:var(--muted)}
+.dias input:checked+span{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.dias input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.rango{display:flex;align-items:center;gap:6px}
+.tilde{display:flex;align-items:center;gap:6px;font-size:14px}
+.hrow .x{margin-left:auto}
+.pista-sala{font-size:13.5px;color:var(--muted)}
+.pista-sala.mal{color:var(--bad)}
+.errores{background:var(--bad-bg);color:var(--bad-ink);box-shadow:inset 4px 0 0 var(--bad);border-radius:4px;padding:10px 14px;font-size:14px}
+.errores ul{padding-left:18px}
+.pie-dlg{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px}
+.pie-dlg .acciones{margin-left:auto}
+.enlace{appearance:none;background:none;border:0;padding:0;color:var(--accent);text-decoration:underline;cursor:pointer;font-size:13.5px;text-align:left}
+.cambios{padding-left:18px;font-size:14.5px;display:flex;flex-direction:column;gap:3px;max-height:40vh;overflow:auto}
+
+/* Requisitos de habilitación: lista de control por consultorio y matriz de resumen. */
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.rq-sel{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,170px),1fr));gap:8px}
+.rq-sel button{appearance:none;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:8px 12px;cursor:pointer;display:flex;flex-direction:column;gap:2px;font-family:var(--f-data)}
+.rq-sel button b{font-size:14.5px}
+.rq-sel button small{font-size:12.5px;color:var(--muted)}
+.rq-sel button small .f{color:var(--bad);font-weight:600}
+.rq-sel button:hover{border-color:var(--accent)}
+.rq-sel button[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.rq-cab{display:flex;flex-direction:column;gap:6px;font-size:14.5px}
+.rq-cuenta{display:flex;flex-wrap:wrap;gap:6px}
+.rq-lista{list-style:none;padding:0;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:4px}
+.rq-item{display:grid;grid-template-columns:minmax(0,1fr) 112px auto;gap:6px 14px;align-items:center;padding:8px 12px}
+.rq-item+.rq-item{border-top:1px solid var(--line)}
+.rq-item small{display:block;color:var(--muted);font-size:12.5px;font-family:var(--f-data)}
+.est{justify-self:start;font-family:var(--f-data);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:2px 8px;border-radius:3px;white-space:nowrap}
+.est-ok{background:var(--ok-bg);color:var(--ok-ink)}
+.est-nc{background:var(--bg);color:var(--muted);box-shadow:inset 0 0 0 1px var(--line)}
+.est-falta{background:var(--bad-bg);color:var(--bad-ink)}
+.est-sd{background:var(--warn-bg);color:var(--warn-ink)}
+.est-no{background:var(--bg);color:var(--muted)}
+.est-dato{padding:0}
+.tri{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end}
+.tb{appearance:none;border:1px solid var(--borde);background:var(--surface);border-radius:3px;padding:4px 10px;font-family:var(--f-data);font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap}
+.tb:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.tb[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.tb-no[aria-pressed="true"]{background:var(--bad);border-color:var(--bad);color:#fff}
+.tb:disabled{cursor:default}
+.tb:disabled:not([aria-pressed="true"]){opacity:.5}
+.rq-num{display:flex;align-items:center;gap:6px;justify-content:flex-end;font-family:var(--f-data)}
+.rq-num input{width:84px;text-align:right}
+@media (max-width:640px){ .rq-item{grid-template-columns:minmax(0,1fr) auto} .rq-item>:last-child{grid-column:1/-1} .tri,.rq-num{justify-content:flex-start} }
+.matriz table{min-width:0;font-size:13.5px}
+.matriz thead th{text-align:center;white-space:nowrap;padding:8px 10px}
+.matriz thead th:first-child{text-align:left;position:sticky;left:0;background:var(--surface);z-index:1}
+.matriz tbody th,.matriz tbody td{padding:5px 10px;border-top:1px solid var(--line)}
+.matriz tbody th{font-family:var(--f-text);font-size:13.5px;font-weight:400;white-space:normal;min-width:220px;max-width:380px;position:sticky;left:0;background:var(--surface);z-index:1}
+.matriz tbody td{text-align:center;font-family:var(--f-data);font-weight:600;white-space:nowrap;border-left:1px solid var(--line)}
+.matriz tr.mg th{font-family:var(--f-data);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);background:var(--bg)}
+.m-ok{color:var(--ok-ink);background:var(--ok-bg)}
+.m-nc{color:var(--muted)}
+.matriz sup{font-size:12px;font-weight:600;margin-left:1px}
+.rq-agregar{display:flex;gap:8px;grid-column:1/-1}
+.rq-agregar input{flex:1;max-width:420px}
+.rq-comp{display:flex;flex-direction:column;gap:12px;padding:14px}
+.rq-comp+.rq-comp{border-top:1px solid var(--line)}
+.rq-salas{display:flex;flex-wrap:wrap;gap:6px 16px}
+.m-falta{color:var(--bad-ink);background:var(--bad-bg)}
+.m-sd{color:var(--warn-ink);background:var(--warn-bg)}
+.matriz .m-tot{border-left:2px solid var(--line);font-variant-numeric:tabular-nums}
+.matriz tfoot th,.matriz tfoot td{padding:7px 10px;border-top:2px solid var(--line);font-weight:600;text-align:center}
+.matriz tfoot th{text-align:left;font-family:var(--f-data);position:sticky;left:0;background:var(--surface);z-index:1}
+.cat{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:10px 16px}
+.cat summary{cursor:pointer;font-weight:600}
+.cat summary small{font-weight:400;color:var(--muted);margin-left:6px}
+.cat[open] summary{margin-bottom:8px}
+.cat .cat-cuerpo{display:flex;flex-direction:column;gap:8px;font-size:14px}
+.cat ul{padding-left:18px}
+
+#avisosFlotantes{position:fixed;left:0;right:0;bottom:18px;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;z-index:50;padding-inline:16px}
+.flot{background:var(--ink);color:#fff;padding:10px 16px;border-radius:4px;font-size:14.5px;max-width:560px;box-shadow:var(--issys-shadow-lg)}
+.flot.mal{background:var(--bad);color:#fff}
+
+@media (max-width:520px){ .ancho{padding-inline:16px} main{padding-block:20px 40px;gap:24px} .dlg{padding:18px 16px} }
+
+/* Croquis de la planta: colores tomados de la paleta, para que funcione en tema claro y oscuro. */
+.croquis-wrap{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(280px,1fr);gap:20px;align-items:start}
+@media (max-width:860px){ .croquis-wrap{grid-template-columns:1fr} }
+.croquis{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:12px}
+.croquis svg{display:block;width:100%;height:auto;max-height:78vh}
+.croquis .esp{stroke:var(--muted);stroke-width:4;stroke-linejoin:round}
+.croquis .consultorio{fill:var(--issys-blue-tint);cursor:pointer;transition:fill .15s}
+.croquis .cr-cli{fill:var(--cli-bg)} .croquis .cr-ped{fill:var(--ped-bg)} .croquis .cr-nut{fill:var(--nut-bg)} .croquis .cr-psi{fill:var(--psi-bg)}
+.croquis .cr-pin{fill:var(--pin-bg)} .croquis .cr-car{fill:var(--car-bg)} .croquis .cr-gin{fill:var(--gin-bg)} .croquis .cr-kin{fill:var(--kin-bg)}
+.croquis .cr-odo{fill:var(--odo-bg)} .croquis .cr-x1{fill:var(--x1-bg)} .croquis .cr-x2{fill:var(--x2-bg)} .croquis .cr-x3{fill:var(--x3-bg)} .croquis .cr-x4{fill:var(--x4-bg)}
+.croquis .consultorio.sin-asignar{fill:var(--bg)}
+.croquis .consultorio:hover{stroke:var(--accent)}
+.croquis .consultorio:focus{outline:none}
+.croquis .consultorio:focus-visible,.croquis .consultorio.activo{stroke:var(--accent);stroke-width:10}
+.croquis .vacunatorio{fill:var(--issys-blue-tint)}
+.croquis .patio{fill:var(--issys-green-tint)}
+.croquis .espera{fill:var(--issys-yellow-tint)}
+.croquis .sanitario{fill:var(--issys-surface)}
+.croquis .servicio{fill:var(--bg)}
+.croquis .circ{fill:var(--surface)}
+.croquis .lbl{font-family:var(--f-data);font-size:30px;font-weight:600;fill:var(--ink);text-anchor:middle;dominant-baseline:middle;pointer-events:none}
+.croquis .sub{font-family:var(--f-data);font-size:19px;fill:var(--muted);text-anchor:middle;dominant-baseline:middle;pointer-events:none}
+.croquis .sub.chico{font-size:17px}
+.croquis .sub.cr-esp{fill:var(--ink)}
+.croquis .fachada{fill:none;stroke:var(--ink);stroke-width:9}
+.cr-profs{list-style:none;padding:0;display:flex;flex-direction:column;gap:10px}
+.cr-profs li{display:flex;flex-direction:column;gap:3px;font-size:14.5px}
+.cr-profs li>div:first-child{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
+.cr-profs .num{font-size:13.5px}
+.cr-req{border-radius:4px;padding:8px 12px;font-size:14px}
+.cr-req ul{padding-left:18px;margin:4px 0 0;display:flex;flex-direction:column;gap:2px}
+.cr-falta{background:var(--bad-bg);color:var(--bad-ink);box-shadow:inset 4px 0 0 var(--bad)}
+.cr-falta .muted{color:inherit;opacity:.8}
+.cr-tiene{background:var(--ok-bg);color:var(--ok-ink)}
+.cr-tiene .muted{color:inherit;opacity:.8}
+
+/* Informe de faltantes: se arma al imprimir y reemplaza a la página. */
+#impresion{display:none}
+.imp{display:flex;flex-direction:column;gap:14px;font-size:12px;color:#000}
+.imp h2{font-size:17px}
+.imp h3{font-family:var(--f-data);font-size:13px;color:#000;letter-spacing:.06em}
+.imp h3 small{font-weight:400;text-transform:none;letter-spacing:0;color:#444;margin-left:6px}
+.imp table{min-width:0;width:100%;border-collapse:collapse;font-size:12px}
+.imp th,.imp td{border:1px solid #999;padding:4px 7px;text-align:left;vertical-align:top}
+.imp thead th{background:#eee;color:#000;font-size:12px}
+.imp td.cant{text-align:right;white-space:nowrap}
+.imp td.obs{width:22%}
+.imp .imp-res{display:flex;flex-wrap:wrap;gap:4px 18px}
+.imp section{gap:6px;break-inside:avoid}
+.imp p{margin:0}
+.imp-croquis{align-items:center;text-align:center}
+.imp-croquis h2{font-size:16px;letter-spacing:.02em}
+.imp-croquis .croquis{border:0;padding:0;width:100%}
+.imp-croquis .croquis svg{max-height:245mm;margin:0 auto}
+@page faltantes{size:A4 portrait;margin:12mm}
+@media print{
+  body.imp-faltantes>*:not(#impresion){display:none!important}
+  body.imp-faltantes #impresion{display:block;page:faltantes}
+  :root{ --bg:#fff; --surface:#fff; --ink:#000; --muted:#444; --line:#bbb }
+  @page{size:A4 landscape;margin:10mm}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{font-size:12px}
+  .enc,.tabs,.no-imp,#avisosFlotantes,#issys-aviso,dialog{display:none!important}
+  .titulo-imp{display:block!important;font-weight:900;font-size:18px;margin:0 0 6px}
+  .ancho{max-width:none;padding-inline:0}
+  main{padding-block:6px 0;gap:14px}
+  .desliza,.tabla{overflow:visible;border-color:var(--line)}
+  .plan{min-width:0!important}
+  .dia,.tabla tr{break-inside:avoid}
+  .dia{zoom:.74}
+}
+</style>
+</head>
+<body>
+
+<header class="enc">
+  <img class="issys-logo" src="/shared/marca/issys-logo-recorte.png" alt="ISSyS">
+  <span class="enc-nombre">Consultorios Comodoro Rivadavia</span>
+  <span class="enc-esp"></span>
+  <div id="issys-encabezado"></div><!-- encabezado común: lanzador de sistemas + foto (shared/auth.js) -->
+</header>
+<nav class="tabs" id="tabs" hidden><div class="ancho" role="tablist"></div></nav>
+<p class="titulo-imp">Cronograma de consultorios · Comodoro Rivadavia (Mitre 837)</p>
+<main class="ancho" id="app"><p class="cargando">Cargando el cronograma…</p></main>
+
+<dialog id="dlgProf" aria-labelledby="dlgProfTit"></dialog>
+<dialog id="dlgConf" aria-labelledby="dlgConfTit"></dialog>
+<div id="impresion"></div>
+<div id="avisosFlotantes" aria-live="polite"></div>
+
+<script>
+"use strict";
+/* ============================================================================
+   1) DATOS EN FIRESTORE (proyecto común de los Sistemas ISSyS)
+   El ingreso con Google y los permisos los resuelve shared/auth.js
+   (ISSyS.iniciar). Colección y reglas: firestore.rules de la raíz del repo.
+   ========================================================================== */
+const SISTEMA = "consultorios";
+const COLECCION = "consultoriosCronogramas";
+const DOC_ID = "mitre837";          // documento del cronograma (consultorios, establecimiento y equipamiento compartido)
+
+/* ============================================================================
+   2) DATOS INICIALES (archivo «Días y horarios de profesionales Mitre 837»)
+   ========================================================================== */
+const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+const DIA_ABR = ["Lu", "Ma", "Mi", "Ju", "Vi", "Sá"];
+const L = 0, MA = 1, MI = 2, J = 3, V = 4;
+const hm = (h, m = 0) => h * 60 + m;
+const bl = (dias, ini, fin, conf = false) => dias.map(dia => ({ dia, ini, fin, conf }));
+
+/* «nro»: número del local en el croquis (C1 a C9). */
+const SALAS_BASE = [
+  { id: "gin", nro: 1, nombre: "Consultorio 1", tipo: "exclusivo", especialidad: "Ginecología" },
+  { id: "c1", nro: 2, nombre: "Consultorio 2", tipo: "general", especialidad: "" },
+  { id: "c2", nro: 3, nombre: "Consultorio 3", tipo: "general", especialidad: "" },
+  { id: "odo", nro: 4, nombre: "Consultorio 4", tipo: "exclusivo", especialidad: "Odontología" },
+  { id: "c6", nro: 5, nombre: "Consultorio 5", tipo: "exclusivo", especialidad: "Odontología" },
+  { id: "c3", nro: 6, nombre: "Consultorio 6", tipo: "general", especialidad: "" },
+  { id: "c4", nro: 7, nombre: "Consultorio 7", tipo: "general", especialidad: "" },
+  { id: "c5", nro: 8, nombre: "Consultorio 8", tipo: "general", especialidad: "" },
+  { id: "kin", nro: 9, nombre: "Consultorio 9", tipo: "exclusivo", especialidad: "Kinesiología" }
+];
+const PROFS_BASE = [
+  { id: "romero", nombre: "Dr. Romero, Claudio", corto: "Romero", especialidad: "Clínica médica", sala: "c1", bloques: bl([L, MA, MI, J, V], hm(15), hm(20)) },
+  { id: "cerda", nombre: "Lic. Cerda, Florencia", corto: "Cerda", especialidad: "Nutrición", sala: "c1", bloques: bl([L, MI], hm(8), hm(14)) },
+  { id: "nunez", nombre: "Dr. Núñez, Ángel", corto: "Núñez", especialidad: "Clínica médica", sala: "c2", bloques: bl([MA, MI], hm(16), hm(20)) },
+  { id: "hernandez", nombre: "Lic. Hernández, Nadia", corto: "Hernández", especialidad: "Psicología", sala: "c2", bloques: bl([L, MI], hm(8), hm(15)) },
+  { id: "fernandez", nombre: "Dra. Fernández, Andrea", corto: "Fernández", especialidad: "Clínica médica", sala: "c3", bloques: [...bl([L], hm(15), hm(19)), ...bl([MA], hm(15), hm(18)), ...bl([J], hm(9), hm(12))] },
+  { id: "miguel", nombre: "Dr. Raúl Héctor Miguel", corto: "R. H. Miguel", especialidad: "Cardiología", sala: "c3", bloques: [...bl([L, MI], hm(9), hm(12)), ...bl([V], hm(15, 30), hm(20))] },
+  { id: "contreras", nombre: "Dra. Contreras, Iris", corto: "Contreras", especialidad: "Pediatría", sala: "c4", bloques: [...bl([L, J], hm(8), hm(12)), ...bl([MA, MI], hm(8), hm(12), true)] },
+  { id: "wybert", nombre: "Dra. Wybert, Laura", corto: "Wybert", especialidad: "Pediatría", sala: "c4", bloques: bl([L, MA, J, V], hm(12), hm(16)) },
+  { id: "rodriguez", nombre: "Dra. Rodríguez, Mónica", corto: "Rodríguez", especialidad: "Pediatría", sala: "c5", bloques: bl([L, J], hm(8), hm(13)) },
+  { id: "marinvanesa", nombre: "Lic. Marín, Vanesa", corto: "Marín Vanesa", especialidad: "Psicología infantil", sala: "c5", bloques: bl([MI, V], hm(12), hm(20)) },
+  { id: "marinviviana", nombre: "Lic. Marín, Viviana", corto: "Marín Viviana", especialidad: "Nutrición", sala: "c5", bloques: [...bl([L], hm(10), hm(16)), ...bl([MA, J], hm(17), hm(20)), ...bl([MI], hm(11), hm(16))] },
+  { id: "longo", nombre: "Dra. Longo, Mariela", corto: "Longo", especialidad: "Ginecología", sala: "gin", bloques: [...bl([L, J], hm(8, 30), hm(12, 30)), ...bl([MI], hm(8), hm(12))] },
+  { id: "alive", nombre: "Dra. Alive, María Rosa", corto: "Alive", especialidad: "Ginecología", sala: "gin", bloques: [...bl([MA, V], hm(8, 30), hm(11)), ...bl([MI], hm(12), hm(16)), ...bl([J], hm(15), hm(18))] },
+  { id: "rios", nombre: "Lic. Ríos, Walter", corto: "Ríos", especialidad: "Kinesiología", sala: "kin", bloques: bl([L, MA, MI, J, V], hm(8), hm(13)) }
+];
+
+/* ============================================================================
+   2b) REQUISITOS DE HABILITACIÓN — Resolución N° 461/11-MS (Chubut)
+   Anexo I: consultorios de establecimientos sin internación. Anexo II:
+   kinesiología y terapia física. Cada ítem es [grupo, texto, admite «No
+   corresponde», es un dato y no un requisito].
+   ========================================================================== */
+const GRUPOS_REQ = { local: "Local", equipo: "Equipamiento", func: "Funcionamiento y documentación", extra: "Equipamiento adicional", comp: "Equipamiento compartido" };
+const ITEMS_REQ = {
+  equipoEsp: ["local", "Cuenta con equipamiento especializado dentro del consultorio", false, true],
+  accesoEspera: ["local", "Acceso directo a la sala de espera o a la circulación que comunica con ella"],
+  tabique: ["local", "Separado de la sala de espera por pared o tabique doble completo, con aislante acústico"],
+  terminaciones: ["local", "Pisos, zócalos, paredes y cielorrasos lisos, lavables e ignífugos"],
+  ventilacion: ["local", "Ventilación natural o renovación de aire con salida al exterior"],
+  ventNatural: ["local", "Ventilación natural"],
+  electrica: ["local", "Iluminación de 60 W o más, puesta a tierra, llave termomagnética y disyuntor diferencial"],
+  climatizacion: ["local", "Climatización acorde a la temperatura del lugar"],
+  luzEmergencia: ["local", "Luz de emergencia"],
+  opaco: ["local", "Puertas y paredes internas no transparentes"],
+  identificado: ["local", "Local identificado"],
+  banoDirecto: ["local", "Acceso directo al baño desde el consultorio"],
+  banoAdaptado: ["local", "Baño con inodoro para discapacitados o sobreelevado 10 cm, barral entre 0,70 y 1,10 m y bidet anulado"],
+  lavabo: ["local", "Lavabo con provisión de agua continua"],
+  aguaCaliente: ["local", "Mesada con lavabo con agua fría y caliente dentro del consultorio"],
+  mesada60: ["local", "Revestimiento lavable y resistente al desgaste hasta 60 cm sobre la mesada"],
+  mesadaAreas: ["local", "Mesada con áreas sucia y limpia diferenciadas"],
+  giroSilla: ["local", "Espacio libre para el ingreso y giro de una silla de ruedas"],
+  segNinos: ["local", "Medidas de seguridad para niños (consultorio en planta alta)", true],
+  exclusivoVac: ["local", "Local de uso exclusivo"],
+  circuitos: ["local", "Dos circuitos eléctricos independientes"],
+  boxMedidas: ["local", "Boxes de 2,00 × 1,60 m como mínimo", true],
+  boxDivisorios: ["local", "Divisorios entre boxes que resguardan la privacidad (se admiten cortinas lavables)", true],
+  boxLavatorio: ["local", "Lavatorio en el área de boxes", true],
+  pisoAntiderrapante: ["local", "Pisos antiderrapantes"],
+  circulacion: ["local", "Circulaciones de 1,00 m o más, aptas para silla de ruedas"],
+  tomas: ["local", "Tomacorrientes ubicados de modo que los cables no obstruyan la circulación"],
+  gimnasio: ["local", "Gimnasio terapéutico con 60 cm libres entre aparatos", true],
+  escritorio: ["equipo", "Escritorio"],
+  sillas: ["equipo", "Sillas"],
+  toallero: ["equipo", "Toallero para toallas descartables"],
+  residuos: ["equipo", "Recipiente para residuos con tapa"],
+  escalera: ["equipo", "Escalera de dos peldaños"],
+  descartador: ["equipo", "Descartador de objetos punzantes"],
+  camilla: ["equipo", "Camilla"],
+  negatoscopio: ["equipo", "Negatoscopio"],
+  tensiometro: ["equipo", "Tensiómetro"],
+  luzFocal: ["equipo", "Acceso a luz focalizada"],
+  carro: ["equipo", "Acceso a carro de suministros o curaciones"],
+  equipoCard: ["equipo", "Equipamiento específico de cardiología (a definir con el profesional)"],
+  camillaPed: ["equipo", "Camilla pediátrica"],
+  tensiometroPed: ["equipo", "Tensiómetro con manguito pediátrico"],
+  balanzaAlt: ["equipo", "Balanza con altímetro"],
+  balanzaLact: ["equipo", "Balanza para lactantes"],
+  cinta: ["equipo", "Cinta métrica"],
+  otoscopio: ["equipo", "Otoscopio"],
+  oftalmoscopio: ["equipo", "Oftalmoscopio"],
+  divan: ["equipo", "Sillón o diván"],
+  camillaGin: ["equipo", "Camilla de examen ginecológico"],
+  cintaInext: ["equipo", "Cinta métrica inextensible"],
+  pinard: ["equipo", "Estetoscopio de Pinard o detector de latidos fetales"],
+  colposcopio: ["equipo", "Acceso a colposcopio e insumos para colposcopía"],
+  lamparaPie: ["equipo", "Lámpara de pie"],
+  taburete: ["equipo", "Taburete"],
+  sillonDental: ["equipo", "Sillón dental regulable"],
+  luzDirecta: ["equipo", "Luz directa"],
+  salivadera: ["equipo", "Salivadera"],
+  consola: ["equipo", "Consola con turbina"],
+  torno: ["equipo", "Torno convencional"],
+  jeringa: ["equipo", "Jeringa triple (agua, aire y spray)"],
+  esterilizador: ["equipo", "Esterilizador o estufa de esterilización para instrumental"],
+  lamparaPortatil: ["equipo", "Lámpara portátil"],
+  instrumentalInox: ["equipo", "Instrumental de acero inoxidable"],
+  oxigeno: ["equipo", "Tubo de oxígeno con mascarilla"],
+  estetoscopio: ["equipo", "Estetoscopio y esfigmomanómetro"],
+  nebulizador: ["equipo", "Nebulizador con aspirador"],
+  armario: ["equipo", "Armario para insumos"],
+  residuosDif: ["equipo", "Recipientes para residuos diferenciados"],
+  cabina: ["equipo", "Cabina audiológica de 1,50 × 1,50 × 2 m, sonoamortiguada (30 a 40 dB)", true],
+  audiometro: ["equipo", "Audiómetro con calibración anual", true],
+  heladera: ["equipo", "Heladera exclusiva para vacunas, con termómetros"],
+  heladeraTransp: ["equipo", "Heladera de transporte"],
+  exhibicion: ["func", "Título del profesional y certificado de habilitación exhibidos"],
+  rx: ["func", "Habilitación del equipo de rayos X como emisor de radiaciones ionizantes", true],
+  listadoEquipos: ["func", "Listado de equipos presentado al solicitar la habilitación (con altas y bajas comunicadas)"]
+};
+
+/* Tipos de consultorio. «esp»: especialidades de la app que cubre (comparadas con norm()). */
+const REQUISITOS = [
+  { id: "general", nombre: "Todo consultorio", esp: [], punto: "Anexo I, II-1 a II-18", sup: 7.5, lado: 2.5, puntoSup: "Anexo I, II-17",
+    items: [["accesoEspera", "Anexo I, II-17/18"], ["tabique", "Anexo I, II-17/18"], ["terminaciones", "Anexo I, II-1 a II-13"], ["ventilacion", "Anexo I, II-1 a II-13"],
+      ["electrica", "Anexo I, II-1 a II-13"], ["climatizacion", "Anexo I, II-1 a II-13"], ["luzEmergencia", "Anexo I, II-1 a II-13"], ["opaco", "Anexo I, II-1 a II-13"],
+      ["identificado", "Anexo I, II-1 a II-13"], ["exhibicion", "Anexo I, I-8"]],
+    notas: ["Con equipamiento especializado, la superficie cubierta mínima es de 9 m² (II-17-b).", "Si el equipamiento está en otro espacio contiguo, ese espacio se habilita como un segundo consultorio."] },
+  { id: "clinico", nombre: "Consultorio médico clínico", esp: ["clinica medica", "medico generalista", "medicina general", "medico clinico", "clinico", "medicina familiar"], punto: "Anexo I, III-1",
+    items: ["lavabo", "toallero", "escritorio", "sillas", "camilla", "negatoscopio", "tensiometro", "residuos", "escalera", "carro", "luzFocal"] },
+  { id: "cardio", nombre: "Consultorio médico especializado", esp: ["cardiologia"], punto: "Anexo I, III-2", hereda: "clinico", puntoHereda: "Anexo I, III-2 (remite a III-1)",
+    items: ["equipoCard"], notas: ["La norma no enumera el equipamiento específico: definirlo con el profesional e indicar si queda dentro del consultorio."] },
+  { id: "ped", nombre: "Pediatría", esp: ["pediatria"], punto: "Anexo I, III-3", altaRequiere: ["segNinos"],
+    items: ["lavabo", "toallero", "escritorio", "negatoscopio", "tensiometroPed", "residuos", "camillaPed", "balanzaAlt", "balanzaLact", "cinta", "otoscopio", "oftalmoscopio"] },
+  { id: "mental", nombre: "Salud mental, psiquiatría y psicología", esp: ["psicologia", "psicologia infantil", "psiquiatria", "salud mental"], punto: "Anexo I, III-4",
+    items: ["escritorio", "sillas", "divan"], notas: ["La norma no distingue psicología infantil: rige el mismo punto."] },
+  { id: "gin", nombre: "Ginecología y obstetricia", esp: ["ginecologia", "obstetricia", "ginecologia y obstetricia", "tocoginecologia"], punto: "Anexo I, III-6", plantaBaja: true,
+    hereda: "clinico", puntoHereda: "Anexo I, III-2 (remite a III-1)",
+    items: ["banoDirecto", "banoAdaptado", "cintaInext", "pinard", "colposcopio", "descartador", "camillaGin", "lamparaPie", "taburete", "escalera"],
+    notas: ["El equipamiento del consultorio clínico se suma por tratarse de un consultorio especializado (interpretación de III-2)."] },
+  { id: "odo", nombre: "Odontología", esp: ["odontologia", "odontopediatria", "ortodoncia"], punto: "Anexo I, III-8", sup: 9,
+    items: ["ventNatural", "tabique", "aguaCaliente", "mesada60", "sillonDental", "luzDirecta", "salivadera", "consola", "torno", "jeringa", "esterilizador", ["giroSilla", "Anexo I, III-9"], "rx"],
+    notas: ["Con dos sillones, 6 m² como mínimo por cada uno.", "Documentación: datos de los protesistas a los que se encomienden trabajos (IV-11)."] },
+  { id: "nut", nombre: "Nutrición", esp: ["nutricion", "nutricionista"], punto: "Anexo I, III-10", items: [],
+    notas: ["Solo rigen las condiciones generales; no se exige equipamiento específico.", "El horario de cobertura debe permitir la continuidad de los tratamientos.", "Indicaciones médicas escritas, firmadas y selladas, archivadas por orden cronológico durante 2 años como mínimo."] },
+  { id: "kin", nombre: "Kinesiología y terapia física", esp: ["kinesiologia", "fisioterapia", "terapia fisica", "kinesiologia y fisioterapia"], punto: "Anexo II",
+    items: ["pisoAntiderrapante", "circulacion", "tomas", "boxMedidas", "boxDivisorios", "boxLavatorio", "gimnasio", "listadoEquipos"],
+    notas: ["Debe habilitarse al menos una figura: consultorio, boxes, gimnasio terapéutico o sala de hidroterapia.", "Para tratar personas enfermas es indispensable la prescripción del médico tratante.", "Sala de hidroterapia (si la hubiera): cambiador, duchas, baño adaptado, barandas y piletas de 1,40 m como mínimo."] },
+  { id: "oft", nombre: "Oftalmología con equipamiento", esp: ["oftalmologia"], punto: "Anexo I, III-5", sup: 9, items: ["giroSilla"],
+    notas: ["Un lateral de 3 m como mínimo.", "Preferentemente en planta baja."] },
+  { id: "uro", nombre: "Urología", esp: ["urologia"], punto: "Anexo I, III-7", items: ["banoDirecto", "camilla", "escalera"] },
+  { id: "enf", nombre: "Enfermería", esp: ["enfermeria"], punto: "Anexo I, III-11",
+    items: ["mesada60", "mesadaAreas", "aguaCaliente", "camilla", "oxigeno", "lamparaPortatil", "estetoscopio", "nebulizador", "esterilizador", "armario", "residuosDif", "giroSilla"],
+    notas: ["Registro foliado y habilitado."] },
+  { id: "fono", nombre: "Fonoaudiología", esp: ["fonoaudiologia"], punto: "Anexo I, III-12 y III-13", items: [["cabina", "Anexo I, III-13"], ["audiometro", "Anexo I, III-13"]],
+    notas: ["Con equipamiento (III-13), la superficie mínima es de 9 m².", "Indicaciones médicas archivadas 2 años y registro de pacientes."] },
+  { id: "vac", nombre: "Vacunación", esp: ["vacunacion", "vacunatorio"], punto: "Anexo I, III-14", items: ["exclusivoVac", "circuitos", "heladera", "heladeraTransp"],
+    notas: ["Libro foliado y planilla de temperatura cada 6 horas."] },
+  { id: "pod", nombre: "Podología", esp: ["podologia"], punto: "Anexo I, III-15", items: ["mesada60", "mesadaAreas", "aguaCaliente", "camilla", "lamparaPortatil", "esterilizador", "instrumentalInox"] }
+];
+const REQ_GENERAL = REQUISITOS[0];
+/* Requisitos edilicios que excluyen un consultorio en la asignación automática. */
+const EXCLUYE = ["sup", "lado", "planta", "banoDirecto"];
+
+/* ============================================================================
+   2c) CROQUIS DEL 3.er PISO (archivo croquis-3er_piso.svg)
+   Los consultorios C1 a C9 se vinculan por el campo «nro» de cada consultorio.
+   {{cN}} clases, {{aN}} texto accesible y {{sN}} rótulo bajo el número.
+   ========================================================================== */
+const CROQUIS_NROS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+const CROQUIS_EXCL = { ginecologia: [1], odontologia: [4, 5], kinesiologia: [9] };
+const CROQUIS_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="945 285 880 1215" id="croquis-mitre837" role="group" aria-label="Croquis de la planta, Mitre 837">
+  <defs>
+    <clipPath id="croquis-interior"><path d="M1128 870 C1150 1150 1330 1420 1625 1480 L1900 1480 L1900 0 L900 0 L900 870 Z"/></clipPath>
+  </defs>
+  <!-- Hall de espera y circulación -->
+  <path id="hall-espera" class="esp espera" data-tipo="espera"
+        d="M1170 530 H1690 V590 H1765 V655 H1525 V862 H1445 V1470 L1625 1480 C1330 1420 1150 1150 1128 870 H1272 V585 H1170 Z" clip-path="url(#croquis-interior)"/>
+  <text class="lbl" x="1360" y="1150" style="font-size:24px">Hall de</text>
+  <text class="lbl" x="1360" y="1180" style="font-size:24px">espera</text>
+  <text class="sub" x="1420" y="560">Circulación</text>
+  <!-- Fila superior de consultorios -->
+  <g id="consultorio-01" class="esp consultorio{{c1}}" data-nro="1" data-act="croquis-sel" role="button" tabindex="0" aria-label="{{a1}}"><path d="M985 330 H1100 V530 H1170 V585 H985 Z"/></g>
+  <g id="consultorio-02" class="esp consultorio{{c2}}" data-nro="2" data-act="croquis-sel" role="button" tabindex="0" aria-label="{{a2}}"><rect x="1100" y="330" width="132" height="200"/></g>
+  <g id="consultorio-03" class="esp consultorio{{c3}}" data-nro="3" data-act="croquis-sel" role="button" tabindex="0" aria-label="{{a3}}"><rect x="1232" y="330" width="133" height="200"/></g>
+  <g id="consultorio-04" class="esp consultorio{{c4}}" data-nro="4" data-act="croquis-sel" role="button" tabindex="0" aria-label="{{a4}}"><rect x="1365" y="330" width="133" height="200"/></g>
+  <g id="consultorio-05" class="esp consultorio{{c5}}" data-nro="5" data-act="croquis-sel" role="button" tabindex="0" aria-label="{{a5}}"><rect x="1498" y="330" width="132" height="200"/></g>
+  <text class="lbl" x="1042" y="430">C1</text><text class="sub chico" x="1042" y="465">{{s1}}</text>
+  <text class="lbl" x="1166" y="420">C2</text><text class="sub chico" x="1166" y="455">{{s2}}</text>
+  <text class="lbl" x="1298" y="420">C3</text><text class="sub chico" x="1298" y="455">{{s3}}</text>
+  <text class="lbl" x="1431" y="420">C4</text><text class="sub chico" x="1431" y="455">{{s4}}</text>
+  <text class="lbl" x="1564" y="420">C5</text><text class="sub chico" x="1564" y="455">{{s5}}</text>
+  <!-- Columna derecha sobre la curva -->
+  <g id="consultorio-06" class="esp consultorio{{c6}}" data-nro="6" data-act="croquis-sel" role="button" tabindex="0" aria-label="{{a6}}"><rect x="1445" y="865" width="180" height="125"/></g>
+  <g id="consultorio-07" class="esp consultorio{{c7}}" data-nro="7" data-act="croquis-sel" role="button" tabindex="0" aria-label="{{a7}}"><rect x="1445" y="990" width="180" height="122"/></g>
+  <g id="consultorio-08" class="esp consultorio{{c8}}" data-nro="8" data-act="croquis-sel" role="button" tabindex="0" aria-label="{{a8}}"><rect x="1445" y="1112" width="180" height="123"/></g>
+  <text class="lbl" x="1535" y="920">C6</text><text class="sub chico" x="1535" y="955">{{s6}}</text>
+  <text class="lbl" x="1535" y="1043">C7</text><text class="sub chico" x="1535" y="1078">{{s7}}</text>
+  <text class="lbl" x="1535" y="1166">C8</text><text class="sub chico" x="1535" y="1201">{{s8}}</text>
+  <!-- Vacunatorio (dos locales) -->
+  <g id="vacunatorio" class="esp vacunatorio" data-tipo="vacunatorio">
+    <rect x="1445" y="1235" width="180" height="250" clip-path="url(#croquis-interior)"/>
+    <rect x="1630" y="1225" width="170" height="225"/>
+  </g>
+  <text class="sub" x="1560" y="1330" style="font-weight:600">Vacunatorio</text>
+  <text class="sub" x="1715" y="1330" style="font-weight:600">Vacunatorio</text>
+  <!-- Patio interno -->
+  <rect id="patio-interno" class="esp patio" x="1630" y="865" width="170" height="357"/>
+  <text class="sub" x="1715" y="1030">Patio</text><text class="sub" x="1715" y="1055">interno</text>
+  <!-- Consultorio junto al palier -->
+  <g id="consultorio-09" class="esp consultorio{{c9}}" data-nro="9" data-act="croquis-sel" role="button" tabindex="0" aria-label="{{a9}}" clip-path="url(#croquis-interior)"><rect x="1135" y="865" width="137" height="230"/></g>
+  <text class="lbl" x="1203" y="965">C9</text><text class="sub chico" x="1203" y="1000">{{s9}}</text>
+  <!-- Núcleo vertical y servicios -->
+  <rect id="escalera" class="esp servicio" x="965" y="585" width="285" height="135"/>
+  <text class="sub" x="1107" y="652">Escalera</text>
+  <rect id="ascensores" class="esp servicio" x="975" y="720" width="120" height="142"/>
+  <text class="sub chico" x="1035" y="791">Ascensores</text>
+  <rect id="palier" class="esp circ" x="1095" y="720" width="177" height="142"/>
+  <text class="sub" x="1183" y="791">Palier</text>
+  <!-- Sector superior derecho -->
+  <path id="office" class="esp servicio" d="M1630 330 H1805 V425 H1690 V530 H1630 Z"/>
+  <text class="sub" x="1712" y="380">Office</text>
+  <rect id="sanitarios-publico" class="esp sanitario" x="1690" y="425" width="115" height="165"/>
+  <text class="sub chico" x="1747" y="507">Sanitarios</text>
+  <!-- Sector medio derecho -->
+  <rect id="deposito" class="esp servicio" x="1525" y="655" width="100" height="207"/>
+  <text class="sub chico" x="1575" y="758">Depósito</text>
+  <rect id="sanitarios" class="esp sanitario" x="1630" y="655" width="170" height="207"/>
+  <text class="sub" x="1715" y="758">Sanitarios</text>
+  <!-- Recepción: mostrador para 2 puestos -->
+  <g id="recepcion" data-tipo="recepcion">
+    <rect x="1450" y="688" width="20" height="166" rx="3" style="fill:var(--line);stroke:var(--muted)" stroke-width="3"/>
+    <circle cx="1500" cy="705" r="13" style="fill:var(--surface);stroke:var(--muted)" stroke-width="3"/>
+    <circle cx="1500" cy="838" r="13" style="fill:var(--surface);stroke:var(--muted)" stroke-width="3"/>
+  </g>
+  <text class="sub chico" x="1500" y="772" transform="rotate(-90 1500 772)">Recepción</text>
+  <!-- Fachada curva vidriada -->
+  <path class="fachada" d="M1128 870 C1150 1150 1330 1420 1625 1480"/>
+  <text class="sub chico" x="965" y="305" style="text-anchor:start">Croquis esquemático — sin escala</text>
+</svg>
+`;
+
+/* ============================================================================
+   3) UTILIDADES
+   ========================================================================== */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const norm = s => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim().replace(/\s+/g, " ");
+const hhmm = m => `${Math.floor(m / 60)}:${String(m % 60).padStart(2, "0")}`;
+const aInput = m => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+const deInput = v => { const m = /^(\d{1,2}):(\d{2})/.exec(v || ""); return m ? (+m[1]) * 60 + (+m[2]) : NaN; };
+const rango = (a, b) => `${hhmm(a)}–${hhmm(b)}`;
+const nuevoId = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+const clonar = o => JSON.parse(JSON.stringify(o));
+const mayus = s => s ? s[0].toUpperCase() + s.slice(1) : s;
+
+function textoDias(ds) {
+  ds = [...new Set(ds)].sort((a, b) => a - b);
+  const n = ds.map(d => DIAS[d].toLowerCase());
+  if (n.length >= 3 && ds.every((d, i) => i === 0 || d === ds[i - 1] + 1)) return `${n[0]} a ${n[n.length - 1]}`;
+  if (n.length <= 1) return n[0] || "";
+  return n.slice(0, -1).join(", ") + " y " + n[n.length - 1];
+}
+function nombreCorto(p) {
+  if (p.corto && p.corto.trim()) return p.corto.trim();
+  const s = String(p.nombre || "").replace(/^\s*(dra?|lic|od|odont|kgo|klgo|kga|farm|prof|ing)\.?:?\s+/i, "").trim();
+  if (s.includes(",")) return s.split(",")[0].trim();
+  const partes = s.split(/\s+/);
+  return partes[partes.length - 1] || s;
+}
+const COLORES = { "clinica medica": "cli", "medico generalista": "cli", "medicina general": "cli", "pediatria": "ped", "nutricion": "nut", "psicologia": "psi", "psicologia infantil": "pin", "cardiologia": "car", "ginecologia": "gin", "kinesiologia": "kin", "odontologia": "odo" };
+function claseEsp(esp) {
+  const k = norm(esp);
+  if (COLORES[k]) return "s-" + COLORES[k];
+  let h = 0; for (const c of k) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return "s-x" + (h % 4 + 1);
+}
+
+/* ============================================================================
+   4) LÓGICA: superposiciones, asignación automática y avisos
+   ========================================================================== */
+const solapa = (a, b) => a.dia === b.dia && a.ini < b.fin && b.ini < a.fin;
+const chocan = (p, q) => p.bloques.some(a => q.bloques.some(b => solapa(a, b)));
+const tieneSala = b => b.sala !== undefined && b.sala !== null;
+function salaDe(p, b, ids) {
+  const s = tieneSala(b) ? b.sala : (p.sala || "");
+  return ids && !ids.has(s) ? "" : s;
+}
+const idsSalas = salas => new Set(salas.map(s => s.id));
+const nombreSala = (id, salas) => (salas.find(s => s.id === id) || {}).nombre || "Sin asignar";
+
+/* Consultorio exclusivo de la especialidad o, si no hay, los generales que no incumplen
+   requisitos edilicios cargados en su ficha. Si ninguno los cumple, se ofrecen todos. */
+function salasElegibles(p, salas) {
+  const k = norm(p.especialidad);
+  const ex = salas.filter(s => s.tipo === "exclusivo" && norm(s.especialidad || s.nombre) === k).map(s => s.id);
+  if (ex.length) return ex;
+  const gen = salas.filter(s => s.tipo !== "exclusivo");
+  const aptas = gen.filter(s => !incumpleEdilicio(s, p.especialidad).length);
+  return (aptas.length ? aptas : gen).map(s => s.id);
+}
+
+/* ---- Requisitos de habilitación (Resolución 461/11-MS) ---- */
+const fmtN = n => Number(n).toLocaleString("es-AR", { minimumFractionDigits: Number.isInteger(+n) ? 0 : 2, maximumFractionDigits: 2 });
+const reqDeEsp = e => REQUISITOS.find(r => r.esp.includes(norm(e)));
+const itemsDe = (r, punto) => r.items.map(i => typeof i === "string" ? [i, punto || r.punto] : [i[0], punto || i[1]]);
+
+/* Especialidades que atienden en la sala, más la del consultorio exclusivo. */
+function espDeSala(s, profs, ids) {
+  const m = new Map();
+  if (s.tipo === "exclusivo") { const e = s.especialidad || s.nombre; m.set(norm(e), e); }
+  for (const p of profs) if (p.especialidad && p.bloques.some(b => salaDe(p, b, ids) === s.id)) m.set(norm(p.especialidad), p.especialidad);
+  return [...m.values()];
+}
+
+/* Unión de los requisitos de las especialidades, con su estado según la ficha del consultorio. */
+function exigencias(esps, ficha) {
+  ficha = ficha || {};
+  const it = ficha.items || {};
+  const tipos = [{ r: REQ_GENERAL, quien: REQ_GENERAL.nombre }], sinCatalogo = [];
+  for (const e of esps) {
+    const r = reqDeEsp(e);
+    if (!r) { sinCatalogo.push(e); continue; }
+    const t = tipos.find(x => x.r === r);
+    if (t) t.quien += ", " + e; else tipos.push({ r, quien: e });
+  }
+  const filas = new Map();
+  const exigir = (id, quien, punto, minimo) => {
+    if (!filas.has(id)) filas.set(id, { id, fuentes: [], minimo: 0 });
+    const f = filas.get(id);
+    if (!f.fuentes.some(x => x.quien === quien && x.punto === punto)) f.fuentes.push({ quien, punto });
+    if (minimo) f.minimo = Math.max(f.minimo, minimo);
+  };
+  for (const { r, quien } of tipos) {
+    if (r.sup) exigir("sup", quien, r.puntoSup || r.punto, r.sup);
+    if (r.lado) exigir("lado", quien, r.puntoSup || r.punto, r.lado);
+    if (r.plantaBaja) exigir("planta", quien, r.punto);
+    const lista = [...(r.hereda ? itemsDe(REQUISITOS.find(x => x.id === r.hereda), r.puntoHereda) : []), ...itemsDe(r)];
+    for (const [id, punto] of lista) exigir(id, quien, punto);
+    if (r.altaRequiere && ficha.planta !== "baja") r.altaRequiere.forEach(id => exigir(id, quien, r.punto));
+  }
+  if (it.equipoEsp === true) exigir("sup", "Equipamiento especializado", "Anexo I, II-17-b", 9);
+  // Equipamiento adicional: lo agrega el establecimiento, aunque la norma no lo exija.
+  // Puede ser un ítem del catálogo (agregado a mano o marcado) o uno escrito libremente.
+  for (const k of new Set([...(ficha.agregados || []), ...Object.keys(it)]))
+    if (ITEMS_REQ[k] && !ITEMS_REQ[k][3] && !filas.has(k)) filas.set(k, { id: k, fuentes: [{ quien: "Adicional", punto: "no exigido por la norma" }], minimo: 0, adicional: true });
+  for (const x of ficha.extra || []) filas.set("x:" + x.clave, { id: "x:" + x.clave, nombre: x.nombre, fuentes: [{ quien: "Adicional", punto: "no exigido por la norma" }], minimo: 0 });
+  return { tipos, sinCatalogo, filas: [...filas.values()].map(f => ({ ...f, estado: estadoReq(f, ficha) })) };
+}
+function estadoReq(f, ficha) {
+  if (f.id === "sup" || f.id === "lado") { const v = ficha[f.id]; return typeof v !== "number" ? "sd" : v >= f.minimo ? "ok" : "falta"; }
+  if (f.id === "planta") return !ficha.planta ? "sd" : ficha.planta === "baja" ? "ok" : "falta";
+  return estadoDe(f.id.startsWith("x:") ? ((ficha.extra || []).find(x => "x:" + x.clave === f.id) || {}).v : (ficha.items || {})[f.id]);
+}
+const estadoDe = v => v === undefined ? "sd" : v === false ? "falta" : v === "na" ? "nc" : "ok";
+const valorValido = v => v === true || v === false || v === "na";
+const claveExtra = nombre => norm(nombre).replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+function textoReq(f) {
+  if (f.nombre) return f.nombre;
+  if (f.id === "sup") return `Superficie de ${fmtN(f.minimo)} m² o mayor`;
+  if (f.id === "lado") return `Lado mínimo de ${fmtN(f.minimo)} m`;
+  if (f.id === "planta") return "Ubicado en planta baja (edificio de más de una planta)";
+  return ITEMS_REQ[f.id][1];
+}
+function detalleFalta(f, ficha) {
+  ficha = ficha || {};
+  if (f.id === "sup") return `superficie de ${fmtN(ficha.sup)} m²; se exigen ${fmtN(f.minimo)} m²`;
+  if (f.id === "lado") return `lado mínimo de ${fmtN(ficha.lado)} m; se exigen ${fmtN(f.minimo)} m`;
+  if (f.id === "planta") return "está en planta alta; debe estar en planta baja";
+  const t = textoReq(f);
+  return "falta " + t[0].toLowerCase() + t.slice(1) + (f.comp ? ` (compartido: ${f.comp.nombre})` : "");
+}
+const fuentesTxt = f => f.fuentes.map(x => `${x.quien}, ${x.punto}`).join("; ");
+/* Evaluación del consultorio. Un ítem cubierto por equipamiento compartido toma el estado de ese equipo. */
+function evaluarSala(s, ids) {
+  const esps = espDeSala(s, estado.profs, ids), ev = { esps, ...exigencias(esps, s.ficha) };
+  ev.comps = (estado.comp || []).filter(c => (c.salas || []).includes(s.id));
+  for (const f of ev.filas) {
+    const c = ev.comps.find(c => c.item && c.item === f.id);
+    if (c) { f.comp = c; f.estado = estadoDe(c.v); }
+  }
+  return ev;
+}
+function cuentaReq(ev) {
+  const c = { ok: 0, falta: 0, sd: 0 };
+  for (const f of ev.filas) c[f.estado === "nc" ? "ok" : f.estado]++;
+  return c;
+}
+
+/* Requisitos edilicios que el consultorio incumple para una especialidad (solo con dato cargado). */
+function incumpleEdilicio(s, esp) {
+  if (!s.ficha) return [];
+  return exigencias(esp ? [esp] : [], s.ficha).filas.filter(f => EXCLUYE.includes(f.id) && f.estado === "falta" && !f.adicional);
+}
+
+/* Requisitos del establecimiento según la cantidad de consultorios (Anexo I, II-14 a II-16 y I). */
+function requisitosEstab(salas, profs) {
+  const n = salas.length;
+  const hay = id => profs.some(p => (reqDeEsp(p.especialidad) || {}).id === id) || salas.some(s => s.tipo === "exclusivo" && (reqDeEsp(s.especialidad || s.nombre) || {}).id === id);
+  const m2 = n <= 1 ? 6 : 9 + 2 * Math.max(0, n - 4);
+  const P = "Anexo I, II-14 a II-16", G = "Anexo I, II-1 a II-13";
+  const L = [
+    { id: "espera", texto: `Sala de espera ${n <= 1 ? "individual" : "colectiva"} de ${fmtN(m2)} m² como mínimo, con lado mínimo de 2,50 m`, punto: P,
+      nota: n > 4 ? `Más de 4 consultorios: 9 m² más 2 m² por cada consultorio por encima de cuatro, o salas de espera adicionales. Si se cuentan los ${n} consultorios, serían ${fmtN(9 + 2 * n)} m²; confirmar el criterio con Fiscalización Sanitaria.` : "" },
+    { id: "esperaBano", texto: "Sala de espera con acceso contiguo al baño por vía señalizada, ventilación y sillas o sillones", punto: P },
+    { id: "bano", texto: "Baño general con acceso directo a la sala de espera, señalizado, con lavabo, inodoro, agua continua y ventilación", punto: P },
+    n > 6 && { id: "bano2", texto: "Segundo baño, accesible para personas con movilidad reducida", punto: P, nota: "Obligatorio con más de 6 consultorios." },
+    { id: "banoPersonal", texto: "Baño de personal", punto: P, opcional: n <= 3, nota: n <= 3 ? "Optativo hasta 3 consultorios." : "" },
+    { id: "secretaria", texto: "Secretaría o recepción de 3 m² con lado mínimo de 1,50 m, con sillas, escritorio y armario o archivo", punto: P, opcional: n <= 3, nota: "Puede integrarse a la sala de espera." + (n <= 3 ? " Optativa hasta 3 consultorios." : "") },
+    { id: "ingreso", texto: "Ingreso de fácil acceso: rampa o elevación mecánica si hay escalones, y paso para silla de ruedas", punto: G },
+    { id: "ascensor", texto: "Edificio de más de una planta: ascensor o sistema alternativo; si no lo hay, consultorio garantizado en planta baja", punto: G, opcional: true },
+    { id: "extintores", texto: "Extintores ABC de 5 kg", punto: G },
+    { id: "electricaGral", texto: "Luces de emergencia, llave térmica y disyuntor en todo el establecimiento", punto: G },
+    { id: "agua", texto: "Análisis de agua", punto: G },
+    { id: "direccion", texto: "Dirección técnica: un profesional por consultorio o uno para varios dentro del establecimiento", punto: "Anexo I, I-3" },
+    { id: "usoCompartido", texto: "Autorización de la Dirección para que otros profesionales usen un consultorio habilitado, con conformidad del responsable", punto: "Anexo I, I-5" },
+    { id: "registro", texto: "Registro de pacientes: datos personales, diagnóstico, estudios, tratamiento, evolución y derivaciones", punto: "Anexo I, I-7" },
+    hay("nut") && { id: "indicaciones", texto: "Nutrición: indicaciones médicas escritas, firmadas y selladas, archivadas 2 años como mínimo", punto: "Anexo I, III-10", opcional: true, nota: "Rige si actúa por indicación médica." },
+    hay("odo") && { id: "protesistas", texto: "Odontología: datos de los protesistas a los que se encomiendan trabajos (nombre, matrícula y dirección)", punto: "Anexo I, IV-11" },
+    hay("kin") && { id: "prescripcion", texto: "Kinesiología: prescripción del médico tratante para cada paciente", punto: "Anexo II" }
+  ];
+  return L.filter(Boolean);
+}
+
+/* Días hábiles sin profesionales de cada especialidad (Anexo I, I-4). */
+function cobertura(profs, salas) {
+  const m = new Map();
+  const ver = e => { const k = norm(e); if (!m.has(k)) m.set(k, { nombre: e, firmes: new Set(), tent: new Set() }); return m.get(k); };
+  salas.filter(s => s.tipo === "exclusivo").forEach(s => ver(s.especialidad || s.nombre));
+  for (const p of profs) {
+    if (!p.especialidad) continue;
+    const c = ver(p.especialidad); c.nombre = p.especialidad;
+    for (const b of p.bloques) if (b.dia <= 4) (b.conf ? c.tent : c.firmes).add(b.dia);
+  }
+  return [...m.values()].map(c => ({ ...c,
+    sin: [0, 1, 2, 3, 4].filter(d => !c.firmes.has(d) && !c.tent.has(d)),
+    aConf: [...c.tent].filter(d => !c.firmes.has(d)).sort()
+  })).sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
+}
+
+/* Choques del profesional t en la sala sid contra el resto (solo bloques sin consultorio propio). */
+function conflictosEn(t, sid, otros, ids) {
+  const res = [];
+  for (const b of t.bloques) {
+    if (tieneSala(b)) continue;
+    for (const q of otros) for (const c of q.bloques) if (salaDe(q, c, ids) === sid && solapa(b, c)) res.push({ q, b, c });
+  }
+  return res;
+}
+
+/* Coloreo exacto con consultorio fijo por profesional; minimiza la cantidad de mudanzas. */
+function colorear(ps, rooms, actual, permitidas = () => rooms) {
+  const n = ps.length;
+  if (!n) return [];
+  if (!rooms.length) return null;
+  const perm = ps.map(p => rooms.filter(r => permitidas(p).includes(r)));
+  // Dos consultorios vacíos que admiten a las mismas personas son intercambiables.
+  const firma = new Map(rooms.map(r => [r, perm.map(l => l.includes(r) ? 1 : 0).join("")]));
+  const adj = ps.map(p => ps.map(q => p !== q && chocan(p, q)));
+  const deg = adj.map(r => r.filter(Boolean).length);
+  const ord = [...Array(n).keys()].sort((a, b) => deg[b] - deg[a]);
+  const cur = new Array(n).fill(null);
+  let best = null, bestC = Infinity, nodos = 0;
+  (function bt(k, c) {
+    if (c >= bestC || nodos > 400000) return;
+    if (k === n) { best = cur.slice(); bestC = c; return; }
+    nodos++;
+    const i = ord[k];
+    const pref = actual(ps[i]);
+    const tienePref = !!pref && perm[i].includes(pref);
+    const cand = perm[i].slice();
+    if (tienePref) { cand.splice(cand.indexOf(pref), 1); cand.unshift(pref); }
+    const vacios = new Set();
+    for (const r of cand) {
+      let ok = true, usado = false;
+      for (let j = 0; j < n; j++) { if (cur[j] === r) { usado = true; if (adj[i][j]) { ok = false; break; } } }
+      if (!ok) continue;
+      // Consultorios vacíos, sin preferencia y con la misma firma son equivalentes: probar solo el primero.
+      if (!usado && r !== pref && !ps.some(p => actual(p) === r)) { const fz = firma.get(r); if (vacios.has(fz)) continue; vacios.add(fz); }
+      cur[i] = r;
+      bt(k + 1, c + (tienePref && r !== pref ? 1 : 0));
+      cur[i] = null;
+      if (bestC === 0) return;
+    }
+  })(0, 0);
+  return best;
+}
+
+/* Plan B: reparto día por día (un profesional puede cambiar de consultorio según el día). */
+function repartirPorDia(ps, rooms, actual, permitidas = () => rooms) {
+  const libre = new Map(rooms.map(r => [r, []]));
+  const res = new Map(ps.map(p => [p.id, p.bloques.map(() => "")]));
+  const casa = new Map();
+  const items = [];
+  ps.forEach(p => p.bloques.forEach((b, i) => items.push({ p, b, i })));
+  items.sort((x, y) => x.b.dia - y.b.dia || x.b.ini - y.b.ini || y.b.fin - x.b.fin);
+  for (const it of items) {
+    const pref = casa.get(it.p.id) || actual(it.p);
+    const cand = rooms.filter(r => permitidas(it.p).includes(r));
+    if (pref && cand.includes(pref)) { cand.splice(cand.indexOf(pref), 1); cand.unshift(pref); }
+    const r = cand.find(x => !libre.get(x).some(o => solapa(o, it.b)));
+    if (r) { libre.get(r).push(it.b); res.get(it.p.id)[it.i] = r; if (!casa.has(it.p.id)) casa.set(it.p.id, r); }
+  }
+  return res;
+}
+
+/* Devuelve una copia de los profesionales con consultorio asignado. */
+function autoAsignar(profs, salas) {
+  const ids = idsSalas(salas);
+  // Los profesionales que comparten algún consultorio elegible se resuelven juntos.
+  const eleg = new Map(), grupos = [];
+  for (const p of profs) {
+    const el = salasElegibles(p, salas);
+    eleg.set(p.id, el);
+    const g = { rooms: new Set(el), ps: [p] };
+    for (const t of grupos.filter(x => el.some(r => x.rooms.has(r)))) {
+      t.rooms.forEach(r => g.rooms.add(r)); g.ps.unshift(...t.ps); grupos.splice(grupos.indexOf(t), 1);
+    }
+    grupos.push(g);
+  }
+  const salida = new Map();
+  let fijo = true;
+  const sinLugar = [];
+  const actual = p => (p.sala && ids.has(p.sala)) ? p.sala : "";
+  const permitidas = p => eleg.get(p.id);
+  for (const g of grupos) {
+    const rooms = salas.map(s => s.id).filter(r => g.rooms.has(r)), ps = g.ps;
+    const col = colorear(ps, rooms, actual, permitidas);
+    if (col) {
+      ps.forEach((p, i) => salida.set(p.id, { ...p, sala: col[i], bloques: p.bloques.map(({ sala, ...b }) => b) }));
+      continue;
+    }
+    fijo = false;
+    const rep = repartirPorDia(ps, rooms, actual, permitidas);
+    for (const p of ps) {
+      const rs = rep.get(p.id);
+      const cuenta = {};
+      rs.forEach(r => { if (r) cuenta[r] = (cuenta[r] || 0) + 1; });
+      const principal = Object.keys(cuenta).sort((a, b) => cuenta[b] - cuenta[a] || rooms.indexOf(a) - rooms.indexOf(b))[0] || "";
+      if (rs.some(r => !r)) sinLugar.push(nombreCorto(p));
+      salida.set(p.id, { ...p, sala: principal, bloques: p.bloques.map(({ sala, ...b }, i) => rs[i] === principal ? b : { ...b, sala: rs[i] }) });
+    }
+  }
+  return { profs: profs.map(p => salida.get(p.id)), fijo, sinLugar };
+}
+
+function analizar(profs, salas) {
+  const ids = idsSalas(salas);
+  const items = [];
+  profs.forEach(p => p.bloques.forEach((b, i) => items.push({ p, b, i, sala: salaDe(p, b, ids), clave: p.id + ":" + i })));
+  const porSalaDia = new Map();
+  for (const it of items) {
+    const k = it.sala + "|" + it.b.dia;
+    if (!porSalaDia.has(k)) porSalaDia.set(k, []);
+    porSalaDia.get(k).push(it);
+  }
+  const choques = [], relevos = [], enChoque = new Set();
+  for (const [k, l] of porSalaDia) {
+    const sid = k.split("|")[0];
+    if (!sid) continue;
+    l.sort((a, b) => a.b.ini - b.b.ini);
+    for (let i = 0; i < l.length; i++) for (let j = i + 1; j < l.length; j++) {
+      const a = l[i], b = l[j];
+      if (solapa(a.b, b.b)) { choques.push({ sala: sid, dia: a.b.dia, ini: Math.max(a.b.ini, b.b.ini), fin: Math.min(a.b.fin, b.b.fin), a: a.p, b: b.p }); enChoque.add(a.clave); enChoque.add(b.clave); }
+      else if (a.b.fin === b.b.ini && a.p.id !== b.p.id) relevos.push({ sala: sid, dia: a.b.dia, hora: a.b.fin, a: a.p, b: b.p });
+    }
+  }
+  const sinAsignar = profs.filter(p => p.bloques.some(b => !salaDe(p, b, ids)));
+  const fuera = [];
+  for (const p of profs) {
+    const vistos = new Set();
+    for (const b of p.bloques) {
+      const s = salas.find(x => x.id === salaDe(p, b, ids));
+      if (s && s.tipo === "exclusivo" && norm(s.especialidad || s.nombre) !== norm(p.especialidad) && !vistos.has(s.id)) { vistos.add(s.id); fuera.push({ p, sala: s }); }
+    }
+  }
+  const vacios = salas.filter(s => !items.some(it => it.sala === s.id));
+  // Franjas con todos los consultorios generales ocupados.
+  const gen = salas.filter(s => s.tipo !== "exclusivo").map(s => s.id);
+  const completos = [];
+  if (gen.length) for (let d = 0; d < DIAS.length; d++) {
+    const its = items.filter(it => it.b.dia === d && gen.includes(it.sala));
+    const cortes = [...new Set(its.flatMap(it => [it.b.ini, it.b.fin]))].sort((a, b) => a - b);
+    let abierto = null;
+    for (let i = 0; i < cortes.length - 1; i++) {
+      const a = cortes[i], b = cortes[i + 1];
+      const ocupadas = new Set(its.filter(it => it.b.ini < b && a < it.b.fin).map(it => it.sala));
+      if (ocupadas.size === gen.length) { if (abierto && abierto.fin === a) abierto.fin = b; else { abierto = { dia: d, ini: a, fin: b }; completos.push(abierto); } }
+      else abierto = null;
+    }
+  }
+  const aConfirmar = profs.filter(p => p.bloques.some(b => b.conf));
+  return { items, choques, relevos, enChoque, sinAsignar, fuera, vacios, completos, aConfirmar, generales: gen.length };
+}
+
+/* ============================================================================
+   5) ESTADO Y ALMACENAMIENTO
+   ========================================================================== */
+const estado = {
+  listo: false, existe: false, error: "",
+  salas: [], profs: [], meta: {}, estab: {}, comp: [],
+  usuario: null, rol: "lector",
+  vista: "cronograma", filtro: "", reqSala: "", reqTodos: false, croquisSel: 0, croquisEsp: true
+};
+// Roles (usuarios/{email}.roles.consultorios, se asignan en el portal): editor o lector.
+const puedeEditar = () => estado.rol === "editor";
+let almacen = null;
+let encabezado = null;
+
+function limpiar(p) {
+  return {
+    id: p.id, nombre: String(p.nombre || "").trim(), corto: String(p.corto || "").trim(), especialidad: String(p.especialidad || "").trim(), sala: p.sala || "",
+    bloques: p.bloques.map(b => { const o = { dia: b.dia, ini: b.ini, fin: b.fin, conf: !!b.conf }; if (tieneSala(b)) o.sala = b.sala; return o; })
+      .sort((a, b) => a.dia - b.dia || a.ini - b.ini)
+  };
+}
+function guardar({ profs = [], borrar = [], salas, establecimiento, compartidos } = {}) {
+  if (!puedeEditar()) { flotante("No tiene permiso para modificar el cronograma.", true); return false; }
+  almacen.guardar({ profs: profs.map(limpiar), borrar, salas, establecimiento, compartidos });
+  return true;
+}
+
+/* Firestore (SDK compat que carga shared/auth.js):
+   consultoriosCronogramas/mitre837 → { nombre, salas, establecimiento, compartidos, actualizado, por }
+   consultoriosCronogramas/mitre837/profesionales/{id} → { nombre, corto, especialidad, sala, bloques } */
+function almacenFirebase(ses) {
+  const db = ses.db, FV = ses.firebase.firestore.FieldValue;
+  const ref = db.collection(COLECCION).doc(DOC_ID);
+  const col = ref.collection("profesionales");
+  let okDoc = false, okCol = false, mostrado = false;
+  const mostrar = () => { if (!mostrado) { mostrado = true; ses.mostrar(); } };
+  const listo = () => { if (okDoc && okCol) { estado.listo = true; estado.error = ""; mostrar(); } render(true); };
+  const fallo = e => {
+    estado.listo = true;
+    estado.error = e && e.code === "permission-denied"
+      ? "No se pudo leer el cronograma: su cuenta no tiene permiso. Solicite el acceso a un administrador."
+      : "No se pudo conectar con la base de datos. Revise la conexión y vuelva a cargar la página.";
+    mostrar(); render(true);
+  };
+  ref.onSnapshot(s => {
+    const d = s.data() || {};
+    estado.existe = s.exists;
+    estado.salas = Array.isArray(d.salas) ? d.salas : [];
+    estado.estab = d.establecimiento && typeof d.establecimiento === "object" ? d.establecimiento : {};
+    estado.comp = Array.isArray(d.compartidos) ? d.compartidos : [];
+    estado.meta = { actualizado: d.actualizado && d.actualizado.toDate ? d.actualizado.toDate() : null, por: d.por || "" };
+    okDoc = true; listo();
+  }, fallo);
+  col.onSnapshot(s => {
+    estado.profs = s.docs.map(d => ({ bloques: [], ...d.data(), id: d.id }));
+    okCol = true; listo();
+  }, fallo);
+
+  // Estado de guardado en el punto sobre la foto (guía §6.2); en texto sólo el error.
+  let pendientes = 0;
+  const marcar = () => { if (encabezado) encabezado.estado(pendientes ? "guardando" : "ok"); };
+  return {
+    guardar({ profs, borrar, salas, establecimiento, compartidos }) {
+      const lote = db.batch();
+      for (const p of profs) { const { id, ...resto } = p; lote.set(col.doc(id), resto); }
+      for (const id of borrar) lote.delete(col.doc(id));
+      const meta = { nombre: "Mitre 837", actualizado: FV.serverTimestamp(), por: estado.usuario ? estado.usuario.email : "" };
+      if (salas) meta.salas = salas;
+      if (establecimiento) meta.establecimiento = establecimiento;
+      if (compartidos) meta.compartidos = compartidos;
+      // mergeFields reemplaza cada campo completo: así se borran también las marcas quitadas.
+      lote.set(ref, meta, { mergeFields: Object.keys(meta) });
+      pendientes++; marcar();
+      lote.commit().then(() => { pendientes--; marcar(); }, e => {
+        pendientes--;
+        if (encabezado) encabezado.estado("error");
+        flotante(e && e.code === "permission-denied" ? "No tiene permiso para modificar el cronograma." : "No se pudo guardar el cambio. Revise la conexión.", true);
+      });
+    }
+  };
+}
+
+/* ============================================================================
+   6) PANTALLAS
+   ========================================================================== */
+/* Avisos: el flotante común de los Sistemas ISSyS (guía §6.1). */
+function flotante(msg) { ISSyS.avisar(msg); }
+
+function pintarTabs() {
+  const nav = $("#tabs");
+  const tabs = [["cronograma", "Cronograma"], ["croquis", "Croquis"]];
+  if (puedeEditar()) tabs.push(["profesionales", "Profesionales"], ["consultorios", "Consultorios"]);
+  tabs.push(["requisitos", "Requisitos"]);
+  if (!tabs.some(t => t[0] === estado.vista)) estado.vista = "cronograma";
+  nav.hidden = tabs.length < 2 || !estado.existe;
+  $(".ancho", nav).innerHTML = tabs.map(([id, t]) => `<button class="tab" role="tab" aria-selected="${estado.vista === id}" data-vista="${id}">${t}</button>`).join("");
+}
+
+function render(porDatos = false) {
+  pintarTabs();
+  const m = $("#app");
+  // No pisar un campo que se está escribiendo cuando llega un cambio de otra persona.
+  const a = document.activeElement;
+  if (porDatos && a && m.contains(a) && /^(INPUT|SELECT)$/.test(a.tagName) && estado.vista !== "cronograma") {
+    if (estado.vista === "profesionales") pintarTablaProfs();
+    return;
+  }
+  if (!estado.listo) { m.innerHTML = `<p class="cargando">Cargando el cronograma…</p>`; return; }
+  if (estado.error) { m.innerHTML = `<div class="caja mal"><h2>Sin conexión con los datos</h2><p>${esc(estado.error)}</p></div>`; return; }
+  if (!estado.existe) { m.innerHTML = vistaSinDatos(); return; }
+  if (estado.vista !== "consultorios") borrSalas = null;
+  const foco = a && m.contains(a) ? a.id : "";
+  m.innerHTML = { cronograma: vistaCronograma, profesionales: vistaProfesionales, consultorios: vistaConsultorios, croquis: vistaCroquis, requisitos: vistaRequisitos }[estado.vista]();
+  if (estado.vista === "profesionales") pintarTablaProfs();
+  // Conservar el foco del teclado al marcar ítems de la lista de control.
+  if (foco) { const n = document.getElementById(foco); if (n) n.focus({ preventScroll: true }); }
+}
+
+function vistaSinDatos() {
+  if (!puedeEditar()) return `<div class="caja ojo"><h2>Todavía no hay un cronograma cargado</h2><p>Lo carga una persona con rol Editor en Consultorios.</p></div>`;
+  return `<section><div class="caja ojo"><h2>Todavía no hay un cronograma cargado</h2>
+    <p>Puede comenzar con los 14 profesionales y 9 consultorios del archivo «Días y horarios de profesionales Mitre 837», o con los consultorios vacíos.</p>
+    <div class="acciones"><button class="btn pri" data-act="sembrar">Cargar el cronograma inicial</button><button class="btn" data-act="sembrar-vacio">Comenzar con los consultorios vacíos</button></div></div></section>`;
+}
+
+function htmlAvisos(an) {
+  const S = estado.salas;
+  const malos = [], ojo = [];
+  for (const c of an.choques) malos.push(`<strong>${esc(nombreSala(c.sala, S))}</strong>, ${DIAS[c.dia].toLowerCase()} ${rango(c.ini, c.fin)}: se superponen ${esc(nombreCorto(c.a))} y ${esc(nombreCorto(c.b))}.`);
+  for (const p of an.sinAsignar) malos.push(`<strong>${esc(nombreCorto(p))}</strong> no tiene consultorio asignado.`);
+  for (const f of an.fuera) malos.push(`<strong>${esc(nombreCorto(f.p))}</strong> (${esc(f.p.especialidad || "sin especialidad")}) está en ${esc(f.sala.nombre)}, exclusivo de ${esc(f.sala.especialidad || f.sala.nombre)}.`);
+  const rel = new Map();
+  for (const r of an.relevos) { const k = [r.sala, r.hora, r.a.id, r.b.id].join("|"); if (!rel.has(k)) rel.set(k, { ...r, dias: [] }); rel.get(k).dias.push(r.dia); }
+  for (const r of rel.values()) ojo.push(`<strong>Relevo sin intervalo.</strong> ${esc(nombreSala(r.sala, S))}, ${textoDias(r.dias)} a las ${hhmm(r.hora)}: termina ${esc(nombreCorto(r.a))} y comienza ${esc(nombreCorto(r.b))}.`);
+  for (const c of an.completos) ojo.push(`<strong>${DIAS[c.dia]} de ${hhmm(c.ini)} a ${hhmm(c.fin)}.</strong> ${an.generales === 1 ? "El consultorio general está ocupado" : `Los ${an.generales} consultorios generales están ocupados`}; no hay lugar para sumar otro profesional.`);
+  for (const p of an.aConfirmar) {
+    const bs = p.bloques.filter(b => b.conf);
+    ojo.push(`<strong>${esc(nombreCorto(p))}.</strong> Horario a confirmar: ${textoDias(bs.map(b => b.dia))}.`);
+  }
+  for (const s of an.vacios) ojo.push(`<strong>${esc(s.nombre)}.</strong> Sin profesionales asignados.`);
+  let h = "";
+  if (malos.length) h += `<div class="caja mal"><h2>Para resolver (${malos.length})</h2><ul>${malos.map(x => `<li>${x}</li>`).join("")}</ul></div>`;
+  else h += `<div class="caja bien"><h2>Sin superposiciones</h2><p>Todos los profesionales tienen consultorio y ningún horario se pisa.</p></div>`;
+  if (ojo.length) h += `<div class="caja ojo"><h2>Para tener en cuenta</h2><ul>${ojo.map(x => `<li>${x}</li>`).join("")}</ul></div>`;
+  const rq = avisosRequisitos();
+  if (rq.length) h += `<div class="caja ojo"><h2>Requisitos de habilitación</h2><ul>${rq.map(x => `<li>${x}</li>`).join("")}</ul></div>`;
+  return `<section class="avisos no-imp" aria-label="Avisos">${h}</section>`;
+}
+
+function limitesHora() {
+  let h0 = 8, h1 = 20;
+  for (const p of estado.profs) for (const b of p.bloques) { h0 = Math.min(h0, Math.floor(b.ini / 60)); h1 = Math.max(h1, Math.ceil(b.fin / 60)); }
+  return [h0, h1];
+}
+function diasVisibles() {
+  const usaSabado = estado.profs.some(p => p.bloques.some(b => b.dia === 5));
+  return usaSabado ? [0, 1, 2, 3, 4, 5] : [0, 1, 2, 3, 4];
+}
+const anclaDia = d => "dia-" + norm(DIAS[d]);
+
+function htmlDia(d, an, h0, h1) {
+  const tot = (h1 - h0) * 60, pct = m => ((m - h0 * 60) / tot * 100).toFixed(4) + "%";
+  const edita = puedeEditar();
+  const ticks = []; for (let h = h0; h <= h1; h++) ticks.push(`<span style="left:${pct(h * 60)}">${h}</span>`);
+  const filaSala = (sid, etiqueta, extra, clases) => {
+    const its = an.items.filter(it => it.b.dia === d && it.sala === sid).sort((a, b) => a.b.ini - b.b.ini || a.b.fin - b.b.fin);
+    const carriles = [];
+    let barras = "";
+    for (const it of its) {
+      let c = carriles.findIndex(fin => fin <= it.b.ini);
+      if (c < 0) { c = carriles.length; carriles.push(0); }
+      carriles[c] = it.b.fin;
+      const cls = ["b", claseEsp(it.p.especialidad), it.b.conf ? "conf" : "", an.enChoque.has(it.clave) ? "choque" : "", edita ? "edita" : ""].filter(Boolean).join(" ");
+      const nom = nombreCorto(it.p);
+      const tit = `${it.p.nombre} · ${it.p.especialidad || "sin especialidad"} · ${rango(it.b.ini, it.b.fin)}${it.b.conf ? " · a confirmar" : ""}`;
+      barras += `<div class="${cls}" style="left:${pct(it.b.ini)};width:${((it.b.fin - it.b.ini) / tot * 100).toFixed(4)}%;top:${3 + c * 42}px" title="${esc(tit)}" data-prof="${esc(it.p.id)}"${edita ? ` draggable="true" role="button" tabindex="0"` : ""}><b>${esc(nom)}${it.b.conf ? " · a confirmar" : ""}</b><i>${rango(it.b.ini, it.b.fin)}</i></div>`;
+    }
+    if (!its.length && sid) barras = `<div class="vacio">${excl.some(x => x.id === sid) ? "Sin profesionales" : ""}</div>`;
+    const alto = Math.max(1, carriles.length) * 42;
+    return `<div class="fila ${clases}"><div class="sala">${esc(etiqueta)}${extra ? `<small>${extra}</small>` : ""}</div><div class="pista" data-sala="${esc(sid)}" style="height:${alto}px">${barras}</div></div>`;
+  };
+  const excl = estado.salas.filter(s => s.tipo === "exclusivo"), gen = estado.salas.filter(s => s.tipo !== "exclusivo");
+  let filas = "";
+  excl.forEach((s, i) => filas += filaSala(s.id, s.nombre, esc(s.especialidad || "exclusivo"), i === excl.length - 1 ? "fin" : ""));
+  gen.forEach((s, i) => filas += filaSala(s.id, s.nombre, "", (i === 0 && excl.length ? "corte " : "") + (i === gen.length - 1 ? "fin" : "")));
+  if (an.items.some(it => it.b.dia === d && !it.sala)) filas += filaSala("", "Sin asignar", "", "corte sin");
+  return `<section class="dia" id="${anclaDia(d)}"><h3>${DIAS[d]}</h3>
+    <div class="desliza"><div class="plan" style="--n:${h1 - h0};min-width:${132 + (h1 - h0) * 52}px">
+    <div class="fila eje"><div class="sala">Hora</div><div class="horas">${ticks.join("")}</div></div>${filas}</div></div></section>`;
+}
+
+/* Líneas «Lunes y jueves, 8:00 a 12:00» de un profesional; con sid, solo lo que atiende en esa sala. */
+function lineasHorario(p, ids, sid) {
+  const principal = ids.has(p.sala) ? p.sala : "";
+  const g = new Map();
+  p.bloques.forEach(b => {
+    const s = salaDe(p, b, ids);
+    if (sid !== undefined && s !== sid) return;
+    const enOtra = sid === undefined && s !== principal;
+    const k = [b.ini, b.fin, b.conf ? 1 : 0, enOtra ? "o:" + s : ""].join("|");
+    if (!g.has(k)) g.set(k, { ini: b.ini, fin: b.fin, conf: b.conf, enOtra, sala: s, dias: [] });
+    g.get(k).dias.push(b.dia);
+  });
+  return [...g.values()].sort((a, b) => Math.min(...a.dias) - Math.min(...b.dias) || a.ini - b.ini).map(x => {
+    const t = `${mayus(textoDias(x.dias))}, ${hhmm(x.ini)} a ${hhmm(x.fin)}`;
+    const ex = (x.conf ? " · a confirmar" : "") + (x.enOtra ? ` · en ${esc(nombreSala(x.sala, estado.salas))}` : "");
+    return x.conf ? `<span class="pend">${t}${ex}</span>` : t + ex;
+  }).join("<br>") || `<span class="pend">Sin horarios cargados</span>`;
+}
+
+function htmlTablaAsignacion(an) {
+  const ids = idsSalas(estado.salas);
+  const grupos = estado.salas.map(s => ({ sid: s.id, nombre: s.nombre, uso: s.tipo === "exclusivo" ? "Exclusivo · " + esc(s.especialidad || "") : "General" }));
+  if (an.sinAsignar.length) grupos.push({ sid: "", nombre: "Sin asignar", uso: "" });
+  let tr = "";
+  for (const g of grupos) {
+    const ps = estado.profs.filter(p => p.bloques.some(b => salaDe(p, b, ids) === g.sid) || (!p.bloques.length && (ids.has(p.sala) ? p.sala : "") === g.sid));
+    const th = n => `<th scope="row"${n > 1 ? ` rowspan="${n}"` : ""}>${esc(g.nombre)}${g.uso ? `<small>${g.uso}</small>` : ""}</th>`;
+    if (!ps.length) { tr += `<tr class="g">${th(1)}<td colspan="3" class="pend">Sin profesionales asignados.</td></tr>`; continue; }
+    ps.forEach((p, i) => tr += `<tr class="${i ? "" : "g"}">${i ? "" : th(ps.length)}<td>${esc(p.nombre)}</td><td><span class="chip ${claseEsp(p.especialidad)}">${esc(p.especialidad || "Sin especialidad")}</span></td><td class="num">${lineasHorario(p, ids, g.sid)}</td></tr>`);
+  }
+  return `<div class="tabla"><table><thead><tr><th scope="col">Consultorio</th><th scope="col">Profesional</th><th scope="col">Especialidad</th><th scope="col">Días y horarios</th></tr></thead><tbody>${tr}</tbody></table></div>`;
+}
+
+function vistaCronograma() {
+  const an = analizar(estado.profs, estado.salas);
+  const [h0, h1] = limitesHora();
+  const dias = diasVisibles();
+  const esp = [...new Map(estado.profs.filter(p => p.especialidad).map(p => [norm(p.especialidad), p.especialidad])).values()];
+  const acc = puedeEditar() ? `<button class="btn pri" data-act="nuevo-prof">Agregar profesional</button><button class="btn" data-act="reasignar">Reasignar consultorios</button>` : "";
+  const meta = estado.meta && estado.meta.actualizado ? `Última modificación: ${estado.meta.actualizado.toLocaleString("es-AR", { dateStyle: "short", timeStyle: "short" })}${estado.meta.por ? " · " + esc(estado.meta.por) : ""}.` : "";
+  const nGen = estado.salas.filter(s => s.tipo !== "exclusivo").length, nEx = estado.salas.length - nGen;
+  return `
+  <section><div class="fila-tit">
+    <p class="muted">${estado.profs.length} profesionales en ${estado.salas.length} consultorios: ${nEx} ${nEx === 1 ? "exclusivo" : "exclusivos"} y ${nGen} ${nGen === 1 ? "general" : "generales"}.</p>
+    <div class="acciones no-imp">${acc}<button class="btn" data-act="imprimir">Imprimir</button></div></div>
+    <div class="leyenda" aria-label="Especialidades">${esp.map(e => `<span class="chip ${claseEsp(e)}">${esc(e)}</span>`).join("")}</div>
+  </section>
+  <section aria-labelledby="t-sem"><div class="fila-tit"><h2 id="t-sem">Semana día por día</h2>
+    <nav class="saltos no-imp" aria-label="Ir al día">${dias.map(d => `<a href="#${anclaDia(d)}">${DIAS[d]}</a>`).join("")}</nav></div>
+    ${puedeEditar() ? `<p class="pie no-imp">Haga clic en un horario para editar al profesional, o arrástrelo a otro consultorio para mudarlo.</p>` : ""}
+    ${dias.map(d => htmlDia(d, an, h0, h1)).join("")}
+  </section>
+  <section aria-labelledby="t-asig"><h2 id="t-asig">Asignación por consultorio</h2>${htmlTablaAsignacion(an)}
+    ${meta ? `<p class="pie">${meta}</p>` : ""}</section>
+  ${htmlAvisos(an)}`;
+}
+
+function vistaProfesionales() {
+  return `<section><div class="fila-tit"><h2>Profesionales</h2>
+    <div class="acciones"><input type="search" id="buscar" placeholder="Buscar por nombre o especialidad" value="${esc(estado.filtro)}" aria-label="Buscar profesional"><button class="btn pri" data-act="nuevo-prof">Agregar profesional</button></div></div>
+    <div class="tabla"><table><thead><tr><th scope="col">Profesional</th><th scope="col">Especialidad</th><th scope="col">Consultorio</th><th scope="col">Días y horarios</th><th scope="col"><span hidden>Acciones</span></th></tr></thead><tbody id="tbProfs"></tbody></table></div></section>`;
+}
+function pintarTablaProfs() {
+  const tb = $("#tbProfs"); if (!tb) return;
+  const ids = idsSalas(estado.salas), f = norm(estado.filtro);
+  const ps = estado.profs.filter(p => !f || norm(p.nombre).includes(f) || norm(p.especialidad).includes(f)).sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
+  tb.innerHTML = ps.map(p => `<tr class="g"><td><strong>${esc(p.nombre)}</strong></td><td><span class="chip ${claseEsp(p.especialidad)}">${esc(p.especialidad || "Sin especialidad")}</span></td>
+    <td>${ids.has(p.sala) ? esc(nombreSala(p.sala, estado.salas)) : `<span class="pend">Sin asignar</span>`}</td><td class="num">${lineasHorario(p, ids)}</td>
+    <td class="der"><button class="btn chico" data-act="editar-prof" data-id="${esc(p.id)}">Editar</button></td></tr>`).join("")
+    || `<tr><td colspan="5" class="pend">${estado.profs.length ? "Ningún profesional coincide con la búsqueda." : "Todavía no hay profesionales cargados."}</td></tr>`;
+}
+
+/* ---- Consultorios ---- */
+let borrSalas = null;
+function vistaConsultorios() {
+  if (!borrSalas) borrSalas = clonar(estado.salas);
+  const filas = borrSalas.map((s, i) => `<div class="sala-fila" data-i="${i}">
+    <label class="campo"><span>Nombre</span><input type="text" id="sn${i}" data-campo="nombre" value="${esc(s.nombre)}"></label>
+    <label class="campo"><span>N° croquis</span><select id="sc${i}" data-campo="nro"><option value="">—</option>${CROQUIS_NROS.map(n => `<option value="${n}"${+s.nro === n ? " selected" : ""}>C${n}</option>`).join("")}</select></label>
+    <label class="campo"><span>Uso</span><select id="st${i}" data-campo="tipo"><option value="general"${s.tipo !== "exclusivo" ? " selected" : ""}>General</option><option value="exclusivo"${s.tipo === "exclusivo" ? " selected" : ""}>Exclusivo</option></select></label>
+    <label class="campo"><span>Especialidad exclusiva</span><input type="text" id="se${i}" data-campo="especialidad" list="listaEsp" value="${esc(s.especialidad || "")}"${s.tipo === "exclusivo" ? "" : " disabled"}></label>
+    <div class="mov"><button class="btn chico" data-act="ver-req" data-sala="${esc(s.id)}" title="Lista de control de requisitos"${estado.salas.some(x => x.id === s.id) ? "" : " disabled"}>Requisitos</button><button class="btn chico" data-act="sala-subir" title="Subir" aria-label="Subir"${i === 0 ? " disabled" : ""}>↑</button><button class="btn chico" data-act="sala-bajar" title="Bajar" aria-label="Bajar"${i === borrSalas.length - 1 ? " disabled" : ""}>↓</button><button class="btn chico mal" data-act="sala-quitar">Quitar</button></div></div>`).join("");
+  return `${avisoCroquis()}<section><div class="fila-tit"><h2>Consultorios</h2><div class="acciones"><button class="btn" data-act="sala-nueva">Agregar consultorio</button><button class="btn pri" data-act="salas-guardar">Guardar cambios</button></div></div>
+    <p class="muted">Un consultorio exclusivo recibe solo a los profesionales de su especialidad. El resto se reparte entre los generales. El número de croquis vincula cada consultorio con su local en el plano.</p>
+    <div class="lista-salas">${filas || `<p class="pend">No hay consultorios. Agregue al menos uno.</p>`}</div>${datalistEsp()}</section>`;
+}
+function datalistEsp() {
+  const esp = new Map();
+  Object.keys(COLORES).forEach(k => esp.set(k, mayus(k === "clinica medica" ? "clínica médica" : k === "pediatria" ? "pediatría" : k === "nutricion" ? "nutrición" : k === "psicologia" ? "psicología" : k === "psicologia infantil" ? "psicología infantil" : k === "cardiologia" ? "cardiología" : k === "ginecologia" ? "ginecología" : k === "kinesiologia" ? "kinesiología" : k === "odontologia" ? "odontología" : k)));
+  esp.delete("medico generalista"); esp.delete("medicina general");
+  estado.profs.forEach(p => { if (p.especialidad) esp.set(norm(p.especialidad), p.especialidad); });
+  estado.salas.forEach(s => { if (s.especialidad) esp.set(norm(s.especialidad), s.especialidad); });
+  return `<datalist id="listaEsp">${[...esp.values()].sort((a, b) => a.localeCompare(b, "es")).map(e => `<option value="${esc(e)}">`).join("")}</datalist>`;
+}
+async function guardarSalas() {
+  const salas = borrSalas.map(s => {
+    const ficha = (estado.salas.find(x => x.id === s.id) || {}).ficha;   // la ficha de requisitos se edita en la pestaña Requisitos
+    const nro = CROQUIS_NROS.includes(+s.nro) ? +s.nro : 0;
+    return { id: s.id, ...(nro ? { nro } : {}), nombre: s.nombre.trim(), tipo: s.tipo === "exclusivo" ? "exclusivo" : "general", especialidad: s.tipo === "exclusivo" ? (s.especialidad || "").trim() : "", ...(ficha ? { ficha } : {}) };
+  });
+  if (salas.some(s => !s.nombre)) { flotante("Todos los consultorios deben tener nombre.", true); return; }
+  const sinEsp = salas.find(s => s.tipo === "exclusivo" && !s.especialidad);
+  if (sinEsp) { flotante(`Indique la especialidad de ${sinEsp.nombre}, que es exclusivo.`, true); return; }
+  const rep = salas.find((s, i) => s.nro && salas.findIndex(x => x.nro === s.nro) !== i);
+  if (rep) { flotante(`El número C${rep.nro} del croquis está asignado a más de un consultorio.`, true); return; }
+  const quedan = idsSalas(salas);
+  const quitadas = estado.salas.filter(s => !quedan.has(s.id));
+  const afectados = estado.profs.filter(p => quitadas.some(s => s.id === p.sala) || p.bloques.some(b => tieneSala(b) && b.sala && !quedan.has(b.sala)));
+  if (afectados.length) {
+    const ok = await confirmar("Quitar consultorios con profesionales", `Al quitar ${quitadas.map(s => s.nombre).join(", ")}, ${afectados.length === 1 ? "1 profesional queda" : afectados.length + " profesionales quedan"} sin consultorio asignado: ${afectados.map(nombreCorto).join(", ")}.`, "Quitar y guardar");
+    if (!ok) return;
+  }
+  const profs = afectados.map(p => ({ ...p, sala: quedan.has(p.sala) ? p.sala : "", bloques: p.bloques.map(b => tieneSala(b) && b.sala && !quedan.has(b.sala) ? (({ sala, ...r }) => r)(b) : b) }));
+  borrSalas = null;
+  guardar({ salas, profs });
+  flotante("Consultorios guardados.");
+  render();
+}
+
+/* ---- Croquis ---- */
+/* Número de croquis para cada consultorio: respeta los ya cargados; los exclusivos van a sus
+   locales (C1 ginecología, C4 y C5 odontología, C9 kinesiología) y el resto, en orden, a los libres. */
+function propuestaCroquis(salas) {
+  const res = new Map(), usados = new Set();
+  for (const s of salas) if (CROQUIS_NROS.includes(+s.nro) && !usados.has(+s.nro)) { res.set(s.id, +s.nro); usados.add(+s.nro); }
+  for (const s of salas) if (!res.has(s.id) && s.tipo === "exclusivo") {
+    const n = (CROQUIS_EXCL[norm(s.especialidad || s.nombre)] || []).find(x => !usados.has(x));
+    if (n) { res.set(s.id, n); usados.add(n); }
+  }
+  const libres = CROQUIS_NROS.filter(n => !usados.has(n));
+  for (const s of salas) if (!res.has(s.id) && libres.length) res.set(s.id, libres.shift());
+  return res;
+}
+function avisoCroquis() {
+  if (!estado.salas.length || !estado.salas.some(s => !s.nro)) return "";
+  return `<div class="aviso-local no-imp"><span>Los consultorios todavía no usan la numeración del croquis (Consultorio 1 a 9).</span>${puedeEditar() ? `<button data-act="adoptar-croquis">Adoptar la numeración del croquis</button>` : ""}</div>`;
+}
+async function adoptarCroquis() {
+  const prop = propuestaCroquis(estado.salas);
+  const li = estado.salas.map(s => `<li>${esc(s.nombre)} → ${prop.has(s.id) ? `<strong>Consultorio ${prop.get(s.id)}</strong>${s.tipo === "exclusivo" ? ` (exclusivo de ${esc(s.especialidad)})` : ""}` : "sin número: no hay más locales en el croquis"}</li>`).join("");
+  const ok = await confirmar("Adoptar la numeración del croquis", `<p>Los consultorios pasan a llamarse como en el croquis. Cada uno conserva sus profesionales, horarios y requisitos.</p><ul class="cambios">${li}</ul><p class="pie">Si algún número no coincide con el local real, puede cambiarlo después en la pestaña Consultorios.</p>`, "Aplicar");
+  if (!ok) return;
+  const salas = estado.salas.map(s => prop.has(s.id) ? { ...s, nro: prop.get(s.id), nombre: "Consultorio " + prop.get(s.id) } : s).sort((a, b) => (a.nro || 99) - (b.nro || 99));
+  if (guardar({ salas })) { borrSalas = null; flotante("Consultorios renumerados según el croquis."); render(); }
+}
+const TITULO_CROQUIS = "CROQUIS CONSULTORIOS 3º PISO - DELEGACIÓN COMODORO RIVADAVIA - ISSYS";
+/* Espacio de cada local para los rótulos: centro horizontal, borde superior e inferior y ancho útil. */
+const CROQUIS_CAJAS = {
+  1: { x: 1042, sup: 330, inf: 585, ancho: 108 }, 2: { x: 1166, sup: 330, inf: 530, ancho: 122 }, 3: { x: 1298, sup: 330, inf: 530, ancho: 122 },
+  4: { x: 1431, sup: 330, inf: 530, ancho: 122 }, 5: { x: 1564, sup: 330, inf: 530, ancho: 122 }, 6: { x: 1535, sup: 865, inf: 990, ancho: 168 },
+  7: { x: 1535, sup: 990, inf: 1112, ancho: 168 }, 8: { x: 1535, sup: 1112, inf: 1235, ancho: 168 }, 9: { x: 1218, sup: 865, inf: 1075, ancho: 100 }
+};
+/* Especialidades que atienden en el consultorio, más la propia si es exclusivo. */
+function especialidadesSala(s) {
+  const ids = idsSalas(estado.salas), esp = new Map();
+  const sumar = e => { if (String(e ?? "").trim()) esp.set(norm(e), String(e).trim()); };
+  if (s.tipo === "exclusivo") sumar(s.especialidad);
+  for (const p of estado.profs) if (p.bloques.some(b => salaDe(p, b, ids) === s.id)) sumar(p.especialidad);
+  return [...esp.values()].sort((a, b) => a.localeCompare(b, "es"));
+}
+/* Número y especialidades centrados en el local, con la letra más grande que entre. */
+function rotuloEspecialidades(n, esps) {
+  const c = CROQUIS_CAJAS[n], ALTO_NRO = 38, alto = c.inf - c.sup - 16;
+  let lineas = [], fs = 19;
+  for (; fs >= 12; fs--) {
+    const max = Math.floor(c.ancho / (fs * .5));
+    lineas = esps.flatMap(e => e.split(" ").reduce((l, pal) => {
+      const u = l.length ? l[l.length - 1] + " " + pal : pal;
+      if (l.length && u.length <= max) l[l.length - 1] = u; else l.push(pal);
+      return l;
+    }, []));
+    if (lineas.every(l => l.length <= max) && ALTO_NRO + lineas.length * fs * 1.18 <= alto) break;
+  }
+  fs = Math.max(fs, 12);
+  const paso = fs * 1.18, y = c.sup + (c.inf - c.sup - ALTO_NRO - lineas.length * paso) / 2;
+  return `<text class="lbl" x="${c.x}" y="${y + 17}">C${n}</text>` + lineas.map((l, i) =>
+    `<text class="sub chico cr-esp" x="${c.x}" y="${(y + ALTO_NRO + paso * (i + .5)).toFixed(1)}" style="font-size:${fs}px">${esc(l)}</text>`).join("");
+}
+function svgCroquis(sel) {
+  let svg = CROQUIS_SVG;
+  for (const n of CROQUIS_NROS) {
+    const s = estado.salas.find(x => +x.nro === n);
+    const cls = (s ? (s.tipo === "exclusivo" ? " " + claseEsp(s.especialidad).replace("s-", "cr-") : "") : " sin-asignar") + (sel === n ? " activo" : "");
+    const sub = s ? (s.tipo === "exclusivo" ? s.especialidad : "General") : "Sin asignar";
+    const esps = s && estado.croquisEsp ? especialidadesSala(s) : [];
+    if (esps.length) svg = svg.replace(new RegExp(`<text class="lbl"[^>]*>C${n}</text><text class="sub chico"[^>]*>\{\{s${n}\}\}</text>`), () => rotuloEspecialidades(n, esps));
+    svg = svg.replace(`{{c${n}}}`, cls).replace(`{{a${n}}}`, esc(`C${n}: ${s ? s.nombre + ", " + (esps.length ? esps.join(", ") : sub) : "sin consultorio asignado"}`)).replace(`{{s${n}}}`, esc(sub));
+  }
+  return svg;
+}
+/* Plano solo, para exportar: sin la leyenda «sin escala» y sin el margen superior que ocupaba. */
+const planoCroquis = () => svgCroquis(0).replace(/\s*<text[^>]*>Croquis esquemático[^<]*<\/text>/, "").replace('viewBox="945 285 880 1215"', 'viewBox="945 315 880 1185"');
+function vistaCroquis() {
+  return `${avisoCroquis()}
+  <section><div class="fila-tit"><h2>Croquis del 3.er piso</h2>
+    <div class="acciones no-imp"><label class="tilde"><input type="checkbox" id="croquis-esp"${estado.croquisEsp ? " checked" : ""}>Mostrar especialidades</label><button class="btn" data-act="croquis-pdf">Imprimir / PDF</button><button class="btn" data-act="croquis-png">Descargar imagen</button></div></div>
+    <p class="muted">Haga clic en un consultorio para ver quiénes atienden y en qué horarios. Croquis esquemático, sin escala.</p>
+    <div class="croquis-wrap"><div class="croquis">${svgCroquis(estado.croquisSel)}</div><div id="croquisDetalle">${htmlDetalleCroquis(estado.croquisSel)}</div></div>
+  </section>`;
+}
+/* Requisitos del consultorio en dos listas: lo que falta y lo que tiene. */
+function htmlReqCroquis(s, ev) {
+  const fi = s.ficha || {};
+  const texto = f => {
+    if (f.estado === "falta" && ["sup", "lado", "planta"].includes(f.id)) return mayus(detalleFalta(f, fi));
+    const t = textoReq(f);
+    if (f.id === "sup" && typeof fi.sup === "number") return `${t} (${fmtN(fi.sup)} m²)`;
+    if (f.id === "lado" && typeof fi.lado === "number") return `${t} (${fmtN(fi.lado)} m)`;
+    return t;
+  };
+  const marca = f => f.comp ? ` <span class="muted">· compartido</span>` : f.adicional || f.id.startsWith("x:") ? ` <span class="muted">· adicional</span>` : "";
+  const items = [...ev.filas.map(f => ({ txt: esc(texto(f)) + marca(f), e: f.estado })),
+    ...ev.comps.filter(c => !c.item).map(c => ({ txt: esc(c.nombre) + ` <span class="muted">· compartido</span>`, e: estadoDe(c.v) }))];
+  const lista = (e, tit, cls) => {
+    const l = items.filter(x => x.e === e);
+    return l.length ? `<div class="cr-req ${cls}"><p><strong>${tit} (${l.length})</strong></p><ul>${l.map(x => `<li>${x.txt}</li>`).join("")}</ul></div>` : "";
+  };
+  const sd = items.filter(x => x.e === "sd").length, nc = items.filter(x => x.e === "nc").length;
+  const otros = [sd ? `${sd} sin dato` : "", nc ? `${nc} no ${nc === 1 ? "necesario" : "necesarios"}` : ""].filter(Boolean).join(" · ");
+  const h = lista("falta", "Falta", "cr-falta") + lista("ok", "Tiene", "cr-tiene");
+  return `<h3>Requisitos</h3>${h || `<p class="pend">Todavía no hay ítems marcados como «tiene» o «falta».</p>`}${otros ? `<p class="pie">Además: ${otros}.</p>` : ""}`;
+}
+function htmlDetalleCroquis(nro) {
+  if (!nro) return `<div class="panel"><p class="pend">Seleccione un consultorio del plano.</p></div>`;
+  const s = estado.salas.find(x => +x.nro === nro);
+  if (!s) return `<div class="panel"><h2>C${nro}</h2><p class="pend">Este local del croquis no está vinculado a ningún consultorio de la app.${puedeEditar() ? " Asígnele el número en la pestaña Consultorios." : ""}</p></div>`;
+  const ids = idsSalas(estado.salas);
+  const ps = estado.profs.filter(p => p.bloques.some(b => salaDe(p, b, ids) === s.id)).sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
+  const uso = s.tipo === "exclusivo" ? `<span class="chip ${claseEsp(s.especialidad)}">Exclusivo · ${esc(s.especialidad)}</span>` : `<span class="chip s-kin">General</span>`;
+  return `<div class="panel"><div class="fila-tit"><h2>${esc(s.nombre)}</h2>${uso}</div>
+    <h3>Profesionales</h3>
+    ${ps.length ? `<ul class="cr-profs">${ps.map(p => `<li><div><strong>${esc(p.nombre)}</strong><span class="chip ${claseEsp(p.especialidad)}">${esc(p.especialidad || "Sin especialidad")}</span></div><div class="num muted">${lineasHorario(p, ids, s.id)}</div></li>`).join("")}</ul>` : `<p class="pend">Sin profesionales asignados.</p>`}
+    ${htmlReqCroquis(s, evaluarSala(s, ids))}
+    <div class="acciones"><button class="btn" data-act="ver-req" data-sala="${esc(s.id)}">Ver lista de requisitos</button></div></div>`;
+}
+
+/* ---- Requisitos de habilitación ---- */
+function avisosRequisitos() {
+  const ids = idsSalas(estado.salas), L = [];
+  let sd = 0, salasSd = 0;
+  for (const s of estado.salas) {
+    const ev = evaluarSala(s, ids);
+    const fal = ev.filas.filter(f => f.estado === "falta" && !f.comp);   // los compartidos se informan una sola vez, abajo
+    const n = ev.filas.filter(f => f.estado === "sd").length;
+    if (n) { sd += n; salasSd++; }
+    if (fal.length) L.push(`<strong>${esc(s.nombre)}:</strong> ${fal.slice(0, 5).map(f => `${esc(detalleFalta(f, s.ficha))} (${esc(fuentesTxt(f))})`).join("; ")}${fal.length > 5 ? `; y ${fal.length - 5} más` : ""}.`);
+    if (ev.sinCatalogo.length) L.push(`<strong>${esc(s.nombre)}:</strong> ${esc(ev.sinCatalogo.join(", "))} no figura en el catálogo de la norma; rigen solo las condiciones generales.`);
+  }
+  for (const c of estado.comp || []) if (c.v === false)
+    L.push(`<strong>Equipamiento compartido:</strong> ${cantComp(c) > 1 ? `faltan ${cantComp(c)} × ` : "falta "}${esc(c.nombre)}${c.salas.length ? ` (lo usan ${esc(c.salas.map(id => nombreSala(id, estado.salas)).join(", "))})` : ""}.`);
+  for (const c of cobertura(estado.profs, estado.salas)) {
+    if (!c.sin.length && !c.aConf.length) continue;
+    const t = c.sin.length === 5 ? "sin profesionales en días hábiles" : [c.sin.length ? `sin cobertura ${textoDias(c.sin)}` : "", c.aConf.length ? `${textoDias(c.aConf)} a confirmar` : ""].filter(Boolean).join("; ");
+    L.push(`<strong>${esc(c.nombre)}:</strong> ${t} (Anexo I, I-4).`);
+  }
+  if (sd) L.push(`<strong>Sin relevar:</strong> ${sd} ${sd === 1 ? "ítem" : "ítems"} en ${salasSd} ${salasSd === 1 ? "consultorio" : "consultorios"}. ${puedeEditar() ? "Complételos" : "Se completan"} en la pestaña Requisitos.`);
+  return L;
+}
+
+const ETQ_EST = { ok: "Cumple", nc: "No necesario", falta: "Falta", sd: "Sin dato", no: "No exigido", dato: "" };
+const filaReq = (texto, fuentes, est, control) => `<li class="rq-item"><div>${texto}${fuentes ? `<small>${fuentes}</small>` : ""}</div><span class="est est-${est}">${ETQ_EST[est]}</span><div>${control}</div></li>`;
+/* Botones Tiene / Falta / No necesario. Volver a pulsar el marcado lo deja «sin dato». */
+function botonesTri(amb, sid, id, v, conNa, etq, extra = "") {
+  const dis = puedeEditar() ? "" : " disabled";
+  const b = (val, txt, on) => `<button type="button" class="tb tb-${val}" id="rq-${amb}-${esc(sid)}-${esc(id)}-${val}" data-act="rq-marcar" data-amb="${amb}" data-sala="${esc(sid)}" data-item="${esc(id)}" data-val="${val}" aria-pressed="${on}"${dis}>${txt}</button>`;
+  return `<div class="tri" role="group">${b("si", etq[0], v === true)}${b("no", etq[1], v === false)}${conNa ? b("na", "No necesario", v === "na") : ""}${extra}</div>`;
+}
+const resumenCuenta = c => !c.falta && !c.sd ? "Completo" : [c.falta ? `<span class="f">${c.falta} ${c.falta === 1 ? "falta" : "faltan"}</span>` : "", c.sd ? `${c.sd} sin dato` : ""].filter(Boolean).join(" · ");
+
+function htmlChecklist(s, ev) {
+  const f = s.ficha || {}, it = f.items || {}, dis = puedeEditar() ? "" : " disabled";
+  const req = new Map(ev.filas.map(x => [x.id, x]));
+  const fte = r => r ? r.fuentes.map(x => `${esc(x.quien)} · ${esc(x.punto)}`).join("; ") : "";
+  const g = { local: [], equipo: [], func: [], extra: [], comp: [] };
+  const num = (campo, unidad, etq) => `<label class="rq-num"><input type="text" inputmode="decimal" id="rq-${campo}" data-ficha="${campo}" data-sala="${esc(s.id)}" value="${typeof f[campo] === "number" ? fmtN(f[campo]) : ""}" aria-label="${etq}"${dis}>${unidad}</label>`;
+  const rs = req.get("sup"), rl = req.get("lado"), rp = req.get("planta");
+  g.local.push(filaReq(esc(textoReq(rs)), fte(rs), rs.estado, num("sup", "m²", "Superficie en metros cuadrados")));
+  g.local.push(filaReq(esc(textoReq(rl)), fte(rl), rl.estado, num("lado", "m", "Lado menor en metros")));
+  g.local.push(filaReq(rp ? esc(textoReq(rp)) : "Planta en la que se ubica", fte(rp), rp ? rp.estado : "dato",
+    `<div class="tri"><select id="rq-planta" data-ficha="planta" data-sala="${esc(s.id)}" aria-label="Planta"${dis}><option value="">Sin dato</option><option value="baja"${f.planta === "baja" ? " selected" : ""}>Planta baja</option><option value="alta"${f.planta === "alta" ? " selected" : ""}>Planta alta</option></select></div>`));
+  g.local.push(filaReq(esc(ITEMS_REQ.equipoEsp[1]), "Si lo tiene, la superficie mínima pasa a 9 m² · Anexo I, II-17-b", "dato", botonesTri("s", s.id, "equipoEsp", it.equipoEsp, false, ["Sí", "No"])));
+  for (const [id, [grupo, texto, , dato]] of Object.entries(ITEMS_REQ)) {
+    if (dato) continue;
+    const r = req.get(id);
+    if (!r && it[id] === undefined && !estado.reqTodos) continue;
+    const quitar = r && r.adicional && puedeEditar() ? `<button type="button" class="tb" data-act="rq-agregado-quitar" data-sala="${esc(s.id)}" data-item="${esc(id)}">Quitar</button>` : "";
+    const control = r && r.comp
+      ? `<a class="enlace" href="#rq-comp">Compartido: ${esc(r.comp.nombre)}${r.comp.ubicacion ? " · " + esc(r.comp.ubicacion) : ""}</a>`
+      : botonesTri("s", s.id, id, it[id], true, grupo === "equipo" ? ["Tiene", "Falta"] : ["Sí", "No"], quitar);
+    g[r && r.adicional ? "extra" : grupo].push(filaReq(esc(texto), fte(r), r ? r.estado : "no", control));
+  }
+  const ed = puedeEditar();
+  for (const x of f.extra || []) {
+    const r = req.get("x:" + x.clave);
+    g.extra.push(filaReq(esc(x.nombre), "No exigido por la norma", r.estado, botonesTri("s", s.id, "x:" + x.clave, x.v, true, ["Tiene", "Falta"],
+      ed ? `<button type="button" class="tb" data-act="rq-extra-quitar" data-sala="${esc(s.id)}" data-item="x:${esc(x.clave)}">Quitar</button>` : "")));
+  }
+  if (ed) g.extra.push(`<li class="rq-item"><form class="rq-agregar" data-form="rq-extra" data-sala="${esc(s.id)}"><input type="text" id="rq-extra" list="listaExtra" placeholder="Elija de la lista o escriba uno nuevo" aria-label="Nombre del equipamiento adicional" autocomplete="off"><button class="btn chico">Agregar</button></form></li>`);
+  for (const c of ev.comps) g.comp.push(filaReq(esc(c.nombre), [c.ubicacion ? esc(c.ubicacion) : "", c.item ? "cubre: " + esc(ITEMS_REQ[c.item][1]) : ""].filter(Boolean).join(" · "), estadoDe(c.v), `<a class="enlace" href="#rq-comp">Ver equipamiento compartido</a>`));
+  const c = cuentaReq(ev);
+  const notas = ev.tipos.flatMap(t => (t.r.notas || []).map(n => `${esc(n)} <span class="muted">(${esc(t.r.punto)})</span>`));
+  return `<div class="panel">
+    <div class="rq-cab"><div class="fila-tit"><h2>${esc(s.nombre)}</h2><div class="rq-cuenta"><span class="est est-ok">${c.ok} cumple${c.ok === 1 ? "" : "n"}</span><span class="est est-falta">${c.falta} falta${c.falta === 1 ? "" : "n"}</span><span class="est est-sd">${c.sd} sin dato</span></div></div>
+      <div class="leyenda">${ev.esps.map(e => `<span class="chip ${claseEsp(e)}">${esc(e)}</span>`).join("") || `<span class="pend">Sin profesionales asignados: rigen solo las condiciones generales.</span>`}</div>
+      <p class="muted">Normas que aplican: ${ev.tipos.map(t => `${esc(t.r.nombre)} (${esc(t.r.punto)})`).join(" · ")}.</p>
+      ${ev.sinCatalogo.length ? `<p class="pista-sala mal">${esc(ev.sinCatalogo.join(", "))} no figura en el catálogo de la norma; se aplican solo las condiciones generales.</p>` : ""}
+      ${notas.length ? `<ul class="pie" style="padding-left:18px">${notas.map(n => `<li>${n}</li>`).join("")}</ul>` : ""}</div>
+    ${Object.entries(GRUPOS_REQ).filter(([k]) => g[k].length).map(([k, t]) => `<h3>${t}</h3><ul class="rq-lista">${g[k].join("")}</ul>`).join("")}
+    ${datalistExtra()}
+    <label class="tilde"><input type="checkbox" id="rq-todos"${estado.reqTodos ? " checked" : ""}>Mostrar también los ítems que la norma no exige a este consultorio</label>
+  </div>`;
+}
+
+function datalistExtra() {
+  const n = new Map(Object.values(ITEMS_REQ).filter(d => d[0] === "equipo" && !d[3]).map(d => [claveExtra(d[1]), d[1]]));
+  estado.salas.forEach(s => ((s.ficha || {}).extra || []).forEach(x => n.set(x.clave, x.nombre)));
+  return `<datalist id="listaExtra">${[...n.values()].sort((a, b) => a.localeCompare(b, "es")).map(x => `<option value="${esc(x)}">`).join("")}</datalist>`;
+}
+
+function htmlMatriz(S, evs) {
+  const usados = new Set();
+  evs.forEach(ev => ev.filas.forEach(f => usados.add(f.id)));
+  const extras = new Map();
+  evs.forEach(ev => ev.filas.forEach(f => { if (f.id.startsWith("x:") && !extras.has(f.id)) extras.set(f.id, f.nombre); }));
+  const orden = [...["sup", "lado", "planta", ...Object.keys(ITEMS_REQ)].filter(id => usados.has(id)), ...extras.keys()];
+  const etq = id => id === "sup" ? "Superficie (m²)" : id === "lado" ? "Lado mínimo (m)" : id === "planta" ? "Planta baja" : extras.has(id) ? extras.get(id) : ITEMS_REQ[id][1];
+  const grupo = id => ["sup", "lado", "planta"].includes(id) ? "local" : extras.has(id) ? "extra" : ITEMS_REQ[id][0];
+  const SIM = { ok: "✓", nc: "—", falta: "✗", sd: "?" };
+  let filas = "", gAnt = "";
+  // Lo cubierto por equipamiento compartido no se cuenta por consultorio: se cuenta una vez, con su cantidad.
+  const faltaPropia = f => f && f.estado === "falta" && !f.comp;
+  const faltaEn = id => S.filter(s => faltaPropia(evs.get(s.id).filas.find(x => x.id === id))).length;
+  const celdaTotal = n => `<td class="m-tot${n ? " m-falta" : ""}">${n || ""}</td>`;
+  for (const id of orden) {
+    if (grupo(id) !== gAnt) { gAnt = grupo(id); filas += `<tr class="mg"><th colspan="${S.length + 2}" scope="colgroup">${GRUPOS_REQ[gAnt]}</th></tr>`; }
+    filas += `<tr><th scope="row">${esc(etq(id))}</th>${S.map(s => {
+      const f = evs.get(s.id).filas.find(x => x.id === id);
+      if (!f) return `<td><span class="sr">No exigido</span></td>`;
+      const fi = s.ficha || {};
+      const val = (id === "sup" || id === "lado") && typeof fi[id] === "number" ? fmtN(fi[id]) : SIM[f.estado];
+      const comp = f.comp ? ` · compartido: ${f.comp.nombre}` : "";
+      return `<td class="m-${f.estado}" title="${esc(s.nombre)}: ${esc(textoReq(f))} · ${ETQ_EST[f.estado]}${esc(comp)}">${val}${f.comp ? "<sup>c</sup>" : ""}<span class="sr"> ${ETQ_EST[f.estado]}${esc(comp)}</span></td>`;
+    }).join("")}${celdaTotal(faltaEn(id))}</tr>`;
+  }
+  const porSala = S.map(s => evs.get(s.id).filas.filter(faltaPropia).length);
+  // Equipamiento compartido: una fila por equipo; si falta, suma la cantidad cargada a mano.
+  let faltanComp = 0;
+  const comps = estado.comp || [];
+  if (comps.length) filas += `<tr class="mg"><th colspan="${S.length + 2}" scope="colgroup">${GRUPOS_REQ.comp}</th></tr>`;
+  for (const c of comps) {
+    const e = estadoDe(c.v), usan = S.filter(s => (c.salas || []).includes(s.id));
+    const det = [c.ubicacion, c.item ? "cubre: " + ITEMS_REQ[c.item][1] : ""].filter(Boolean).join(" · ");
+    filas += `<tr><th scope="row">${esc(c.nombre)}${det ? `<small class="muted" style="display:block">${esc(det)}</small>` : ""}</th>${S.map(s => (c.salas || []).includes(s.id)
+      ? `<td class="m-${e}" title="${esc(s.nombre)}: ${esc(c.nombre)} (compartido) · ${ETQ_EST[e]}">${SIM[e]}<sup>c</sup><span class="sr"> ${ETQ_EST[e]}</span></td>`
+      : `<td><span class="sr">No lo usa</span></td>`).join("")}`;
+    const n = e === "falta" ? cantComp(c) : 0;
+    faltanComp += n;
+    filas += `${celdaTotal(n)}</tr>`;
+  }
+  const total = porSala.reduce((a, b) => a + b, 0) + faltanComp;
+  return `<div class="tabla matriz"><table><thead><tr><th scope="col">Requisito</th>${S.map(s => `<th scope="col"><button type="button" class="enlace" data-act="rq-sala" data-sala="${esc(s.id)}">${esc(s.nombre)}</button></th>`).join("")}<th scope="col" class="m-tot">Faltan</th></tr></thead><tbody>${filas}</tbody>
+    <tfoot><tr><th scope="row">Total de faltantes</th>${porSala.map(celdaTotal).join("")}${celdaTotal(total)}</tr></tfoot></table></div>
+    <p class="pie">✓ cumple · ✗ falta · ? sin dato · — no necesario · <sup>c</sup> cubierto por equipamiento compartido · celda vacía: no exigido para ese consultorio.${faltanComp ? ` El total incluye ${faltanComp} ${faltanComp === 1 ? "unidad" : "unidades"} de equipamiento compartido, que no se suman por consultorio.` : ""}</p>`;
+}
+
+function vistaRequisitos() {
+  const S = estado.salas, ids = idsSalas(S);
+  if (!S.some(s => s.id === estado.reqSala)) estado.reqSala = S.length ? S[0].id : "";
+  const evs = new Map(S.map(s => [s.id, evaluarSala(s, ids)]));
+  const sel = S.map(s => `<button type="button" data-act="rq-sala" data-sala="${esc(s.id)}" aria-pressed="${s.id === estado.reqSala}"><b>${esc(s.nombre)}</b><small>${resumenCuenta(cuentaReq(evs.get(s.id)))}</small></button>`).join("");
+  const actual = S.find(s => s.id === estado.reqSala);
+  const est = requisitosEstab(S, estado.profs), ve = estado.estab || {};
+  const filasEst = est.map(r => {
+    const v = ve[r.id], e = v === undefined ? "sd" : v === false ? "falta" : v === "na" ? "nc" : "ok";
+    return filaReq(esc(r.texto), esc(r.punto) + (r.nota ? " · " + esc(r.nota) : ""), e, botonesTri("e", "", r.id, v, true, ["Sí", "No"]));
+  }).join("");
+  const cob = cobertura(estado.profs, S);
+  const filasCob = cob.map(c => `<tr class="g"><th scope="row">${esc(c.nombre)}</th><td>${c.firmes.size ? mayus(textoDias([...c.firmes])) : `<span class="pend">Ninguno</span>`}</td><td>${c.sin.length ? mayus(textoDias(c.sin)) : "Ninguno"}</td><td>${c.aConf.length ? mayus(textoDias(c.aConf)) : ""}</td></tr>`).join("");
+  const usoCat = r => S.filter(s => evs.get(s.id).tipos.some(t => t.r === r)).map(s => s.nombre);
+  const cat = REQUISITOS.map(r => {
+    const en = usoCat(r);
+    const lista = [...(r.hereda ? itemsDe(REQUISITOS.find(x => x.id === r.hereda), r.puntoHereda) : []), ...itemsDe(r)];
+    return `<details class="cat"><summary>${esc(r.nombre)}<small>${esc(r.punto)}${en.length ? " · en uso: " + esc(en.join(", ")) : ""}</small></summary><div class="cat-cuerpo">
+      ${r.esp.length ? `<p class="muted">Especialidades: ${esc(r.esp.join(", "))}.</p>` : ""}
+      ${r.sup || r.lado ? `<p>Superficie mínima: ${r.sup ? fmtN(r.sup) + " m²" : "la general (7,50 m²)"}${r.lado ? `, lado mínimo de ${fmtN(r.lado)} m` : ""}.</p>` : ""}
+      ${r.plantaBaja ? `<p>En edificios de más de una planta, consultorio garantizado en planta baja.</p>` : ""}
+      ${lista.length ? `<ul>${lista.map(([id, p]) => `<li>${esc(ITEMS_REQ[id][1])} <span class="muted">(${esc(p)})</span></li>`).join("")}</ul>` : ""}
+      ${r.notas ? `<ul>${r.notas.map(n => `<li>${esc(n)}</li>`).join("")}</ul>` : ""}</div></details>`;
+  }).join("");
+  return `
+  <section><div class="fila-tit"><h2>Requisitos de habilitación</h2>
+    <div class="acciones no-imp"><button class="btn" data-act="imprimir-faltantes">Imprimir faltantes</button><button class="btn" data-act="imprimir-listado">Imprimir listado general</button></div></div>
+    <nav class="saltos no-imp" aria-label="Ir a"><a href="#rq-cons">Por consultorio</a><a href="#rq-res">Resumen</a><a href="#rq-est">Establecimiento</a><a href="#rq-comp">Compartido</a><a href="#rq-cob">Cobertura</a><a href="#rq-cat">Norma</a></nav>
+    <p class="muted">Resolución N° 461/11-MS del Ministerio de Salud del Chubut. Cada consultorio debe reunir los requisitos de las especialidades que atienden en él. ${puedeEditar() ? "Marque lo que tiene y lo que falta; lo que quede sin marcar figura como «sin dato»." : "Solo los editores pueden modificar la lista de control."} Los faltantes son avisos: no impiden guardar ni asignar.</p>
+  </section>
+  <section id="rq-cons" class="dia"><h3>Por consultorio</h3>
+    <div class="rq-sel">${sel || `<p class="pend">No hay consultorios cargados.</p>`}</div>
+    ${actual ? htmlChecklist(actual, evs.get(actual.id)) : ""}
+  </section>
+  <section id="rq-res" class="dia"><h3>Resumen por consultorio</h3>${S.length ? htmlMatriz(S, evs) : ""}</section>
+  <section id="rq-est" class="dia"><h3>Establecimiento</h3>
+    <p class="muted">Calculado para ${S.length} ${S.length === 1 ? "consultorio" : "consultorios"}.</p>
+    <ul class="rq-lista">${filasEst}</ul></section>
+  <section id="rq-comp" class="dia"><h3>Equipamiento compartido</h3>${htmlCompartidos()}</section>
+  <section id="rq-cob" class="dia"><h3>Cobertura en días hábiles</h3>
+    <p class="muted">Cuando la habilitación se pide para una especialidad, debe cubrirse con profesionales de esa especialidad en días hábiles (Anexo I, I-4). Confirmar con Fiscalización Sanitaria cómo se aplica a los consultorios generales compartidos.</p>
+    <div class="tabla"><table><thead><tr><th scope="col">Especialidad</th><th scope="col">Días con profesional</th><th scope="col">Sin cobertura</th><th scope="col">A confirmar</th></tr></thead><tbody>${filasCob || `<tr><td colspan="4" class="pend">Sin especialidades cargadas.</td></tr>`}</tbody></table></div></section>
+  <section id="rq-cat" class="dia"><h3>Catálogo de la norma</h3>${cat}</section>`;
+}
+
+function htmlCompartidos() {
+  const ed = puedeEditar(), dis = ed ? "" : " disabled";
+  const opts = Object.entries(ITEMS_REQ).filter(([, d]) => d[0] === "equipo").sort((a, b) => a[1][1].localeCompare(b[1][1], "es"));
+  const filas = (estado.comp || []).map(c => {
+    const i = esc(c.id), e = estadoDe(c.v);
+    return `<li class="rq-comp" data-comp-id="${i}">
+      <div class="fila-tit"><span class="est est-${e}">${ETQ_EST[e]}</span>${botonesTri("c", c.id, "v", c.v, true, ["Tiene", "Falta"], ed ? `<button type="button" class="tb" data-act="comp-quitar" data-id="${i}">Quitar</button>` : "")}</div>
+      <div class="dos">
+        <label class="campo"><span>Equipamiento</span><input type="text" id="cp-n-${i}" data-comp="nombre" value="${esc(c.nombre)}" autocomplete="off"${dis}></label>
+        <label class="campo"><span>Ubicación</span><input type="text" id="cp-u-${i}" data-comp="ubicacion" value="${esc(c.ubicacion || "")}" placeholder="Por ejemplo: sala de esterilización" autocomplete="off"${dis}></label>
+        <label class="campo"><span>Cantidad que falta</span><input type="text" inputmode="numeric" id="cp-c-${i}" data-comp="cant" value="${cantComp(c)}" autocomplete="off"${dis}><small>Se cuenta en «Faltan» cuando está marcado como Falta.</small></label>
+        <label class="campo"><span>Cubre el ítem de la norma</span><select id="cp-i-${i}" data-comp="item"${dis}><option value="">Ninguno (equipamiento adicional)</option>${opts.map(([k, d]) => `<option value="${k}"${c.item === k ? " selected" : ""}>${esc(d[1])}</option>`).join("")}</select></label>
+      </div>
+      <div class="campo"><span>Consultorios que lo usan</span><div class="rq-salas">${estado.salas.map(s => `<label class="tilde"><input type="checkbox" id="cp-s-${i}-${esc(s.id)}" data-comp="sala" value="${esc(s.id)}"${(c.salas || []).includes(s.id) ? " checked" : ""}${dis}>${esc(s.nombre)}</label>`).join("")}</div></div>
+    </li>`;
+  }).join("");
+  return `<p class="muted">Equipos que usan varios consultorios, por ejemplo un esterilizador de 20 L. Si cubre un ítem de la norma, en los consultorios que lo usan ese ítem toma el estado del equipo compartido, sin marcarlo en cada uno.</p>
+    ${filas ? `<ul class="rq-lista">${filas}</ul>` : `<p class="pend">Todavía no hay equipamiento compartido cargado.</p>`}
+    ${ed ? `<div class="acciones"><button type="button" class="btn" data-act="comp-nuevo">Agregar equipamiento compartido</button></div>` : ""}`;
+}
+
+/* Detalle de faltantes para imprimir: por consultorio, compartido y establecimiento. */
+function htmlFaltantes() {
+  const ids = idsSalas(estado.salas);
+  const ORDEN = { equipo: 0, extra: 1, local: 2, func: 3 };
+  const tipo = f => f.id.startsWith("x:") || f.adicional ? "extra" : ["sup", "lado", "planta"].includes(f.id) ? "local" : ITEMS_REQ[f.id][0];
+  const texto = (f, ficha) => ["sup", "lado", "planta"].includes(f.id) ? mayus(detalleFalta(f, ficha)) : textoReq(f);
+  let total = 0, sd = 0, conFalta = 0;
+  const secciones = estado.salas.map(s => {
+    const ev = evaluarSala(s, ids);
+    sd += ev.filas.filter(f => f.estado === "sd").length;
+    const fal = ev.filas.filter(f => f.estado === "falta" && !f.comp).sort((a, b) => ORDEN[tipo(a)] - ORDEN[tipo(b)]);
+    if (!fal.length) return "";
+    total += fal.length; conFalta++;
+    return `<section><h3>${esc(s.nombre)}<small>${esc(ev.esps.join(", ") || "Sin profesionales asignados")}</small></h3>
+      <table><thead><tr><th>Faltante</th><th>Tipo</th><th>Norma</th><th>Observaciones</th></tr></thead><tbody>
+      ${fal.map(f => `<tr><td>${esc(texto(f, s.ficha))}</td><td>${GRUPOS_REQ[tipo(f)]}</td><td>${esc(fuentesTxt(f))}</td><td class="obs"></td></tr>`).join("")}</tbody></table></section>`;
+  }).join("");
+  const comps = (estado.comp || []).filter(c => c.v === false);
+  const unidades = comps.reduce((a, c) => a + cantComp(c), 0);
+  const secComp = comps.length ? `<section><h3>Equipamiento compartido</h3>
+    <table><thead><tr><th>Equipamiento</th><th>Cantidad</th><th>Ubicación</th><th>Lo usan</th><th>Observaciones</th></tr></thead><tbody>
+    ${comps.map(c => `<tr><td>${esc(c.nombre)}${c.item ? `<br><small>Cubre: ${esc(ITEMS_REQ[c.item][1])}</small>` : ""}</td><td class="cant">${cantComp(c)}</td><td>${esc(c.ubicacion || "")}</td><td>${esc((c.salas || []).map(id => nombreSala(id, estado.salas)).join(", "))}</td><td class="obs"></td></tr>`).join("")}</tbody></table></section>` : "";
+  const ve = estado.estab || {};
+  const est = requisitosEstab(estado.salas, estado.profs).filter(r => ve[r.id] === false);
+  const secEst = est.length ? `<section><h3>Establecimiento</h3>
+    <table><thead><tr><th>Faltante</th><th>Norma</th><th>Observaciones</th></tr></thead><tbody>
+    ${est.map(r => `<tr><td>${esc(r.texto)}</td><td>${esc(r.punto)}</td><td class="obs"></td></tr>`).join("")}</tbody></table></section>` : "";
+  const fecha = new Date().toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" });
+  const nada = !total && !comps.length && !est.length;
+  return `<div class="imp">
+    <div><span class="sobre">Mitre 837 · Resolución N° 461/11-MS</span><h2>Detalle de faltantes</h2><p>Emitido el ${fecha}.</p></div>
+    <div class="imp-res"><span><strong>${total}</strong> ${total === 1 ? "faltante" : "faltantes"} en ${conFalta} ${conFalta === 1 ? "consultorio" : "consultorios"}</span>
+      ${comps.length ? `<span><strong>${unidades}</strong> ${unidades === 1 ? "unidad" : "unidades"} de equipamiento compartido</span>` : ""}
+      ${est.length ? `<span><strong>${est.length}</strong> del establecimiento</span>` : ""}
+      ${sd ? `<span>${sd} ${sd === 1 ? "ítem" : "ítems"} sin relevar (no incluidos)</span>` : ""}</div>
+    ${nada ? `<p>No hay ítems marcados como faltantes.</p>` : secciones + secComp + secEst}
+  </div>`;
+}
+/* Listado general de equipamiento faltante: suma las unidades de todos los consultorios
+   (una por consultorio al que le falta) y las cantidades del equipamiento compartido. */
+function htmlListadoGeneral() {
+  const ids = idsSalas(estado.salas), L = new Map();
+  const sumar = (clave, nombre, n) => { if (!L.has(clave)) L.set(clave, { nombre, n: 0 }); L.get(clave).n += n; };
+  for (const s of estado.salas) for (const f of evaluarSala(s, ids).filas) {
+    if (f.estado !== "falta" || f.comp) continue;
+    if (f.id.startsWith("x:")) sumar(f.id, f.nombre, 1);
+    else if (ITEMS_REQ[f.id] && ITEMS_REQ[f.id][0] === "equipo") sumar(f.id, ITEMS_REQ[f.id][1], 1);
+  }
+  for (const c of estado.comp || []) if (c.v === false) sumar("c:" + claveExtra(c.nombre), c.nombre, cantComp(c));
+  const filas = [...L.values()].sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
+  const total = filas.reduce((a, x) => a + x.n, 0);
+  const fecha = new Date().toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" });
+  return `<div class="imp">
+    <div><span class="sobre">Mitre 837</span><h2>Listado general de equipamiento faltante</h2><p>Emitido el ${fecha}. ${total} ${total === 1 ? "unidad" : "unidades"} en ${filas.length} ${filas.length === 1 ? "ítem" : "ítems"}.</p></div>
+    ${filas.length ? `<table><thead><tr><th>Equipamiento</th><th>Cantidad</th><th>Observaciones</th></tr></thead><tbody>
+      ${filas.map(x => `<tr><td>${esc(x.nombre)}</td><td class="cant">${x.n}</td><td class="obs"></td></tr>`).join("")}</tbody>
+      <tfoot><tr><th>Total</th><td class="cant"><strong>${total}</strong></td><td></td></tr></tfoot></table>` : `<p>No hay equipamiento marcado como faltante.</p>`}
+  </div>`;
+}
+function imprimirFaltantes(listado = false) {
+  $("#impresion").innerHTML = listado ? htmlListadoGeneral() : htmlFaltantes();
+  document.body.classList.add("imp-faltantes");
+  window.print();
+}
+window.addEventListener("afterprint", () => document.body.classList.remove("imp-faltantes"));
+
+/* Croquis para imprimir o guardar como PDF (desde el diálogo de impresión del navegador). */
+function imprimirCroquis() {
+  $("#impresion").innerHTML = `<div class="imp imp-croquis"><h2>${esc(TITULO_CROQUIS)}</h2>
+    <div class="croquis">${planoCroquis().replaceAll("croquis-interior", "croquis-interior-imp")}</div></div>`;
+  document.body.classList.add("imp-faltantes");
+  window.print();
+}
+/* Croquis como imagen PNG (solo el plano): copia el SVG con los estilos ya resueltos (en tema claro)
+   y lo dibuja en un canvas. */
+async function descargarCroquisPNG() {
+  const raiz = document.documentElement, tema = raiz.getAttribute("data-theme");
+  const tmp = document.createElement("div");
+  tmp.className = "croquis";
+  tmp.style.cssText = "position:fixed;left:-10000px;top:0;width:880px";
+  tmp.innerHTML = planoCroquis();
+  document.body.appendChild(tmp);
+  raiz.setAttribute("data-theme", "light");
+  const props = ["fill", "stroke", "stroke-width", "stroke-linejoin", "font-family", "font-size", "font-weight", "text-anchor", "dominant-baseline"];
+  const svg = tmp.querySelector("svg"), copia = svg.cloneNode(true);
+  const orig = [svg, ...svg.querySelectorAll("*")], dest = [copia, ...copia.querySelectorAll("*")];
+  orig.forEach((el, i) => {
+    if (el.closest("defs")) return;
+    const cs = getComputedStyle(el);
+    dest[i].setAttribute("style", props.map(p => `${p}:${cs.getPropertyValue(p)}`).join(";"));
+  });
+  if (tema === null) raiz.removeAttribute("data-theme"); else raiz.setAttribute("data-theme", tema);
+  tmp.remove();
+  const [, , vw, vh] = copia.getAttribute("viewBox").split(/\s+/).map(Number);
+  copia.setAttribute("width", vw); copia.setAttribute("height", vh);
+  const url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(copia)], { type: "image/svg+xml" }));
+  try {
+    const img = new Image();
+    await new Promise((ok, mal) => { img.onload = ok; img.onerror = mal; img.src = url; });
+    const esc2 = 2, mrg = 20;
+    const cv = document.createElement("canvas"), ctx = cv.getContext("2d");
+    cv.width = (vw + mrg * 2) * esc2; cv.height = (vh + mrg * 2) * esc2;
+    ctx.scale(esc2, esc2);
+    ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, vw + mrg * 2, vh + mrg * 2);
+    ctx.drawImage(img, mrg, mrg, vw, vh);
+    const a = document.createElement("a");
+    a.download = "croquis-consultorios-3er-piso.png";
+    a.href = cv.toDataURL("image/png");
+    a.click();
+  } catch { flotante("No se pudo generar la imagen del croquis.", true); }
+  finally { URL.revokeObjectURL(url); }
+}
+
+function guardarFicha(sid, cambiar) {
+  if (!puedeEditar()) { flotante("No tiene permiso para modificar el cronograma.", true); return; }
+  const salas = clonar(estado.salas), s = salas.find(x => x.id === sid);
+  if (!s) return;
+  const f = s.ficha ? s.ficha : {};
+  f.items = f.items || {};
+  cambiar(f);
+  s.ficha = {
+    sup: typeof f.sup === "number" ? f.sup : null,
+    lado: typeof f.lado === "number" ? f.lado : null,
+    planta: f.planta === "baja" || f.planta === "alta" ? f.planta : "",
+    items: Object.fromEntries(Object.entries(f.items).filter(([k, v]) => ITEMS_REQ[k] && valorValido(v))),
+    agregados: [...new Set((f.agregados || []).filter(k => ITEMS_REQ[k] && !ITEMS_REQ[k][3]))],
+    extra: (f.extra || []).filter(x => x && x.clave && x.nombre).map(x => valorValido(x.v) ? { clave: x.clave, nombre: x.nombre, v: x.v } : { clave: x.clave, nombre: x.nombre })
+  };
+  estado.salas = salas;   // reflejo inmediato; la base de datos confirma después
+  guardar({ salas });
+  render();
+}
+function marcarReq(el) {
+  const val = { si: true, no: false, na: "na" }[el.dataset.val], id = el.dataset.item;
+  if (el.dataset.amb === "e") {
+    if (!puedeEditar()) return;
+    const e = clonar(estado.estab || {});
+    if (e[id] === val) delete e[id]; else e[id] = val;
+    estado.estab = e;
+    guardar({ establecimiento: e });
+    render();
+    return;
+  }
+  if (el.dataset.amb === "c") { guardarCompartidos(L => { const c = L.find(x => x.id === el.dataset.sala); if (c) { if (c.v === val) delete c.v; else c.v = val; } }); return; }
+  if (id.startsWith("x:")) {
+    guardarFicha(el.dataset.sala, f => { const x = (f.extra || []).find(x => "x:" + x.clave === id); if (x) { if (x.v === val) delete x.v; else x.v = val; } });
+    return;
+  }
+  guardarFicha(el.dataset.sala, f => { if (f.items[id] === val) delete f.items[id]; else f.items[id] = val; });
+}
+
+/* Equipamiento compartido entre consultorios (documento del cronograma, campo «compartidos»). */
+const cantComp = c => { const n = Number(c.cant); return Number.isInteger(n) && n >= 1 ? n : 1; };
+function guardarCompartidos(cambiar) {
+  if (!puedeEditar()) { flotante("No tiene permiso para modificar el cronograma.", true); return; }
+  const L = clonar(estado.comp || []);
+  cambiar(L);
+  const ids = idsSalas(estado.salas);
+  estado.comp = L.map(c => {
+    const o = { id: c.id, nombre: String(c.nombre || "").trim() || "Sin nombre", ubicacion: String(c.ubicacion || "").trim(), item: ITEMS_REQ[c.item] ? c.item : "", salas: (c.salas || []).filter(x => ids.has(x)), cant: cantComp(c) };
+    if (valorValido(c.v)) o.v = c.v;
+    return o;
+  });
+  guardar({ compartidos: estado.comp });
+  render();
+}
+
+/* ---- Diálogo de confirmación ---- */
+function confirmar(titulo, htmlCuerpo, textoOk = "Aceptar", peligro = false) {
+  const d = $("#dlgConf");
+  d.innerHTML = `<form method="dialog" class="dlg"><h2 id="dlgConfTit">${esc(titulo)}</h2><div>${htmlCuerpo}</div>
+    <div class="pie-dlg"><div class="acciones"><button class="btn" value="no">Cancelar</button><button class="btn ${peligro ? "mal" : "pri"}" value="si" autofocus>${esc(textoOk)}</button></div></div></form>`;
+  return new Promise(res => { d.addEventListener("close", () => res(d.returnValue === "si"), { once: true }); d.returnValue = "no"; d.showModal(); });
+}
+
+/* ---- Diálogo de profesional ---- */
+let borr = null;
+const filaVacia = () => ({ dias: [false, false, false, false, false, false], ini: "08:00", fin: "12:00", conf: false, sala: "=" });
+function abrirProf(id) {
+  const p = id ? estado.profs.find(x => x.id === id) : null;
+  if (id && !p) return;
+  if (p) {
+    const g = new Map();
+    for (const b of p.bloques) {
+      const s = tieneSala(b) ? b.sala : "=";
+      const k = [b.ini, b.fin, b.conf ? 1 : 0, s].join("|");
+      if (!g.has(k)) g.set(k, { ...filaVacia(), ini: aInput(b.ini), fin: aInput(b.fin), conf: !!b.conf, sala: s });
+      g.get(k).dias[b.dia] = true;
+    }
+    const ids = idsSalas(estado.salas);
+    borr = { id: p.id, nombre: p.nombre, corto: p.corto || "", especialidad: p.especialidad || "", sala: ids.has(p.sala) ? p.sala : "", filas: [...g.values()] };
+    if (!borr.filas.length) borr.filas.push(filaVacia());
+  } else borr = { id: null, nombre: "", corto: "", especialidad: "", sala: "auto", filas: [filaVacia()] };
+  borr.verSalas = borr.filas.some(f => f.sala !== "=");
+  borr.errores = [];
+  pintarDlgProf();
+  $("#dlgProf").showModal();
+}
+function profDeBorrador() {
+  const bloques = [];
+  for (const f of borr.filas) {
+    const ini = deInput(f.ini), fin = deInput(f.fin);
+    f.dias.forEach((on, d) => { if (on && !isNaN(ini) && !isNaN(fin) && ini < fin) bloques.push({ dia: d, ini, fin, conf: !!f.conf, ...(f.sala !== "=" ? { sala: f.sala } : {}) }); });
+  }
+  return { id: borr.id || "__nuevo__", nombre: borr.nombre, corto: borr.corto, especialidad: borr.especialidad, sala: borr.sala === "auto" ? "" : borr.sala, bloques };
+}
+function opcionesSala(valor, conAuto, t, otros, ids) {
+  let h = conAuto ? `<option value="auto"${valor === "auto" ? " selected" : ""}>Asignar automáticamente</option>` : "";
+  for (const s of estado.salas) {
+    const libre = t && t.bloques.length ? (conflictosEn(t, s.id, otros, ids).length ? " · se superpone" : " · libre") : "";
+    h += `<option value="${esc(s.id)}"${valor === s.id ? " selected" : ""}>${esc(s.nombre)}${libre}</option>`;
+  }
+  return h + `<option value=""${valor === "" ? " selected" : ""}>Sin asignar</option>`;
+}
+function pistaSala() {
+  const t = profDeBorrador();
+  if (!t.bloques.length) return { txt: "Cargue al menos un horario para ver en qué consultorios entra.", mal: false };
+  const ids = idsSalas(estado.salas), otros = estado.profs.filter(x => x.id !== borr.id);
+  const eleg = salasElegibles(t, estado.salas);
+  const libres = eleg.filter(sid => !conflictosEn(t, sid, otros, ids).length);
+  const exclusivo = eleg.length && estado.salas.find(s => s.id === eleg[0]).tipo === "exclusivo";
+  if (borr.sala === "auto") {
+    if (libres.length) return { txt: `Se asignará a ${nombreSala(libres[0], estado.salas)}.${libres.length > 1 ? " También entra en: " + libres.slice(1).map(s => nombreSala(s, estado.salas)).join(", ") + "." : ""}`, mal: false };
+    return { txt: `No entra completo en ningún consultorio ${exclusivo ? "exclusivo de su especialidad" : "general"}. Se guardará sin asignar; luego puede usar «Reasignar consultorios».`, mal: true };
+  }
+  if (!borr.sala) return { txt: libres.length ? `Entra sin superposiciones en: ${libres.map(s => nombreSala(s, estado.salas)).join(", ")}.` : "No entra completo en ningún consultorio sin mover a otros profesionales.", mal: !libres.length };
+  const cs = conflictosEn(t, borr.sala, otros, ids);
+  const sala = estado.salas.find(s => s.id === borr.sala);
+  const partes = [];
+  if (cs.length) { const c = cs[0]; partes.push(`Se superpone con ${nombreCorto(c.q)} (${DIAS[c.b.dia].toLowerCase()} ${rango(Math.max(c.b.ini, c.c.ini), Math.min(c.b.fin, c.c.fin))})${cs.length > 1 ? ` y ${cs.length - 1} horario${cs.length > 2 ? "s" : ""} más` : ""}.`); }
+  if (sala && sala.tipo === "exclusivo" && norm(sala.especialidad || sala.nombre) !== norm(t.especialidad)) partes.push(`${sala.nombre} es exclusivo de ${sala.especialidad || sala.nombre}.`);
+  const inc = sala && sala.tipo !== "exclusivo" ? incumpleEdilicio(sala, t.especialidad) : [];
+  if (inc.length) partes.push(`${sala.nombre} no reúne requisitos edilicios${t.especialidad ? " de " + t.especialidad : ""}: ${inc.map(f => detalleFalta(f, sala.ficha)).join("; ")}.`);
+  if (!partes.length) return { txt: "Sin superposiciones en este consultorio.", mal: false };
+  if (libres.length) partes.push(`Entra libre en: ${libres.map(s => nombreSala(s, estado.salas)).join(", ")}.`);
+  return { txt: partes.join(" "), mal: true };
+}
+function pintarDlgProf() {
+  const d = $("#dlgProf");
+  const filas = borr.filas.map((f, i) => `<div class="hrow" data-i="${i}">
+    <div class="dias" role="group" aria-label="Días">${DIA_ABR.map((a, k) => `<label title="${DIAS[k]}"><input type="checkbox" id="pd${i}_${k}" data-dia="${k}"${f.dias[k] ? " checked" : ""}><span>${a}</span></label>`).join("")}</div>
+    <div class="rango"><input type="time" id="pi${i}" data-campo="ini" value="${esc(f.ini)}" step="300" aria-label="Desde"><span>a</span><input type="time" id="pf${i}" data-campo="fin" value="${esc(f.fin)}" step="300" aria-label="Hasta"></div>
+    <label class="tilde"><input type="checkbox" id="pc${i}" data-campo="conf"${f.conf ? " checked" : ""}>A confirmar</label>
+    ${borr.verSalas ? `<select id="ps${i}" data-campo="sala" aria-label="Consultorio para este horario"><option value="="${f.sala === "=" ? " selected" : ""}>Consultorio del profesional</option>${estado.salas.map(s => `<option value="${esc(s.id)}"${f.sala === s.id ? " selected" : ""}>${esc(s.nombre)}</option>`).join("")}</select>` : ""}
+    <button type="button" class="btn chico x" data-act="fila-quitar" aria-label="Quitar horario"${borr.filas.length < 2 ? " hidden" : ""}>Quitar</button></div>`).join("");
+  d.innerHTML = `<form class="dlg" id="frmProf" novalidate>
+    <h2 id="dlgProfTit">${borr.id ? "Editar profesional" : "Agregar profesional"}</h2>
+    <div id="pErr"></div>
+    <div class="dos">
+      <label class="campo"><span>Nombre completo</span><input type="text" id="pNombre" data-campo="nombre" value="${esc(borr.nombre)}" placeholder="Dra. Apellido, Nombre" autocomplete="off"></label>
+      <label class="campo"><span>Especialidad</span><input type="text" id="pEsp" data-campo="especialidad" list="listaEsp" value="${esc(borr.especialidad)}" autocomplete="off"></label>
+      <label class="campo"><span>Nombre en la grilla</span><input type="text" id="pCorto" data-campo="corto" value="${esc(borr.corto)}" placeholder="Apellido" autocomplete="off"><small>Opcional. Si queda vacío se usa el apellido.</small></label>
+      <label class="campo"><span>Consultorio</span><select id="pSala" data-campo="sala"></select></label>
+    </div>
+    <p class="pista-sala" id="pPista"></p>
+    <div class="campo"><span>Días y horarios</span>
+      <div class="horarios">${filas}</div>
+      <div class="acciones"><button type="button" class="btn chico" data-act="fila-nueva">Agregar otro horario</button>
+      ${borr.verSalas ? "" : `<button type="button" class="enlace" data-act="ver-salas">Usar consultorios distintos según el horario</button>`}</div>
+    </div>
+    <div class="pie-dlg">${borr.id ? `<button type="button" class="btn mal" data-act="prof-borrar">Eliminar profesional</button>` : ""}
+      <div class="acciones"><button type="button" class="btn" data-act="dlg-cerrar">Cancelar</button><button type="submit" class="btn pri">Guardar</button></div></div>
+    ${datalistEsp()}</form>`;
+  refrescarPista();
+  pintarErrores();
+}
+function refrescarPista() {
+  const sel = $("#pSala"); if (!sel) return;
+  const t = profDeBorrador(), ids = idsSalas(estado.salas), otros = estado.profs.filter(x => x.id !== borr.id);
+  sel.innerHTML = opcionesSala(borr.sala, !borr.id || borr.sala === "auto", t, otros, ids);
+  const p = pistaSala(), el = $("#pPista");
+  el.textContent = p.txt; el.className = "pista-sala" + (p.mal ? " mal" : "");
+}
+function pintarErrores() {
+  const e = $("#pErr"); if (!e) return;
+  e.innerHTML = borr.errores.length ? `<div class="errores" role="alert"><ul>${borr.errores.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : "";
+}
+function guardarProf() {
+  const er = [];
+  if (!borr.nombre.trim()) er.push("Falta el nombre del profesional.");
+  if (!borr.especialidad.trim()) er.push("Falta la especialidad.");
+  borr.filas.forEach((f, i) => {
+    const ini = deInput(f.ini), fin = deInput(f.fin), n = borr.filas.length > 1 ? ` (horario ${i + 1})` : "";
+    if (!f.dias.some(Boolean)) er.push(`Marque al menos un día${n}.`);
+    if (isNaN(ini) || isNaN(fin)) er.push(`Complete la hora de inicio y de fin${n}.`);
+    else if (ini >= fin) er.push(`La hora de fin debe ser posterior a la de inicio${n}.`);
+  });
+  const t = profDeBorrador();
+  if (!er.length) for (let i = 0; i < t.bloques.length; i++) for (let j = i + 1; j < t.bloques.length; j++)
+    if (solapa(t.bloques[i], t.bloques[j])) { er.push(`Dos horarios del mismo profesional se superponen el ${DIAS[t.bloques[i].dia].toLowerCase()}.`); i = j = 1e9; }
+  borr.errores = er;
+  if (er.length) { pintarErrores(); return; }
+  const ids = idsSalas(estado.salas), otros = estado.profs.filter(x => x.id !== borr.id);
+  let aviso = "";
+  if (borr.sala === "auto") {
+    const libres = salasElegibles(t, estado.salas).filter(sid => !conflictosEn(t, sid, otros, ids).length);
+    t.sala = libres[0] || "";
+    if (!t.sala) aviso = "No entró en ningún consultorio sin superposiciones. Use «Reasignar consultorios».";
+  }
+  t.id = borr.id || nuevoId();
+  guardar({ profs: [t] });
+  $("#dlgProf").close();
+  flotante(aviso || (borr.id ? "Cambios guardados." : `${nombreCorto(t)} quedó en ${nombreSala(t.sala, estado.salas)}.`), !!aviso);
+}
+
+/* ---- Acciones ---- */
+async function reasignar() {
+  const r = autoAsignar(estado.profs, estado.salas);
+  const ids = idsSalas(estado.salas);
+  const cambios = r.profs.filter(n => JSON.stringify(limpiar(n)) !== JSON.stringify(limpiar(estado.profs.find(p => p.id === n.id))));
+  if (!cambios.length) {
+    const an = analizar(estado.profs, estado.salas);
+    if (r.sinLugar.length) flotante(`No hay consultorio libre para ${r.sinLugar.join(", ")}: en ese horario hay más profesionales que consultorios disponibles.`, true);
+    else if (an.choques.length || an.sinAsignar.length) flotante("No se encontró una distribución mejor que la actual.", true);
+    else flotante("La asignación actual ya es válida; no hay nada que mover.");
+    return;
+  }
+  const li = cambios.map(n => {
+    const v = estado.profs.find(p => p.id === n.id);
+    const de = ids.has(v.sala) ? nombreSala(v.sala, estado.salas) : "Sin asignar";
+    const varias = n.bloques.some(tieneSala);
+    return `<li><strong>${esc(nombreCorto(n))}</strong>: ${esc(de)} → ${esc(nombreSala(n.sala, estado.salas))}${varias ? " (cambia de consultorio según el día)" : ""}</li>`;
+  }).join("");
+  let nota = "";
+  if (!r.fijo) nota = `<p>No existe una distribución con consultorio fijo para todos. Algunos profesionales atenderían en consultorios distintos según el día.</p>`;
+  if (r.sinLugar.length) nota += `<p><strong>Sin lugar en algún horario:</strong> ${esc(r.sinLugar.join(", "))}. Hay más profesionales que consultorios en esa franja.</p>`;
+  const ok = await confirmar("Reasignar consultorios", `${nota}<p>Se ${cambios.length === 1 ? "moverá 1 profesional" : `moverán ${cambios.length} profesionales`}:</p><ul class="cambios">${li}</ul>`, "Aplicar");
+  if (!ok) return;
+  guardar({ profs: cambios });
+  flotante("Consultorios reasignados.");
+}
+function moverProf(id, sid) {
+  const p = estado.profs.find(x => x.id === id); if (!p) return;
+  const ids = idsSalas(estado.salas);
+  if ((ids.has(p.sala) ? p.sala : "") === sid && !p.bloques.some(tieneSala)) return;
+  const n = { ...p, sala: sid, bloques: p.bloques.map(({ sala, ...b }) => b) };
+  guardar({ profs: [n] });
+  const cs = sid ? conflictosEn(n, sid, estado.profs.filter(x => x.id !== id), ids) : [];
+  const sala = estado.salas.find(x => x.id === sid);
+  const inc = sala && sala.tipo !== "exclusivo" ? incumpleEdilicio(sala, p.especialidad) : [];
+  const extra = inc.length ? ` No reúne requisitos edilicios: ${inc.map(f => detalleFalta(f, sala.ficha)).join("; ")}.` : "";
+  flotante((cs.length ? `${nombreCorto(p)} pasó a ${nombreSala(sid, estado.salas)}, pero se superpone con ${nombreCorto(cs[0].q)}.` : `${nombreCorto(p)} pasó a ${nombreSala(sid, estado.salas)}.`) + extra, !!cs.length || !!inc.length);
+}
+
+/* ============================================================================
+   7) EVENTOS
+   ========================================================================== */
+document.addEventListener("click", async e => {
+  const tab = e.target.closest("[data-vista]");
+  if (tab) { estado.vista = tab.dataset.vista; render(); window.scrollTo(0, 0); return; }
+  const barra = e.target.closest(".b.edita");
+  if (barra && !e.target.closest("[data-act]")) { abrirProf(barra.dataset.prof); return; }
+  const el = e.target.closest("[data-act]"); if (!el) return;
+  const act = el.dataset.act;
+  if (act === "imprimir-faltantes") imprimirFaltantes();
+  else if (act === "imprimir-listado") imprimirFaltantes(true);
+  else if (act === "croquis-pdf") imprimirCroquis();
+  else if (act === "croquis-png") descargarCroquisPNG();
+  else if (act === "imprimir") { document.body.classList.remove("imp-faltantes"); if (estado.vista !== "cronograma") { estado.vista = "cronograma"; render(); } window.print(); }
+  else if (act === "sembrar") guardar({ salas: clonar(SALAS_BASE), profs: clonar(PROFS_BASE) });
+  else if (act === "sembrar-vacio") guardar({ salas: clonar(SALAS_BASE) });
+  else if (act === "nuevo-prof") abrirProf(null);
+  else if (act === "editar-prof") abrirProf(el.dataset.id);
+  else if (act === "reasignar") reasignar();
+  else if (act === "dlg-cerrar") $("#dlgProf").close();
+  else if (act === "fila-nueva") { borr.filas.push(filaVacia()); pintarDlgProf(); }
+  else if (act === "fila-quitar") { borr.filas.splice(+el.closest(".hrow").dataset.i, 1); pintarDlgProf(); }
+  else if (act === "ver-salas") { borr.verSalas = true; pintarDlgProf(); }
+  else if (act === "prof-borrar") {
+    const p = estado.profs.find(x => x.id === borr.id);
+    if (p && await confirmar("Eliminar profesional", `<p>Se elimina a <strong>${esc(p.nombre)}</strong> y todos sus horarios.</p>`, "Eliminar", true)) { guardar({ borrar: [p.id] }); $("#dlgProf").close(); flotante("Profesional eliminado."); }
+  }
+  else if (act === "sala-nueva") { const n = CROQUIS_NROS.find(x => !borrSalas.some(s => +s.nro === x)); borrSalas.push({ id: "s" + nuevoId(), ...(n ? { nro: n } : {}), nombre: "Consultorio " + (n || borrSalas.length + 1), tipo: "general", especialidad: "" }); render(); }
+  else if (act === "sala-quitar") { borrSalas.splice(+el.closest(".sala-fila").dataset.i, 1); render(); }
+  else if (act === "sala-subir" || act === "sala-bajar") { const i = +el.closest(".sala-fila").dataset.i, j = i + (act === "sala-subir" ? -1 : 1); [borrSalas[i], borrSalas[j]] = [borrSalas[j], borrSalas[i]]; render(); }
+  else if (act === "salas-guardar") guardarSalas();
+  else if (act === "ver-req") { estado.reqSala = el.dataset.sala; estado.vista = "requisitos"; render(); window.scrollTo(0, 0); }
+  else if (act === "rq-sala") { estado.reqSala = el.dataset.sala; render(); const c = $("#rq-cons"); if (c && el.closest(".matriz")) c.scrollIntoView(); }
+  else if (act === "rq-marcar") marcarReq(el);
+  else if (act === "croquis-sel") { const n = +el.dataset.nro; estado.croquisSel = estado.croquisSel === n ? 0 : n; render(); const g = document.getElementById("consultorio-0" + n); if (g) g.focus({ preventScroll: true }); }
+  else if (act === "adoptar-croquis") adoptarCroquis();
+  else if (act === "rq-agregado-quitar") { const id = el.dataset.item; guardarFicha(el.dataset.sala, f => { f.agregados = (f.agregados || []).filter(k => k !== id); delete f.items[id]; }); }
+  else if (act === "rq-extra-quitar") { const id = el.dataset.item; guardarFicha(el.dataset.sala, f => { f.extra = (f.extra || []).filter(x => "x:" + x.clave !== id); }); }
+  else if (act === "comp-nuevo") {
+    const id = nuevoId();
+    guardarCompartidos(L => L.push({ id, nombre: "Nuevo equipamiento", salas: [] }));
+    const n = document.getElementById("cp-n-" + id); if (n) { n.focus(); n.select(); }
+  }
+  else if (act === "comp-quitar") {
+    const c = (estado.comp || []).find(x => x.id === el.dataset.id);
+    if (c && await confirmar("Quitar equipamiento compartido", `<p>Se quita <strong>${esc(c.nombre)}</strong> de la lista. Los consultorios que lo usaban vuelven a su propia marca.</p>`, "Quitar", true)) guardarCompartidos(L => L.splice(L.findIndex(x => x.id === c.id), 1));
+  }
+});
+
+document.addEventListener("keydown", e => {
+  if ((e.key === "Enter" || e.key === " ") && e.target.matches && e.target.matches(".b.edita")) { e.preventDefault(); abrirProf(e.target.dataset.prof); }
+  if ((e.key === "Enter" || e.key === " ") && e.target.matches && e.target.matches("[data-act=croquis-sel]")) { e.preventDefault(); e.target.dispatchEvent(new MouseEvent("click", { bubbles: true })); }
+});
+
+document.addEventListener("input", e => {
+  const t = e.target;
+  if (t.id === "buscar") { estado.filtro = t.value; pintarTablaProfs(); return; }
+  const sf = t.closest(".sala-fila");
+  if (sf && borrSalas) {
+    const s = borrSalas[+sf.dataset.i]; s[t.dataset.campo] = t.value;
+    if (t.dataset.campo === "tipo") $("[data-campo=especialidad]", sf).disabled = t.value !== "exclusivo";
+    // Con número de croquis, el nombre sigue la numeración salvo que se haya escrito otro.
+    if (t.dataset.campo === "nro" && t.value && (!s.nombre.trim() || /^Consultorio \d+$/.test(s.nombre.trim()))) { s.nombre = "Consultorio " + t.value; $("[data-campo=nombre]", sf).value = s.nombre; }
+    return;
+  }
+  if (t.closest("#frmProf") && borr) {
+    const fila = t.closest(".hrow");
+    if (fila) {
+      const f = borr.filas[+fila.dataset.i];
+      if (t.dataset.dia !== undefined) f.dias[+t.dataset.dia] = t.checked;
+      else if (t.dataset.campo === "conf") f.conf = t.checked;
+      else f[t.dataset.campo] = t.value;
+    } else if (t.dataset.campo) borr[t.dataset.campo] = t.value;
+    if (t.id !== "pSala") refrescarPista(); else { const p = pistaSala(), el = $("#pPista"); el.textContent = p.txt; el.className = "pista-sala" + (p.mal ? " mal" : ""); }
+  }
+});
+
+/* Lista de control: superficie, lado y planta se guardan al confirmar el campo. */
+document.addEventListener("change", e => {
+  const t = e.target;
+  if (t.id === "rq-todos") { estado.reqTodos = t.checked; render(); return; }
+  if (t.id === "croquis-esp") { estado.croquisEsp = t.checked; render(); return; }
+  const cp = t.dataset && t.dataset.comp;
+  if (cp) {
+    const id = t.closest("[data-comp-id]").dataset.compId;
+    guardarCompartidos(L => {
+      const c = L.find(x => x.id === id); if (!c) return;
+      if (cp === "cant" && !(/^\d+$/.test(t.value.trim()) && +t.value >= 1)) { flotante("Ingrese una cantidad entera, 1 o más.", true); return; }
+      if (cp === "sala") c.salas = t.checked ? [...new Set([...(c.salas || []), t.value])] : (c.salas || []).filter(x => x !== t.value);
+      else c[cp] = t.value;
+    });
+    return;
+  }
+  const campo = t.dataset && t.dataset.ficha;
+  if (!campo) return;
+  if (campo === "planta") { guardarFicha(t.dataset.sala, f => { f.planta = t.value; }); return; }
+  const txt = t.value.trim().replace(",", ".");
+  const v = txt === "" ? null : Number(txt);
+  if (v !== null && !(v > 0 && v < 10000)) { flotante("Ingrese un número válido, por ejemplo 9,5.", true); return; }
+  guardarFicha(t.dataset.sala, f => { f[campo] = v; });
+});
+
+document.addEventListener("submit", e => {
+  if (e.target.id === "frmProf") { e.preventDefault(); guardarProf(); return; }
+  if (e.target.dataset.form === "rq-extra") {
+    e.preventDefault();
+    const nombre = $("input", e.target).value.trim(), clave = claveExtra(nombre), sid = e.target.dataset.sala;
+    if (!clave) { flotante("Escriba el nombre del equipamiento.", true); return; }
+    const s = estado.salas.find(x => x.id === sid);
+    const cat = Object.keys(ITEMS_REQ).find(k => !ITEMS_REQ[k][3] && claveExtra(ITEMS_REQ[k][1]) === clave);
+    if (cat) {
+      const ev = evaluarSala(s, idsSalas(estado.salas));
+      if (ev.filas.some(f => f.id === cat)) { flotante(ev.filas.find(f => f.id === cat).adicional ? "Ese equipamiento ya está en la lista del consultorio." : "La norma ya lo exige en este consultorio: figura en la lista.", true); return; }
+      guardarFicha(sid, f => { f.agregados = [...(f.agregados || []), cat]; });
+      return;
+    }
+    if (((s && s.ficha && s.ficha.extra) || []).some(x => x.clave === clave)) { flotante("Ese equipamiento ya está en la lista del consultorio.", true); return; }
+    guardarFicha(sid, f => { f.extra = [...(f.extra || []), { clave, nombre }]; });
+    return;
+  }
+});
+
+/* Arrastrar un horario a otro consultorio muda al profesional toda la semana. */
+let arrastrado = null;
+document.addEventListener("dragstart", e => {
+  const b = e.target.closest && e.target.closest(".b.edita"); if (!b) return;
+  arrastrado = b.dataset.prof;
+  e.dataTransfer.effectAllowed = "move";
+  try { e.dataTransfer.setData("text/plain", arrastrado); } catch (err) { /* algunos navegadores lo restringen */ }
+});
+document.addEventListener("dragover", e => {
+  const p = e.target.closest && e.target.closest(".pista[data-sala]"); if (!p || !arrastrado) return;
+  e.preventDefault(); e.dataTransfer.dropEffect = "move";
+  $$(".pista.sobre-drop").forEach(x => x !== p && x.classList.remove("sobre-drop"));
+  p.classList.add("sobre-drop");
+});
+document.addEventListener("drop", e => {
+  const p = e.target.closest && e.target.closest(".pista[data-sala]");
+  $$(".pista.sobre-drop").forEach(x => x.classList.remove("sobre-drop"));
+  if (!p || !arrastrado) return;
+  e.preventDefault();
+  const id = arrastrado; arrastrado = null;
+  moverProf(id, p.dataset.sala);
+});
+document.addEventListener("dragend", () => { arrastrado = null; $$(".pista.sobre-drop").forEach(x => x.classList.remove("sobre-drop")); });
+
+/* ============================================================================
+   8) INICIO
+   ========================================================================== */
+(async function iniciar() {
+  render();
+  // Ingreso único de los Sistemas ISSyS: Google + permiso 'consultorios' en usuarios/{email}.
+  const ses = await ISSyS.iniciar({ sistema: SISTEMA, titulo: "Consultorios Comodoro Rivadavia", texto: "Cronograma de atención de los consultorios" });
+  estado.usuario = { email: ses.usuario.email, nombre: ses.usuario.nombre };
+  estado.rol = ISSyS.rolEn(ses.usuario, SISTEMA) || "lector";
+  encabezado = ISSyS.ponerEncabezado(document.getElementById("issys-encabezado"), ses.usuario, {
+    sistema: SISTEMA, rol: ISSyS.nombreRol(ses.usuario, SISTEMA)
+  });
+  almacen = almacenFirebase(ses);
+  render();
+})();
+</script>
+</body>
+</html>

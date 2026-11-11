@@ -47,8 +47,13 @@ window.ISSYS_CONFIG = {
             descripcion: 'Estructuras de las delegaciones. Se integra en una próxima etapa (hoy en issys-delegaciones).'
         },
         {
-            id: 'consultorios', nombre: 'Consultorios Mitre 837', estado: 'proximamente', url: '/consultorios/', color: 'blue', icono: 'consultorios',
-            descripcion: 'Cronograma de atención de consultorios. Pendiente de relevamiento.'
+            id: 'consultorios', nombre: 'Consultorios Comodoro Rivadavia', estado: 'activo', url: '/consultorios/', color: 'green', icono: 'consultorios',
+            descripcion: 'Cronograma de atención, croquis y requisitos de habilitación de los consultorios.',
+            // Editor: carga profesionales, horarios, consultorios y requisitos. Lector: sólo consulta.
+            roles: [
+                { id: 'editor', nombre: 'Editor' },
+                { id: 'lector', nombre: 'Lector' }
+            ]
         }
     ]
 };

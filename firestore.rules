@@ -11,6 +11,7 @@ rules_version = '2';
 //   Procesos        → datos/{clave}
 //   Presentaciones  → presentaciones/{id}, presentacionesImagenes/{hash}
 //   Estatuto        → eerEditor/state (texto, comentarios, marcas), eerGraph/{concepts|links|positions|categories}
+//   Consultorios    → consultoriosCronogramas/mitre837 y su subcolección profesionales/{id}
 //
 // Las listas anteriores (acceso, presentacionesAcceso) se retiraron el 11/11/2026: no hay ninguna regla para ellas,
 // así que nadie puede leerlas ni escribirlas.
@@ -97,6 +98,25 @@ service cloud.firestore {
     match /eerGraph/{documento=**} {
       allow read: if habilitado('estatuto');
       allow write: if editaEstatuto();
+    }
+
+    // ---------- Consultorios ----------
+    // Roles (usuarios/{email}.roles.consultorios): editor, lector.
+    // Sin rol asignado: un administrador global es editor; el resto, lector (igual que ISSyS.rolEn en auth.js).
+    function rolConsultoriosAsignado() {
+      return get(rutaPerfil()).data.get('roles', {}).get('consultorios', '');
+    }
+    function editaConsultorios() {
+      return dueno() || (habilitado('consultorios') && (
+        rolConsultoriosAsignado() == 'editor' ||
+        (rolConsultoriosAsignado() == '' && get(rutaPerfil()).data.get('admin', false) == true)
+      ));
+    }
+    // consultoriosCronogramas/mitre837 (consultorios, establecimiento, equipamiento compartido)
+    // y su subcolección profesionales/{id}
+    match /consultoriosCronogramas/{documento=**} {
+      allow read: if habilitado('consultorios');
+      allow write: if editaConsultorios();
     }
   }
 }

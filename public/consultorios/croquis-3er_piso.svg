@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="945 285 880 1215" id="croquis-mitre837" font-family="Segoe UI, Roboto, Arial, sans-serif">
+  <title>Croquis planta – Delegación Comodoro Rivadavia (Mitre 837)</title>
+  <style>
+    .esp{stroke:#37474f;stroke-width:4;stroke-linejoin:round;transition:fill .15s}
+    .consultorio{fill:#dcebfa}
+    .consultorio:hover,.consultorio.activo{fill:#90c2f0;cursor:pointer}
+    .consultorio.ocupado{fill:#f6c9c4}
+    .consultorio.libre{fill:#cfeccf}
+    .vacunatorio{fill:#efe2f7}
+    .vacunatorio:hover,.vacunatorio.activo{fill:#d5b6ea;cursor:pointer}
+    .patio{fill:#e9f2e1}
+    .espera{fill:#fff7e0}
+    .sanitario{fill:#e6f2ef}
+    .servicio{fill:#eceff1}
+    .circ{fill:#ffffff}
+    .tecnico{fill:#e0e0e0}
+    .lbl{font-size:30px;font-weight:700;fill:#1c2b36;text-anchor:middle;dominant-baseline:middle;pointer-events:none}
+    .sub{font-size:19px;font-weight:400;fill:#455a64;text-anchor:middle;dominant-baseline:middle;pointer-events:none}
+    .chico{font-size:17px}
+    .fachada{fill:none;stroke:#1c2b36;stroke-width:9}
+  </style>
+
+  <defs>
+    <clipPath id="interior"><path d="M1128 870 C1150 1150 1330 1420 1625 1480 L1900 1480 L1900 0 L900 0 L900 870 Z"/></clipPath>
+  </defs>
+
+  <!-- Hall de espera y circulación -->
+  <path id="hall-espera" class="esp espera" data-tipo="espera"
+        d="M1170 530 H1690 V590 H1765 V655 H1525 V862 H1445 V1470 L1625 1480 C1330 1420 1150 1150 1128 870 H1272 V585 H1170 Z" clip-path="url(#interior)"/>
+  <text class="lbl" x="1360" y="1150" style="font-size:24px">Hall de</text>
+  <text class="lbl" x="1360" y="1180" style="font-size:24px">espera</text>
+  <text class="sub" x="1420" y="560">Circulación</text>
+
+  <!-- Fila superior de consultorios -->
+  <g id="consultorio-01" class="esp consultorio" data-tipo="consultorio" data-nro="1"><path d="M985 330 H1100 V530 H1170 V585 H985 Z"/></g>
+  <g id="consultorio-02" class="esp consultorio" data-tipo="consultorio" data-nro="2"><rect x="1100" y="330" width="132" height="200"/></g>
+  <g id="consultorio-03" class="esp consultorio" data-tipo="consultorio" data-nro="3"><rect x="1232" y="330" width="133" height="200"/></g>
+  <g id="consultorio-04" class="esp consultorio" data-tipo="consultorio" data-nro="4"><rect x="1365" y="330" width="133" height="200"/></g>
+  <g id="consultorio-05" class="esp consultorio" data-tipo="consultorio" data-nro="5"><rect x="1498" y="330" width="132" height="200"/></g>
+  <text class="lbl" x="1042" y="430">C1</text><text class="sub chico" x="1042" y="465">Consultorio</text>
+  <text class="lbl" x="1166" y="420">C2</text><text class="sub chico" x="1166" y="455">Consultorio</text>
+  <text class="lbl" x="1298" y="420">C3</text><text class="sub chico" x="1298" y="455">Consultorio</text>
+  <text class="lbl" x="1431" y="420">C4</text><text class="sub chico" x="1431" y="455">Consultorio</text>
+  <text class="lbl" x="1564" y="420">C5</text><text class="sub chico" x="1564" y="455">Consultorio</text>
+
+  <!-- Columna derecha sobre la curva -->
+  <g id="consultorio-06" class="esp consultorio" data-tipo="consultorio" data-nro="6"><rect x="1445" y="865" width="180" height="125"/></g>
+  <g id="consultorio-07" class="esp consultorio" data-tipo="consultorio" data-nro="7"><rect x="1445" y="990" width="180" height="122"/></g>
+  <g id="consultorio-08" class="esp consultorio" data-tipo="consultorio" data-nro="8"><rect x="1445" y="1112" width="180" height="123"/></g>
+  <text class="lbl" x="1535" y="920">C6</text><text class="sub chico" x="1535" y="955">Consultorio</text>
+  <text class="lbl" x="1535" y="1043">C7</text><text class="sub chico" x="1535" y="1078">Consultorio</text>
+  <text class="lbl" x="1535" y="1166">C8</text><text class="sub chico" x="1535" y="1201">Consultorio</text>
+
+  <!-- Vacunatorio (dos locales) -->
+  <g id="vacunatorio" class="esp vacunatorio" data-tipo="vacunatorio">
+    <rect x="1445" y="1235" width="180" height="250" clip-path="url(#interior)"/>
+    <rect x="1630" y="1225" width="170" height="225"/>
+  </g>
+  <text class="sub" x="1560" y="1330" style="font-weight:700;fill:#1c2b36">Vacunatorio</text>
+  <text class="sub" x="1715" y="1330" style="font-weight:700;fill:#1c2b36">Vacunatorio</text>
+
+  <!-- Patio interno -->
+  <rect id="patio-interno" class="esp patio" x="1630" y="865" width="170" height="357"/>
+  <text class="sub" x="1715" y="1030">Patio</text><text class="sub" x="1715" y="1055">interno</text>
+
+  <!-- Consultorio junto al palier -->
+  <g id="consultorio-09" class="esp consultorio" data-tipo="consultorio" data-nro="9" clip-path="url(#interior)"><rect x="1135" y="865" width="137" height="230"/></g>
+  <text class="lbl" x="1203" y="965">C9</text><text class="sub chico" x="1203" y="1000">Consultorio</text>
+
+  <!-- Núcleo vertical y servicios -->
+  <rect id="escalera" class="esp servicio" x="965" y="585" width="285" height="135"/>
+  <text class="sub" x="1107" y="652">Escalera</text>
+  <rect id="ascensores" class="esp servicio" x="975" y="720" width="120" height="142"/>
+  <text class="sub chico" x="1035" y="791">Ascensores</text>
+  <rect id="palier" class="esp circ" x="1095" y="720" width="177" height="142"/>
+  <text class="sub" x="1183" y="791">Palier</text>
+
+  <!-- Sector superior derecho -->
+  <path id="office" class="esp servicio" d="M1630 330 H1805 V425 H1690 V530 H1630 Z"/>
+  <text class="sub" x="1712" y="380">Office</text>
+  <rect id="sanitarios-publico" class="esp sanitario" x="1690" y="425" width="115" height="165"/>
+  <text class="sub chico" x="1747" y="507">Sanitarios</text>
+
+  <!-- Sector medio derecho -->
+  <rect id="deposito" class="esp servicio" x="1525" y="655" width="100" height="207"/>
+  <text class="sub chico" x="1575" y="758">Depósito</text>
+  <rect id="sanitarios" class="esp sanitario" x="1630" y="655" width="170" height="207"/>
+  <text class="sub" x="1715" y="758">Sanitarios</text>
+
+  <!-- Recepción: mostrador para 2 puestos -->
+  <g id="recepcion" data-tipo="recepcion">
+    <rect x="1450" y="688" width="20" height="166" rx="3" fill="#b0bec5" stroke="#37474f" stroke-width="3"/>
+    <circle cx="1500" cy="705" r="13" fill="#ffffff" stroke="#37474f" stroke-width="3"/>
+    <circle cx="1500" cy="838" r="13" fill="#ffffff" stroke="#37474f" stroke-width="3"/>
+  </g>
+  <text class="sub chico" x="1500" y="772" transform="rotate(-90 1500 772)">Recepción</text>
+
+  <!-- Fachada curva vidriada -->
+  <path class="fachada" d="M1128 870 C1150 1150 1330 1420 1625 1480"/>
+
+  <text class="sub chico" x="965" y="305" style="text-anchor:start">Croquis esquemático — sin escala</text>
+</svg>

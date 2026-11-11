@@ -26,6 +26,7 @@ desde `shared/`.
   - [presentaciones](./presentaciones/README.md): motor y editor de presentaciones; `presentaciones/{id}`,
     `presentacionesImagenes/{hash}`.
   - [estatuto](./estatuto/README.md): editor del Estatuto y mapa de conceptos; `eerEditor/state`, `eerGraph/*`.
+  - [consultorios](./consultorios/README.md): cronograma, croquis y requisitos de habilitación de Mitre 837; `consultoriosCronogramas/mitre837` + `profesionales/{id}`.
 
 ## Invariants
 

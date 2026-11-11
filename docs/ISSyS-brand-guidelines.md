@@ -129,7 +129,7 @@ Valores calculados con los colores de `issys.css` al 11/11/2026. Si cambia un to
 **Reglas:**
 - Los colores [BrandBook] `green`, `yellow`, `gray` y `gray-light` **no deben** usarse para texto: van en fondos, bordes,
   íconos decorativos y acentos. Para texto se usa su gemelo: `green-dark` o `green-deep`, `yellow-ink`, `muted`.
-- Fondo `green` (por ejemplo, los íconos del lanzador): contenido en `ink`. Botón azul: texto `white`. Amarillo: siempre
+- Fondo `green`: contenido en `ink`. Íconos del lanzador: fondo `green-dark` (o `blue`) con ícono `white`. Botón azul: texto `white`. Amarillo: siempre
   fondo, con texto `ink` o `yellow-ink`.
 
 ### 1.5 Fusión, degradados y transparencia
@@ -343,4 +343,5 @@ No hay botón verde: la acción principal es azul.
 | Matriz de contraste (§1.4) | Depende de los HEX de `issys.css`; si cambia un token, recalcularla. |
 | Excepciones al mínimo de 12 px | En Estatuto quedan más chicos sólo los símbolos de adorno dentro de círculos (flechas de `.section-tgl` y `.cap-tgl`, cruz de `.ref-chip-del`) y las etiquetas del grafo de `mapa.html`, que se agrandan con el zoom. |
 | Colores de categorías del mapa de Estatuto | Pasados a la paleta el 11/11/2026 (`mapa.html` migra los colores de fábrica viejos al cargar). Con 7 categorías y 5 colores de marca, algunas se parecen (Normativa y Organismo, dos azules): el nombre del nodo y la leyenda las distinguen. |
+| Colores de especialidades de Consultorios | 13 especialidades y pocos colores de marca: cada una combina un tinte de fondo y un color de borde (texto siempre `ink`). Algunas se parecen; el nombre del profesional, la leyenda y la etiqueta de especialidad las distinguen. |
 | Impresión de Estatuto | La vista de impresión usa Times New Roman en negro: es un documento impreso, fuera del alcance de esta guía (§0.1). |

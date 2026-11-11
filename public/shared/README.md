@@ -27,7 +27,7 @@ Reglas generales del proyecto: [README del repositorio](/README.md) (sección "E
 - `dueno`: correo del administrador fijo.
 - `emuladoresEnLocalhost`: con `true`, en `localhost` se usan los emuladores de Auth (9099) y Firestore (8080).
 - `sistemas[]`: catálogo `{ id, nombre, estado: 'activo' | 'proximamente', url, color: 'blue' | 'green', icono, descripcion, roles? }`.
-  Hoy: `procesos`, `presentaciones`, `estatuto` (con `roles` admin/editor/revisor/lector), `delegaciones` y `consultorios` (próximamente).
+  Hoy: `procesos`, `presentaciones`, `estatuto` (con `roles` admin/editor/revisor/lector), `consultorios` (con `roles` editor/lector) y `delegaciones` (próximamente).
 
 ### `auth.js` → `window.ISSyS`
 
