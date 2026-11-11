@@ -27,8 +27,6 @@ desde `shared/`.
   - [presentaciones](./presentaciones/README.md): motor y editor de presentaciones; `presentaciones/{id}`,
     `presentacionesImagenes/{hash}`.
   - [estatuto](./estatuto/README.md): editor del Estatuto y mapa de conceptos; `eerEditor/state`, `eerGraph/*`.
-  - [herramientas](./herramientas/README.md): `migrar-estatuto.html` (uso único, sólo administradores).
-
 ## Invariants
 
 - Carga de `/shared/firebase-config.js` antes de `/shared/auth.js` en todas las páginas.

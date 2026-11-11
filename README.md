@@ -31,9 +31,8 @@ issys/
     │   └── marca/               logos oficiales
     ├── procesos/          index.html, modelador.html, bpmn-*.js, nube.js
     ├── presentaciones/    index.html, nube.js
-    ├── estatuto/          index.html (editor), mapa.html (mapa de conceptos), nube.js,
-    │                      estatuto-marca.css (identidad común: se carga después de los estilos propios)
-    └── herramientas/      migrar-estatuto.html (uso puntual, sólo administradores; se borra después de migrar)
+    └── estatuto/          index.html (editor), mapa.html (mapa de conceptos), nube.js,
+                           estatuto-marca.css (identidad común: se carga después de los estilos propios)
 ```
 
 ## Cómo se integra un sistema
@@ -156,9 +155,7 @@ sistemas viven en `usuarios/{email}` y los aplica `firestore.rules`. La raíz no
   - `public/shared`: [./public/shared/README.md](./public/shared/README.md) — `ISSYS_CONFIG` (credenciales, `dueno`, catálogo `sistemas`), `window.ISSyS` (login, encabezado común, roles), tokens y componentes de marca.
   - `public/procesos`: [./public/procesos/README.md](./public/procesos/README.md) — visor y modelador BPMN; `nube.js` sincroniza `localStorage` con `datos/{clave}`.
   - `public/presentaciones`: [./public/presentaciones/README.md](./public/presentaciones/README.md) — editor de presentaciones institucionales; modo local (IndexedDB) y en la nube con `presentaciones/{id}` + `presentacionesImagenes/{hash}`.
-  - `public/estatuto`: [./public/estatuto/README.md](./public/estatuto/README.md) — editor del Estatuto y mapa de conceptos; `eerEditor/state`, `eerGraph/*`; roles admin/editor/revisor/lector.
-  - `public/herramientas`: [./public/herramientas/README.md](./public/herramientas/README.md) — `migrar-estatuto.html`: copia desde `issys-eer` (uso puntual, sólo administradores; se borra en la Etapa 2, paso 8).
-- `docs`: manual de marca (`ISSyS-brand-guidelines.md`), sin código.
+  - `public/estatuto`: [./public/estatuto/README.md](./public/estatuto/README.md) — editor del Estatuto y mapa de conceptos; `eerEditor/state`, `eerGraph/*`; roles admin/editor/revisor/lector.- `docs`: manual de marca (`ISSyS-brand-guidelines.md`), sin código.
 - `recursos`: material que no se publica (temas JSON de ejemplo), sin código.
 - `eer`: copia de referencia del repo anterior de Estatuto; está en `.gitignore`.
 
@@ -185,7 +182,6 @@ sistemas viven en `usuarios/{email}` y los aplica `firestore.rules`. La raíz no
 - Firebase Auth (Google) en el proyecto `issys-procesos`: ventana emergente; si el navegador la bloquea, redirección.
 - Firestore `issys-procesos`: `usuarios`, `datos`, `presentaciones`, `presentacionesImagenes`, `eerEditor`, `eerGraph`
   (más `acceso` y `presentacionesAcceso` hasta el paso 9 de la Etapa 1).
-- `migrar-estatuto.html` lee el proyecto `issys-eer` (Auth con usuario y contraseña + Firestore).
 - Almacenamiento del navegador: persistencia de Firestore, `localStorage` (Procesos, Presentaciones, Estatuto), IndexedDB
   (Presentaciones).
 - Scripts de CDN: SDK de Firebase (gstatic), Tailwind/Lucide/bpmn-js (Procesos), D3 y Paged.js (Estatuto), Google Fonts.
@@ -240,7 +236,7 @@ Estado (10/11/2026): hecho el paso 2; los demás, pendientes. Todos los comandos
    firebase deploy --only firestore:rules
    firebase deploy --only hosting:sistemas
    ```
-   Este deploy publica **todo** `public/`, incluidos `/estatuto/` y `/herramientas/` (los datos de Estatuto ya están
+   Este deploy publica **todo** `public/`, incluido `/estatuto/` (los datos de Estatuto ya están
    migrados: ver la Etapa 2).
 
 4. **Configurar el dominio de ingreso** (`authDomain` es `issys-sistemas.web.app`):
@@ -321,8 +317,7 @@ Estado (10/11/2026): hecho el paso 2; los demás, pendientes. Todos los comandos
 
 `firebase emulators:start` y abrir http://localhost:5000. En `localhost` los sistemas usan los emuladores de Auth y Firestore
 (`emuladoresEnLocalhost` en `firebase-config.js`). Firestore arranca vacío: entrar con `sago2107@gmail.com` en el emulador de
-Auth (administrador fijo) y dar de alta usuarios desde el portal. Excepción: `migrar-estatuto.html` lee del `issys-eer` **real**
-aunque se use el emulador.
+Auth (administrador fijo) y dar de alta usuarios desde el portal.
 
 ### Git
 
@@ -352,9 +347,8 @@ paso 7 de la Etapa 2.
 
 Estado (11/11/2026): hechos los pasos 1, 2 y 5 (sitio publicado, datos migrados, workflow desactivado y redirección 302
 publicada en `issys-eer`; nadie editó en el sistema viejo después de migrar) y los pasos 3, 4, 4b, 6 y 7 (ramas unidas
-en `main` el 11/11/2026, `unificacion` borrada, redirección de `issys-eer` en 301). Falta el paso 8 y borrar el secreto
-`FIREBASE_SERVICE_ACCOUNT_ISSYS_EER` en GitHub. Todos los
-comandos se corren en `D:\issys`.
+en `main` el 11/11/2026, `unificacion` borrada, redirección de `issys-eer` en 301, secreto
+borrado) y el paso 8 (herramienta borrada). **Etapa 2 terminada.** Todos los comandos se corren en `D:\issys`.
 
 **Antes de empezar:**
 - **Copias locales anteriores a la migración** (ya migrado: aplica sólo a navegadores que abrieron `/estatuto/` en el sitio
@@ -371,7 +365,8 @@ comandos se corren en `D:\issys`.
    firebase deploy --only firestore:rules,hosting:sistemas
    ```
 2. **Migrar los datos:** entrar con el administrador fijo a
-   https://issys-sistemas.web.app/herramientas/migrar-estatuto.html
+   https://issys-sistemas.web.app/herramientas/migrar-estatuto.html (ya borrada en el paso 8; si hiciera falta, recuperarla
+   del historial de Git: `git log --all -- public/herramientas/migrar-estatuto.html`)
    - Paso 1 de la herramienta: usuario y contraseña de un **Administrador** del Estatuto anterior.
    - Paso 2 de la herramienta: revisar las cantidades de usuarios, artículos y conceptos, y anotar la "Última edición".
      **Descargar el respaldo** (lo baja a Descargas) y moverlo a `D:\issys\respaldos\` (está en `.gitignore`). La herramienta

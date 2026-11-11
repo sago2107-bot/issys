@@ -18,7 +18,7 @@ estáticas sin compilación, con la lógica en `<script>` dentro del HTML:
   `--accent`, `--font-serif`, …) sobre las variables `--issys-*` de `/shared/issys.css`.
 
 Antes vivía en el proyecto `issys-eer` con usuario y contraseña y la colección `users/{uid}`. La
-migración está en `/herramientas/migrar-estatuto.html` (ver el README raíz).
+migración ya se hizo (11/11/2026); la herramienta se borró y queda en el historial de Git (ver el README raíz, Etapa 2).
 
 ## Interface
 
