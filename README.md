@@ -69,7 +69,7 @@ extremo derecho lo arma `shared/auth.js` para que sea idéntico en todos los sis
 - Siempre al final y en este orden: lanzador ⋮⋮⋮ (Inicio, sistemas habilitados, "Usuarios y permisos" para administradores)
   y foto de perfil (menú de cuenta y "Cerrar sesión").
 
-Medidas, colores y estados: sección 8 del [manual de marca](./docs/ISSyS-brand-guidelines.md). Estilos en
+Colores, logo, estados y pantallas chicas: sección "Encabezado común" de la [guía de marca](./docs/ISSyS-brand-guidelines.md). Estilos en
 `shared/issys.css` (sección "ENCABEZADO COMÚN").
 
 Uso:

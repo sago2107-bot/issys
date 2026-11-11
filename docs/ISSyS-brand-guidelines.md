@@ -1,348 +1,317 @@
-# ISSyS — Manual de marca para Web Apps
+# ISSyS — Guía de marca para aplicaciones web
 
-> Especificación técnica derivada del **BrandBook ISSyS – Manual de usos y aplicaciones**.
-> Objetivo: que toda web app institucional (HTML single-file / Firebase Hosting) respete la identidad visual del Instituto de Seguridad Social y Seguros del Chubut.
->
-> **Regla de oro:** los valores marcados como **[Manual]** son oficiales y no se modifican. Los marcados como **[Derivado]** son extensiones técnicas para uso digital (hover, accesibilidad, fondos) y no aparecen en el BrandBook.
+Basada en el **BrandBook ISSyS – Manual de usos y aplicaciones** (Área de Comunicaciones). Versión 2 · 11/11/2026 ·
+Responsable: administrador de los Sistemas ISSyS.
 
 ---
 
-## 1. Paleta cromática
+## 0. Alcance y convenciones
 
-### 1.1 Primarios [Manual]
+### 0.1 Alcance
 
-| Token | Nombre | HEX | RGB | CMYK | Uso |
-|---|---|---|---|---|---|
-| `--issys-green` | Verde ISSyS | `#59B57E` | 89, 181, 126 | 66 / 1 / 63 / 0 | Mitad superior del isologo, acentos, estados positivos, fondos de bloques |
-| `--issys-blue` | Azul ISSyS | `#4657A0` | 70, 87, 160 | 82 / 66 / 2 / 0 | Mitad inferior del isologo, botones primarios, links, encabezados |
+- **Obliga a:** toda aplicación web del Instituto publicada en los Sistemas ISSyS (`public/<sistema>/`). El resumen
+  obligatorio está en [CLAUDE.md](../CLAUDE.md).
+- **Cubre:** la interfaz en pantalla (colores, tipografía, logo, encabezado, componentes y estados).
+- **No cubre:**
+  - impresos, cartelería y piezas de comunicación: ver el BrandBook;
+  - el contenido de las diapositivas que se arman en Presentaciones: sigue su propio tema;
+  - el modo oscuro: no se usa.
 
-### 1.2 Secundarios [Manual]
+### 0.2 Etiquetas de origen
 
-| Token | Nombre | HEX | RGB | CMYK | Uso |
-|---|---|---|---|---|---|
-| `--issys-gray` | Gris medio | `#878787` | 135, 135, 135 | 47 / 37 / 37 / 17 | Texto secundario grande, íconos, bordes fuertes |
-| `--issys-gray-light` | Gris claro | `#C6C6C6` | 198, 198, 198 | 26 / 19 / 20 / 2 | Bordes, divisores, estados deshabilitados |
-| `--issys-yellow` | Amarillo | `#F9D76B` | 249, 215, 107 | 4 / 15 / 67 / 0 | Destacados, advertencias, badges (siempre con texto oscuro) |
+| Etiqueta | Significa | ¿Se puede cambiar? |
+| --- | --- | --- |
+| **[BrandBook]** | Valor oficial del BrandBook. | No. |
+| **[Derivado]** | Extensión para pantalla que el BrandBook no define (hover, tintes, texto accesible). | Sí, con un motivo escrito. |
+| **[WCAG]** | Requisito de accesibilidad (WCAG 2.1, nivel AA). | No. |
+| **[Regla interna]** | Decisión de los Sistemas ISSyS (encabezado común, componentes). | Sí, actualizando esta guía y el código. |
 
-### 1.3 Neutros y derivados digitales [Derivado]
+La etiqueta de un título vale para toda la sección, salvo que una fila diga otra cosa.
 
-| Token | HEX | Uso |
-|---|---|---|
-| `--issys-ink` | `#1D1D1B` | Texto principal y color del logotipo "ISSyS" (negro de marca) |
-| `--issys-white` | `#FFFFFF` | Fondo principal (el logo original va siempre sobre blanco) |
-| `--issys-surface` | `#F5F6F8` | Fondo de página alternativo / tarjetas sobre fondo blanco |
-| `--issys-blue-dark` | `#36457F` | Hover/active de botones azules |
-| `--issys-blue-tint` | `#E3E6F1` | Fondos suaves azulados (como los triángulos del BrandBook) |
-| `--issys-green-dark` | `#2F7D50` | **Texto** en verde sobre blanco (accesible) y hover de botones verdes |
-| `--issys-green-tint` | `#E6F3EB` | Fondos suaves verdes, filas destacadas, alertas de éxito |
+### 0.3 Obligatorio y recomendado
 
-### 1.4 Colores de áreas (logotipos secundarios)
+- **Debe / no debe:** obligatorio. Todo lo obligatorio que se puede verificar está en el checklist (§8).
+- **Conviene:** recomendado; se puede apartar con un motivo.
 
-| Área | Logotipo | Color de acento |
-|---|---|---|
-| Obra Social | SEROS Chubut ISSyS | `#59B57E` (verde) [Manual] |
-| Caja Previsional | Previsión ISSyS | `#4657A0` (azul) [Manual] |
-| Turismo | Turismo ISSyS | `#B5B94B` aprox. (verde oliva) [Derivado — muestreado; el manual no publica el HEX, confirmar con Comunicaciones] |
+### 0.4 Dónde vive cada dato
 
-Si una app pertenece a un área específica, usar el color del área como acento principal y mantener el resto de la paleta institucional.
+| Dato | Dueño | Esta guía |
+| --- | --- | --- |
+| Reglas de marca y accesibilidad | esta guía | — |
+| Valores (HEX, tamaños, radios, sombras) | [issys.css](../public/shared/issys.css) | nombra el token, no copia el valor |
+| Paleta para Tailwind | [issys-tailwind.js](../public/shared/issys-tailwind.js) | — |
+| Uso del encabezado y de `ISSyS.iniciar` | [README → Encabezado común](../README.md#encabezado-común-regla-general) | — |
+| Reglas obligatorias en una línea | [CLAUDE.md](../CLAUDE.md) | — |
 
-### 1.5 Fusión y transparencia [Manual]
-El BrandBook admite superponer verde y azul con transparencia (100% / 0%). En web: degradés o superposiciones decorativas usando `--issys-green` y `--issys-blue` con opacidad, **nunca** sobre el logo.
+Sólo los colores [BrandBook] se escriben con su HEX en esta guía (§1.1), porque son la referencia oficial y el código debe
+coincidir con ellos.
 
----
+### 0.5 Glosario
 
-## 2. Accesibilidad (contraste WCAG sobre blanco)
-
-| Color | Contraste vs `#FFF` | Texto normal (AA 4.5:1) | Texto grande / UI (3:1) |
-|---|---|---|---|
-| `#1D1D1B` ink | ~17:1 | ✅ | ✅ |
-| `#4657A0` azul | ~6.7:1 | ✅ | ✅ |
-| `#2F7D50` verde oscuro | ~5:1 | ✅ | ✅ |
-| `#878787` gris | ~3.6:1 | ❌ | ✅ |
-| `#59B57E` verde | ~2.5:1 | ❌ | ❌ (solo decorativo) |
-| `#F9D76B` amarillo | ~1.4:1 | ❌ | ❌ (solo fondo) |
-
-**Reglas prácticas:**
-- Texto sobre blanco: usar `ink`, `blue` o `green-dark`. **Nunca** texto en `#59B57E` ni `#F9D76B`.
-- Botón verde (`#59B57E`): texto en `ink` (`#1D1D1B`), no en blanco. Si se quiere texto blanco, usar `--issys-green-dark`.
-- Botón azul (`#4657A0`): texto blanco ✅.
-- Amarillo: siempre como fondo con texto `ink`.
+- **Logo:** el conjunto completo (isologo + logotipo, con o sin bajada).
+- **Isologo:** el símbolo verde y azul solo.
+- **Logotipo:** la palabra "ISSyS".
+- **Bajada:** "Instituto de Seguridad Social y Seguros del Chubut" (en el logo). En el encabezado, "bajada" es la segunda
+  línea, debajo del nombre del sistema.
+- **Logo de área:** SEROS Chubut ISSyS, Previsión ISSyS, Turismo ISSyS.
 
 ---
 
-## 3. Tipografía [Manual]
+## 1. Color
 
-**Familia única:** `Encode Sans Condensed` (Google Fonts).
+### 1.1 Paleta [BrandBook]
 
-| Rol | Peso | CSS `font-weight` | Uso |
-|---|---|---|---|
-| Primaria | Black | 900 | Títulos principales (H1), cifras destacadas, numeración de secciones |
-| Secundaria | Semibold | 600 | Subtítulos (H2–H4), botones, etiquetas, encabezados de tabla |
-| Secundaria | Light | 300 | Texto corrido, descripciones, bajadas |
+| Token | Nombre | HEX | RGB | CMYK |
+| --- | --- | --- | --- | --- |
+| `--issys-green` | Verde ISSyS | `#59B57E` | 89, 181, 126 | 66 / 1 / 63 / 0 |
+| `--issys-blue` | Azul ISSyS | `#4657A0` | 70, 87, 160 | 82 / 66 / 2 / 0 |
+| `--issys-gray` | Gris medio | `#878787` | 135, 135, 135 | 47 / 37 / 37 / 17 |
+| `--issys-gray-light` | Gris claro | `#C6C6C6` | 198, 198, 198 | 26 / 19 / 20 / 2 |
+| `--issys-yellow` | Amarillo | `#F9D76B` | 249, 215, 107 | 4 / 15 / 67 / 0 |
 
-> Nota digital [Derivado]: Light (300) en tamaños menores a 16px pierde legibilidad en pantalla. Para cuerpo de texto en apps (tablas, formularios) se recomienda **Regular 400**; reservar 300 para bajadas y textos de 16px o más.
+Verde y azul son los primarios (mitades del isologo); gris, gris claro y amarillo, los secundarios.
 
-**Carga:**
-```html
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Encode+Sans+Condensed:wght@300;400;600;900&display=swap" rel="stylesheet">
-```
+### 1.2 Tokens derivados [Derivado]
 
-**Escala sugerida [Derivado]:**
+Los valores están en [issys.css](../public/shared/issys.css).
 
-| Elemento | Tamaño | Peso | Color |
-|---|---|---|---|
-| H1 | 2.5rem (40px) | 900 | `ink` o `gray` (como en el BrandBook) |
-| H2 | 1.75rem (28px) | 600–900 | `ink` |
-| H3 | 1.25rem (20px) | 600 | `blue` |
-| Cuerpo | 1rem (16px) | 400 | `ink` |
-| Bajada / ayuda | 0.875rem (14px) | 400 | `gray` (solo si es texto auxiliar) |
-| Botón | 1rem | 600 | según botón |
+| Función | Token |
+| --- | --- |
+| Texto principal ("negro de marca") | `--issys-ink` |
+| Texto auxiliar (gemelo de texto del gris) | `--issys-muted` |
+| Fondo principal / alternativo | `--issys-white` / `--issys-surface` |
+| Divisores suaves, fondo de etiqueta gris | `--issys-line` |
+| Hover de botón azul, texto azul fuerte | `--issys-blue-dark` |
+| Texto verde sobre blanco o `surface`; texto blanco sobre verde | `--issys-green-dark` |
+| Texto verde sobre tintes | `--issys-green-deep` |
+| Fondos azules y verdes (tintes) | `--issys-blue-tint` / `--issys-green-tint` |
+| Fondo amarillo claro / texto sobre amarillo | `--issys-yellow-tint` / `--issys-yellow-ink` |
+| Error, acción destructiva | `--issys-danger` |
+| Radio, sombras, fuente | `--issys-radius`, `--issys-shadow`, `--issys-shadow-lg`, `--issys-font` |
 
-Estilo editorial del BrandBook: título en **Black** + segunda línea en **Light** del mismo tamaño o menor (ej. "**Tamaños y proporciones** / Logotipo").
+### 1.3 Colores de área
 
----
+| Área | Logo de área | Acento |
+| --- | --- | --- |
+| Obra Social | SEROS Chubut ISSyS | `--issys-green` [BrandBook] |
+| Caja Previsional | Previsión ISSyS | `--issys-blue` [BrandBook] |
+| Turismo | Turismo ISSyS | `--issys-turismo` [Derivado, **provisorio**: valor muestreado, a confirmar (§9)] |
 
-## 4. Logotipo
+Una aplicación de un área puede usar su acento **dentro del contenido** (destacados, gráficos, fondos). El encabezado no
+cambia: borde verde siempre (§5). Para texto o botones, el acento debe cumplir §1.4; si no, usar `ink` o `blue`.
 
-### 4.1 Archivos (carpeta `assets/brand/`)
+### 1.4 Contraste [WCAG]
 
-| Archivo sugerido | Versión | Cuándo usarlo |
-|---|---|---|
-| `issys-logo-completo.png` | Horizontal con isologo + "ISSyS" + "Instituto de Seguridad Social y Seguros del Chubut" | Encabezados de página, login, reportes imprimibles, pantallas de inicio |
-| `issys-logo.png` | Horizontal con isologo + "ISSyS" (sin bajada) | Barras de navegación, headers compactos, cuando el espacio es reducido |
-| `issys-logo-blanco.png` | Versión en blanco | Sobre fondos oscuros (azul, `ink`, fotos oscuras) |
-| `issys-isologo.png` / `.svg` *(si se dispone)* | Solo el símbolo verde/azul | Favicon, ícono de app (PWA), avatar, loaders |
+- **Texto normal:** debe tener contraste de 4.5:1 o más. **Texto grande** (24 px o más, o 18,66 px o más en peso 600 o
+  superior) e íconos o bordes que transmiten información: 3:1 o más.
+- **No debe** transmitirse información sólo con color (estados, errores, obligatorios): sumar texto, ícono o forma.
 
-> Preferir **SVG** cuando esté disponible (nitidez en cualquier resolución). Si solo hay PNG, exportar a 2× del tamaño de uso.
+Pares permitidos para **texto normal** (contraste calculado):
 
-Versiones oficiales previstas en el manual: **horizontal**, **vertical** (isologo arriba, "ISSyS" abajo), **isologo** y **botón/ícono** (isologo dentro de un cuadrado redondeado o círculo blanco con sombra suave).
+| Texto \ Fondo | `white` | `surface` | `line` | `blue-tint` | `green-tint` | `yellow-tint` | `yellow` |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `ink` | 16.88 | 15.61 | 14.55 | 13.55 | 14.78 | 15.23 | 12.03 |
+| `blue` | 6.71 | 6.20 | 5.78 | 5.38 | 5.87 | 6.05 | 4.78 |
+| `blue-dark` | 9.07 | 8.39 | 7.82 | 7.28 | 7.94 | 8.18 | 6.46 |
+| `muted` | 6.39 | 5.91 | 5.50 | 5.13 | 5.59 | 5.76 | 4.55 |
+| `green-dark` | 5.04 | 4.66 | ❌ 4.34 | ❌ 4.04 | ❌ 4.41 | 4.54 | ❌ 3.59 |
+| `green-deep` | 6.67 | 6.17 | 5.75 | 5.36 | 5.84 | 6.02 | 4.75 |
+| `yellow-ink` | 7.47 | 6.90 | 6.43 | 5.99 | 6.54 | 6.73 | 5.32 |
+| `danger` | 6.54 | 6.04 | 5.63 | 5.25 | 5.72 | 5.89 | 4.66 |
 
-### 4.2 Tamaño mínimo
+Sobre fondos de color: texto `white` sobre `blue` (6.71) o sobre `green-dark` (5.04); texto `ink` sobre `green` (6.70).
 
-| Medio | Mínimo |
-|---|---|
-| Impreso [Manual] | 4 cm de ancho |
-| Pantalla [Derivado] | 120 px de ancho para la versión completa; 90 px para la versión sin bajada; 24 px para el isologo solo |
+**Reglas:**
+- Los colores [BrandBook] `green`, `yellow`, `gray` y `gray-light` **no deben** usarse para texto: van en fondos, bordes,
+  íconos decorativos y acentos. Para texto se usa su gemelo: `green-dark` o `green-deep`, `yellow-ink`, `muted`.
+- Botón verde: texto `ink`. Botón azul: texto `white`. Amarillo: siempre fondo, con texto `ink` o `yellow-ink`.
 
-Si la bajada "Instituto de Seguridad Social…" queda ilegible, usar la versión sin bajada.
+### 1.5 Fusión, degradados y transparencia
 
-### 4.3 Zona de seguridad [Manual]
-El logo debe tener un margen libre alrededor, sin texto, bordes ni otros elementos. En web: **margen mínimo = altura de la letra "S" de ISSyS** en todos los lados (aprox. 25% de la altura total del logo).
-
-```css
-.issys-logo { padding: 0.25em; /* espacio libre mínimo */ }
-```
-
-### 4.4 Aplicación sobre fondos [Manual]
-
-✅ **Correcto**
-- Logo a color sobre **fondo blanco** (versión original).
-- Sobre fondos **claros**: logo en **negro**.
-- Sobre fondos **oscuros**: logo en **blanco** (`issys-logo-blanco.png`).
-- Buscar siempre contraste suficiente.
-
-❌ **Incorrecto**
-- Poner el logo dentro de un **recuadro blanco** sobre un fondo de color.
-- Logo a color sobre fondo azul u otro color de marca.
-- Logo gris oscuro sobre negro o gris claro sobre blanco (bajo contraste).
-- **Expandir, condensar, estirar o alargar** (en CSS: nunca fijar `width` y `height` a la vez sin `object-fit: contain`).
-- Alterar la inclinación, rotar o torcer.
-- Cambiar proporciones, colores o elementos internos.
-- Aplicarlo en **outline** (solo contorno).
-- Agregarle sombras, brillos o efectos.
-
-```css
-/* Uso seguro de la imagen del logo */
-.issys-logo img { height: 40px; width: auto; display: block; }
-```
+- [BrandBook] Verde y azul pueden superponerse con transparencia.
+- [Regla interna] En la interfaz **no se usan degradados suaves**. La fusión se aplica sólo como cortes netos (las diagonales
+  de `.marca-diagonales`, §4) o como superposición con opacidad en piezas decorativas. Nunca sobre el logo.
 
 ---
 
-## 5. Elementos gráficos
+## 2. Tipografía
 
-- **Triángulos/diagonales:** el BrandBook usa grandes formas diagonales en las esquinas superiores con tintes suaves (`--issys-blue-tint`, `--issys-green-tint`, `#E9E9E9`). Uso recomendado como decoración de headers o portadas, nunca detrás de texto denso.
-- **Patrón de isologos:** fondos con el isologo repetido en grilla (banners de lona). En web, solo como fondo muy sutil (opacidad ≤ 8%).
-- **Íconos:** estilo lineal, trazo simple, dentro de círculos con borde (ver cartel Playa Unión). Sugerencia: [Lucide](https://lucide.dev) o Material Symbols *Outlined*, en `blue` o `gray`.
+- [BrandBook] **Familia única:** `Encode Sans Condensed`. La carga [auth.js](../public/shared/auth.js) (Google Fonts, pesos
+  300, 400, 600 y 900); no hace falta agregarla a mano.
+- [BrandBook] **Pesos:** Black 900 (títulos principales, cifras destacadas), Semibold 600 (subtítulos, botones, rótulos,
+  encabezados de tabla), Light 300 (texto corrido y bajadas, en el estilo editorial).
+- [Derivado] **Regular 400** para el cuerpo de texto en pantalla (tablas, formularios): Light pierde legibilidad por debajo
+  de 16 px. Light 300 sólo desde 16 px.
+  - Excepción [Regla interna]: la bajada del encabezado y del lanzador va en 300 a 14 px, en `muted`. Repite información
+    que ya está en el nombre del sistema.
+- [Derivado] Los pesos 500 y 700 no se cargan: en Tailwind, `font-medium` y `font-bold` equivalen a 600 y `font-extrabold`
+  a 900.
+- [Derivado] **Roles de texto:** cuerpo → `ink`, peso 400; auxiliar (ayudas, fechas, notas) → `muted`; títulos → `ink`,
+  900 o 600.
+- [Derivado] **Tamaños:** la condensada se lee más chica que una tipografía común, por eso la base de pantalla es de
+  16-18 px (Tailwind usa 18 px). Los tamaños concretos quedan en el código. **Tamaño mínimo:** 12 px, y sólo para etiquetas
+  y notas de pie.
+- [BrandBook] **Estilo editorial:** título en Black y segunda línea en Light del mismo tamaño o menor (ej.
+  "**Tamaños y proporciones** / Logotipo").
 
 ---
 
-## 6. Tokens listos para usar
+## 3. Logo
 
-### 6.1 CSS (variables)
+### 3.1 Archivos
 
-```css
-:root {
-  /* Marca [Manual] */
-  --issys-green: #59B57E;
-  --issys-blue: #4657A0;
-  --issys-gray: #878787;
-  --issys-gray-light: #C6C6C6;
-  --issys-yellow: #F9D76B;
+Están en [`public/shared/marca/`](../public/shared/marca/) y se usan con ruta absoluta (`/shared/marca/…`).
 
-  /* Derivados [Derivado] */
-  --issys-ink: #1D1D1B;
-  --issys-white: #FFFFFF;
-  --issys-surface: #F5F6F8;
-  --issys-blue-dark: #36457F;
-  --issys-blue-tint: #E3E6F1;
-  --issys-green-dark: #2F7D50;
-  --issys-green-tint: #E6F3EB;
-  --issys-turismo: #B5B94B;
+| Archivo | Versión | Uso |
+| --- | --- | --- |
+| `issys-logo-recorte.png` | Isologo + logotipo, sin bajada, recortado | **Encabezado común** y barras compactas |
+| `issys-logo-completo-recorte.png` | Con bajada, recortado | Pantalla de ingreso, portadas, reportes |
+| `issys-logo-blanco-recorte.png` | Blanco, recortado | Sobre fondos oscuros (`blue`, `ink`, fotos oscuras) |
+| `issys-logo.png`, `issys-logo-completo.png`, `issys-logo-blanco.png` | Las mismas, con margen original | Cuando el margen lo da la imagen |
+| `issys-isologo.png` | Isologo solo | Favicon, ícono de aplicación, avatar |
 
-  /* Semánticos */
-  --color-bg: var(--issys-white);
-  --color-surface: var(--issys-surface);
-  --color-text: var(--issys-ink);
-  --color-text-muted: #5F5F5F;
-  --color-border: var(--issys-gray-light);
-  --color-primary: var(--issys-blue);
-  --color-primary-hover: var(--issys-blue-dark);
-  --color-accent: var(--issys-green);
-  --color-success: var(--issys-green-dark);
-  --color-success-bg: var(--issys-green-tint);
-  --color-warning-bg: var(--issys-yellow);
-  --color-danger: #B3261E;
-  --color-link: var(--issys-blue);
+No disponibles en el repo: versión vertical, logo en negro, versión botón/ícono y SVG (§9). Mientras no estén, sobre fondos
+claros se usa el logo a color.
 
-  /* Tipografía */
-  --font-family: 'Encode Sans Condensed', 'Arial Narrow', Arial, sans-serif;
-  --fw-light: 300;
-  --fw-regular: 400;
-  --fw-semibold: 600;
-  --fw-black: 900;
+### 3.2 Tamaño mínimo
 
-  /* Forma */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --shadow-card: 0 2px 8px rgba(29, 29, 27, 0.08);
-}
+| Versión | Pantalla [Derivado] | Impreso [BrandBook] |
+| --- | --- | --- |
+| Con bajada | 120 px de ancho | 4 cm de ancho |
+| Sin bajada | 24 px de alto (el encabezado usa 32 px) | — |
+| Isologo solo | 24 px de alto | — |
 
-body {
-  font-family: var(--font-family);
-  font-weight: var(--fw-regular);
-  color: var(--color-text);
-  background: var(--color-bg);
-}
-h1 { font-weight: var(--fw-black); }
-h2, h3, h4, th, button { font-weight: var(--fw-semibold); }
-a { color: var(--color-link); }
-```
+Si el logo con bajada mide menos de 120 px de ancho, se debe usar la versión sin bajada.
 
-### 6.2 Componentes base
+### 3.3 Zona de seguridad [BrandBook]
 
-```css
-.btn {
-  font-family: var(--font-family);
-  font-weight: var(--fw-semibold);
-  padding: 0.6rem 1.2rem;
-  border-radius: var(--radius-sm);
-  border: none;
-  cursor: pointer;
-}
-.btn-primary   { background: var(--issys-blue);  color: #fff; }
-.btn-primary:hover { background: var(--issys-blue-dark); }
-.btn-secondary { background: var(--issys-green); color: var(--issys-ink); }
-.btn-secondary:hover { background: var(--issys-green-dark); color: #fff; }
-.btn-outline   { background: transparent; color: var(--issys-blue); border: 1.5px solid var(--issys-blue); }
+Margen libre en los cuatro lados igual a la altura de la "S" de ISSyS, que en pantalla se toma como **25 % de la altura del
+logo**. La clase `.issys-logo` lo aplica (32 px de alto + 8 px de margen): usar esa clase en lugar de CSS propio.
 
-.card {
-  background: #fff;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-card);
-}
+### 3.4 Fondos y usos prohibidos [BrandBook]
 
-.header-bar {
-  background: #fff;
-  border-bottom: 4px solid var(--issys-green);  /* acento de marca */
-}
+**Debe:**
+- logo a color sobre blanco o fondos claros (`surface`, tintes);
+- logo blanco sobre fondos oscuros;
+- contraste de 3:1 o más entre el logo y el fondo.
 
-.badge-warning { background: var(--issys-yellow); color: var(--issys-ink); }
-.badge-success { background: var(--issys-green-tint); color: var(--issys-green-dark); }
-```
+**No debe:**
+- poner el logo dentro de un recuadro blanco sobre un fondo de color;
+- poner el logo a color sobre azul u otro color de marca;
+- deformarlo: expandir, condensar, estirar, rotar o inclinar. En CSS: fijar sólo `height` y dejar `width: auto`;
+- cambiar sus proporciones, colores o elementos, ni aplicarlo sólo en contorno;
+- agregarle sombras, brillos u otros efectos.
 
-### 6.3 Tailwind (CDN)
+### 3.5 Favicon e ícono de aplicación
 
 ```html
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          issys: {
-            green: '#59B57E',
-            'green-dark': '#2F7D50',
-            'green-tint': '#E6F3EB',
-            blue: '#4657A0',
-            'blue-dark': '#36457F',
-            'blue-tint': '#E3E6F1',
-            gray: '#878787',
-            'gray-light': '#C6C6C6',
-            yellow: '#F9D76B',
-            ink: '#1D1D1B',
-            surface: '#F5F6F8',
-          },
-        },
-        fontFamily: {
-          sans: ['"Encode Sans Condensed"', '"Arial Narrow"', 'Arial', 'sans-serif'],
-        },
-      },
-    },
-  };
-</script>
+<link rel="icon" type="image/png" href="/shared/marca/issys-isologo.png">
 ```
 
-### 6.4 Gráficos (Chart.js / Tableau / similares)
-
-Orden de serie recomendado:
-`#4657A0`, `#59B57E`, `#F9D76B`, `#878787`, `#36457F`, `#2F7D50`, `#C6C6C6`
+`theme-color`: no se define (la barra del navegador queda blanca, como el encabezado).
 
 ---
 
-## 7. Favicon y PWA
+## 4. Elementos gráficos
 
-```html
-<link rel="icon" type="image/png" href="assets/brand/issys-isologo.png">
-<meta name="theme-color" content="#4657A0">
-```
-Para el ícono de app usar la versión **botón/ícono** del manual: isologo centrado sobre fondo blanco, con esquinas redondeadas.
-
----
-
-## 8. Encabezado de los Sistemas ISSyS [Regla interna]
-
-Todas las web apps del Instituto comparten el mismo encabezado, con la misma lógica que las apps de Google:
-
-- **Barra blanca** con borde inferior verde (`--issys-green`, 4 px) y sombra suave. Nunca encabezados azules u oscuros.
-- **Izquierda:** logo a color + línea vertical gris + nombre del sistema (Black 900) y bajada (Light 300).
-- **Derecha, siempre en este orden:** herramientas propias del sistema → **lanzador de sistemas** (botón de 9 puntos que abre
-  el panel con los sistemas habilitados) → **foto de perfil** (la de Google; abre el menú de cuenta).
-- Panel del lanzador: fondo `--issys-surface`, bloque blanco con los sistemas activos, íconos en cuadrados redondeados
-  azul (`--issys-blue`, ícono blanco) o verde (`--issys-green`, ícono en `--issys-ink`); los "próximamente" en gris.
-- Menú de cuenta: correo, foto con anillo verde, "¡Hola, Nombre!", etiquetas de rol, acciones y "Cerrar sesión" en `--issys-danger`.
-- Estado de guardado: punto sobre la foto (verde guardado, amarillo guardando, rojo error).
-
-Implementación única: `ISSyS.ponerEncabezado()` en `public/shared/auth.js` + estilos en `public/shared/issys.css`.
-Detalle de uso en el README del repositorio ("Encabezado común").
+- **Diagonales** [BrandBook]: formas diagonales en la esquina superior con `blue-tint` y `green-tint`. En pantalla: clase
+  `.marca-diagonales`. Van sólo detrás de títulos o portadas, nunca detrás de párrafos ni tablas.
+- **Patrón de isologos** [BrandBook]: isologo repetido en grilla. En pantalla, sólo como fondo con opacidad de 8 % o menos.
+- **Íconos** [Regla interna]: estilo lineal y trazo simple.
+  - En el encabezado y el lanzador se usan los del propio encabezado (`ICONOS` en `auth.js`). Un sistema nuevo agrega ahí el
+    suyo.
+  - Dentro de cada sistema, [Lucide](https://lucide.dev) con versión fija, en `blue`, `ink` o `muted`.
 
 ---
 
-## 9. Checklist antes de publicar
+## 5. Encabezado común [Regla interna]
 
-- [ ] El encabezado sigue la sección 8 (lanzador ⋮⋮⋮ y foto de perfil arriba a la derecha, con `ISSyS.ponerEncabezado`).
-- [ ] Se usa `Encode Sans Condensed` en toda la interfaz.
-- [ ] Solo colores de la paleta (o derivados de este documento).
-- [ ] Ningún texto en verde `#59B57E` ni amarillo sobre blanco.
-- [ ] Logo sin deformar (`height` fija + `width: auto`).
-- [ ] Logo con zona de seguridad libre.
-- [ ] Sobre fondo oscuro → logo blanco; sobre fondo claro → logo color o negro; nunca recuadro blanco.
-- [ ] Tamaño del logo ≥ 120 px (completo) / ≥ 90 px (sin bajada).
-- [ ] Contraste AA verificado en botones y textos.
+Toda aplicación de los Sistemas ISSyS **debe** usar el encabezado común. Uso y API:
+[README → Encabezado común](../README.md#encabezado-común-regla-general).
+
+- **Barra:** blanca, borde inferior `--issys-green` de 4 px, sombra `--issys-shadow`. Nunca azul ni oscura.
+- **Izquierda:** logo (`.issys-logo`, `issys-logo-recorte.png`), línea vertical `--issys-gray-light`, nombre del sistema
+  (900) y bajada (300, `muted`, ver §2).
+- **Derecha, siempre en este orden:**
+  1. herramientas propias del sistema;
+  2. lanzador de sistemas;
+  3. foto de perfil.
+
+  El lanzador y la foto los arma `ISSyS.ponerEncabezado()`: **no deben** dibujarse a mano.
+- **Pantallas chicas:** por debajo de 900 px se oculta la bajada; por debajo de 640 px, el nombre del sistema. El logo, el
+  lanzador y la foto quedan siempre.
 
 ---
 
-*Fuente: BrandBook ISSyS — Manual de usos y aplicaciones (Área de Comunicaciones, ISSyS). Elaborado como guía técnica para desarrollos web internos.*
+## 6. Componentes y estados
+
+### 6.1 Componentes [Regla interna]
+
+Clases de [issys.css](../public/shared/issys.css), con prefijo para no pisar los estilos de cada sistema:
+
+| Necesidad | Clase |
+| --- | --- |
+| Botón secundario (blanco, borde azul) | `.issys-btn` |
+| Botón principal (uno por pantalla) | `.issys-btn.prim` |
+| Botón chico | `.issys-btn.chico` |
+| Acción destructiva | `.issys-btn.peligro` |
+| Etiqueta azul / verde / gris / amarilla | `.issys-tag`, `.verde`, `.gris`, `.amarillo` |
+| Logo | `.issys-logo` |
+| Diagonales decorativas | `.marca-diagonales` |
+| Aviso flotante | `ISSyS.avisar(texto)` (crea `#issys-aviso`) |
+
+No hay botón verde: la acción principal es azul.
+
+### 6.2 Estados
+
+| Estado | Regla |
+| --- | --- |
+| Foco | Contorno visible de 2 px en `blue` (`:focus-visible` de `issys.css`). **No debe** quitarse. |
+| Deshabilitado | Opacidad 0,5 y cursor normal (`.issys-btn[disabled]`). El texto no se usa para información importante. |
+| Error | Texto en `danger` con un mensaje que diga qué corregir; nunca sólo el borde rojo. |
+| Guardado | Punto sobre la foto (verde guardado, amarillo guardando, rojo error) **más** el texto en el menú de cuenta. |
+| Movimiento | Respetar `prefers-reduced-motion` en animaciones de más de 0,2 s. |
+
+---
+
+## 7. Sistema nuevo
+
+1. Cargar en el `<head>` `/shared/firebase-config.js` y después `/shared/auth.js`. `auth.js` agrega `issys.css` y la
+   fuente.
+2. Armar el encabezado según §5 y el [README](../README.md#encabezado-común-regla-general).
+3. Si el sistema usa Tailwind: cargar `/shared/issys-tailwind.js` **antes** del CDN de Tailwind.
+   - Las escalas `slate`, `blue`, `emerald`, `amber`, `rose`, etc. ya apuntan a la paleta de marca.
+   - **Debe:** 500 o menos sólo para fondos y decoración, 600 o más para texto.
+4. Usar las clases de §6 antes de crear estilos propios. Si hace falta un color, usar un token de §1.
+
+---
+
+## 8. Checklist antes de publicar
+
+- [ ] El encabezado sigue §5 y usa `ISSyS.ponerEncabezado`.
+- [ ] Toda la interfaz usa `Encode Sans Condensed`.
+- [ ] Sólo colores de §1 (tokens de `issys.css` o escalas de `issys-tailwind.js`).
+- [ ] Ningún texto en `green`, `yellow`, `gray` ni `gray-light`. En Tailwind, buscar
+  `text-(green|emerald|teal|amber|yellow|orange)-(50|100|200|300|400|500)` y `text-(gray|slate)-(50|100|200|300)`.
+- [ ] Todo par de texto y fondo figura como permitido en §1.4.
+- [ ] Ninguna información se indica sólo con color.
+- [ ] El logo usa `.issys-logo` (altura fija, ancho automático y zona de seguridad).
+- [ ] El logo blanco va sobre fondos oscuros; nunca va dentro de un recuadro blanco.
+- [ ] El favicon es `/shared/marca/issys-isologo.png`.
+- [ ] Ningún texto mide menos de 12 px.
+
+---
+
+## 9. Pendientes y riesgos aceptados
+
+| Tema | Estado |
+| --- | --- |
+| Color de Turismo | Valor muestreado; confirmar con Comunicaciones. Ningún sistema lo usa todavía. |
+| `ink` (#1D1D1B) | Marcado [Derivado]; confirmar con Comunicaciones si figura en el BrandBook. |
+| Logo vertical, en negro, botón/ícono y SVG | No hay archivos; pedirlos a Comunicaciones. |
+| BrandBook | No está en el repo; conviene guardar una copia en `docs/`. |
+| Fuente por Google Fonts | Si no carga, el respaldo (`Arial Narrow`, Arial) es más ancho y recorta títulos; cada visita informa la IP a Google. Alternativa: servirla desde `/shared/` (licencia OFL). |
+| Tailwind por CDN | Versión de desarrollo, sin versión fija. |
+| Paleta copiada en `issys-tailwind.js` | Las escalas repiten valores de `issys.css`; si cambia un color, cambiarlo en los dos. |
+| Estado de guardado | El punto sobre la foto distingue los estados sólo por color; el texto está en el menú. Pendiente: forma o `title`. |
+| Spinner de ingreso | Gira aunque se pida movimiento reducido. |

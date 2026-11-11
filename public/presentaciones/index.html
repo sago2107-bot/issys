@@ -659,7 +659,7 @@ dialog header.d h2{margin:0 auto 0 0;font-size:26px;font-weight:900}
 
 <script>
 /* =================== Logo =================== */
-/* Isologo vectorizado del PNG oficial (assets/brands/issys-isologo.png). Reemplazar si Comunicaciones entrega el SVG. */
+/* Isologo vectorizado del PNG oficial (/shared/marca/issys-isologo.png). Reemplazar si Comunicaciones entrega el SVG. */
 const ISO_D = 'M28.5 0H67.5V22.8H27C24.6 23.2 23.4 25.8 23.2 28.8H.8V23C3 9.5 15.5 0 28.5 0Z';
 const isoSVG = (white=false) => `<svg viewBox="0 0 67.5 57.2" aria-hidden="true"><path d="${ISO_D}" fill="${white?'#fff':'#59B57E'}"/><path d="${ISO_D}" transform="rotate(180 33.75 28.6)" fill="${white?'#fff':'#4657A0'}"/></svg>`;
 function logo(kind){
@@ -2488,8 +2488,8 @@ function exportarJSON(){
 
 /* =================== Carga =================== */
 const QS = new URLSearchParams(location.search);
-// Publicado en Sistemas ISSyS (issys-sistemas.web.app/presentaciones/), en el sitio anterior o en los emuladores: usa la nube
-const ES_NUBE = /^((issys-sistemas)\.(web\.app|firebaseapp\.com)|localhost)$/.test(location.hostname);
+// Publicado en Sistemas ISSyS (issys-sistemas.web.app/presentaciones/), en sus vistas previas (issys-sistemas--<canal>.web.app) o en los emuladores: usa la nube
+const ES_NUBE = /^(issys-sistemas(--[a-z0-9-]+)?\.(web\.app|firebaseapp\.com)|localhost)$/.test(location.hostname);
 let NUBE = null, FUENTE = '';
 async function boot(){
   const p = QS.get('deck');
@@ -2655,7 +2655,7 @@ document.readyState === 'loading' ? addEventListener('DOMContentLoaded', start) 
 </script>
 
 <!-- =================== MARCA INCRUSTADA ===================
-     Logos de assets/brand/ y Encode Sans Condensed (Google Fonts, licencia OFL).
+     Logos de /shared/marca/ y Encode Sans Condensed (Google Fonts, licencia OFL).
      El logo blanco o negro se obtiene por filtro del logo oficial, sin deformarlo. -->
 <script>
 const MARCA = {
