@@ -182,9 +182,9 @@ sistemas viven en `usuarios/{email}` y los aplica `firestore.rules`. La raíz no
   resto `lector`; sólo el editor escribe `consultoriosCronogramas`.
 - `firestore.rules` se publica sólo desde este repo; publicarlo desde `D:\issys-procesos` borra la regla de `usuarios`. Por
   eso el `firebase.json` de esa carpeta ya no tiene `"firestore"` (Etapa 1, paso 1).
-- `issys-procesos.web.app`, `issys-presentaciones.web.app` e `issys-eer.web.app` sólo redirigen al portal (301): se
-  publican desde este repo (`hosting:procesos-viejo`, `hosting:presentaciones-viejo`) o, `issys-eer`, desde una carpeta
-  aparte con sólo `hosting`.
+- `issys-procesos.web.app`, `issys-presentaciones.web.app`, `issys-eer.web.app` e `issys-consultorios.web.app` sólo
+  redirigen al portal (301): se publican desde este repo (`hosting:procesos-viejo`, `hosting:presentaciones-viejo`) o,
+  `issys-eer` e `issys-consultorios`, desde una carpeta aparte con sólo `hosting`.
 
 ### Global Side Effects
 
@@ -493,11 +493,13 @@ editado en el sistema nuevo y vuelve a fijar roles y `activo: true`. Después re
    sesión de `firebase-tools` (sólo lectura del origen) y verificados campo por campo: documento igual, 15/15 profesionales.
 3. **Hecho (11/11/2026):** reglas publicadas y prueba en el canal `prueba`.
 4. **Hecho (11/11/2026):** publicado `hosting:sistemas`. Falta dar de alta en el portal a quien use Consultorios.
-5. **Retirar el sitio viejo:** publicar en `issys-consultorios` (desde una carpeta aparte con sólo `hosting`) una redirección
-   301 a `https://issys-sistemas.web.app/consultorios/`, como se hizo con `issys-eer`. Antes, repetir el paso 2 si alguien
-   editó el sitio viejo (pisa lo copiado).
+5. **Hecho (11/11/2026):** sitio viejo retirado. Antes se comprobó que nadie lo había editado (datos iguales a los copiados).
+   Se publicó en `issys-consultorios`, desde una carpeta aparte con un `firebase.json` de sólo `hosting`
+   (`"redirects": [{ "source": "**", "destination": "https://issys-sistemas.web.app/consultorios/", "type": 301 }]`), una
+   redirección 301 de todas las direcciones a `https://issys-sistemas.web.app/consultorios/`. El proyecto conserva sus datos
+   viejos (`cronogramas/mitre837`) como respaldo.
 
-**Vuelta atrás:** hasta el paso 5, el sitio viejo sigue funcionando con sus datos. Después, Firebase Console (proyecto
+**Vuelta atrás:** Firebase Console (proyecto
 `issys-consultorios`) → Hosting → historial de versiones → **Revertir**.
 
 ---
