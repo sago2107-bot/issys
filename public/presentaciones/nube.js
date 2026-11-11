@@ -211,7 +211,8 @@
             usuario = s.usuario;
             ISSyS.alCargarDom(() => {
                 s.mostrar();
-                ISSyS.ponerUsuario(document.getElementById('e-top'), usuario, { alSalir: salir });
+                // Encabezado común de los Sistemas ISSyS: lanzador de sistemas + foto de perfil (la versión descargada no lo tiene: no carga nube.js)
+                ISSyS.ponerEncabezado(document.getElementById('e-top'), usuario, { sistema: 'presentaciones', alSalir: salir });
                 listo({ leer, listar, poner, borrar, avisar, usuario });
             });
         })

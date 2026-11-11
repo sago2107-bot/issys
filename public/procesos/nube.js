@@ -30,7 +30,7 @@
     let usuario = null;
 
     // ------------------------------------------------------------
-    // Estilos propios del chip de usuario (abajo a la izquierda, con estado de guardado)
+    // Estilos de los avisos propios (el usuario va en el encabezado común: ISSyS.ponerEncabezado)
     // ------------------------------------------------------------
     const css = document.createElement('style');
     css.textContent = `
@@ -41,25 +41,6 @@
         .nube-btn.prim:hover { background: #36457F; border-color: #36457F; }
         .nube-btn.chico { font-size: 12px; padding: 5px 10px; border-radius: 8px; }
 
-        #nube-chip { position: fixed; left: 12px; bottom: 12px; z-index: 900; font-family: ${FUENTE}; }
-        #nube-chip > button.avatar { width: 38px; height: 38px; border-radius: 50%; border: 2px solid #fff; padding: 0; cursor: pointer;
-            box-shadow: 0 2px 8px rgba(29,29,27,.3); background: #4657A0; color: #fff; font-weight: 600; overflow: hidden; position: relative; }
-        #nube-chip img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        #nube-chip .punto { position: absolute; right: -1px; bottom: -1px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff; background: #59B57E; }
-        #nube-chip .punto.guardando { background: #F9D76B; }
-        #nube-chip .punto.error { background: #B3261E; }
-        #nube-menu { position: absolute; left: 0; bottom: 48px; width: 270px; background: #fff; border: 1px solid #C6C6C6; border-radius: 12px;
-            box-shadow: 0 12px 30px rgba(29,29,27,.2); padding: 6px; font-size: 14px; color: #1D1D1B; }
-        #nube-menu .cab { padding: 10px 10px 8px; border-bottom: 1px solid #EDEEF1; margin-bottom: 4px; }
-        #nube-menu .cab b { display: block; font-size: 14px; }
-        #nube-menu .cab span { color: #5F5F5F; font-size: 12px; word-break: break-all; }
-        #nube-menu .estado { font-size: 12px; margin-top: 6px; color: #2F7D50; }
-        #nube-menu .estado.guardando { color: #6E5006; }
-        #nube-menu .estado.error { color: #B3261E; }
-        #nube-menu .item { display: block; width: 100%; text-align: left; padding: 8px 10px; border: 0; background: none; border-radius: 8px;
-            cursor: pointer; font-size: 14px; color: #1D1D1B; font-family: inherit; text-decoration: none; box-sizing: border-box; }
-        #nube-menu .item:hover { background: #F5F6F8; }
-        #nube-menu .item.rojo { color: #B3261E; }
 
         #nube-aviso { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 9980; background: #1D1D1B; color: #fff;
             border-radius: 10px; padding: 10px 12px 10px 16px; font: 14px ${FUENTE}; display: flex;
@@ -119,15 +100,11 @@
         return db.collection('datos').doc(encodeURIComponent(clave));
     }
 
+    let encabezado = null;   // { estado(e) } que devuelve ISSyS.ponerEncabezado
+
     function marcarEstado(e) {
         estadoActual = e;
-        const punto = document.querySelector('#nube-chip .punto');
-        if (punto) punto.className = `punto ${e}`;
-        const txt = document.getElementById('nube-estado');
-        if (txt) {
-            txt.className = `estado ${e}`;
-            txt.textContent = { ok: '✓ Guardado en la nube', guardando: 'Guardando en la nube…', error: '⚠ No se pudo guardar en la nube' }[e];
-        }
+        if (encabezado) encabezado.estado(e);   // punto sobre la foto + línea en el menú de cuenta
     }
 
     function encolar(clave, valor) {
@@ -227,43 +204,15 @@
     }
 
     // ------------------------------------------------------------
-    // Menú del usuario
+    // Encabezado común: lanzador de sistemas + foto de perfil con el menú de cuenta
     // ------------------------------------------------------------
-    function ponerChip() {
-        const chip = document.createElement('div');
-        chip.id = 'nube-chip';
-        const inicial = esc((usuario.nombre || usuario.email).charAt(0).toUpperCase());
-        chip.innerHTML = `<button class="avatar" title="${esc(usuario.email)}">${usuario.foto ? `<img src="${esc(usuario.foto)}" alt="" referrerpolicy="no-referrer">` : inicial}<span class="punto"></span></button>`;
-        document.body.appendChild(chip);
-        chip.querySelector('.avatar').onclick = (e) => { e.stopPropagation(); alternarMenu(); };
-        document.addEventListener('click', (e) => {
-            const menu = document.getElementById('nube-menu');
-            if (menu && !menu.contains(e.target)) menu.remove();
-        });
+    function ponerEncabezado() {
+        const items = [{ texto: 'Descargar respaldo', icono: 'descargar', accion: descargarRespaldo }];
+        if (usuario.admin) items.push({ texto: 'Importar respaldo…', icono: 'subir', accion: importarRespaldo });
+        // Va en el hueco #issys-encabezado del encabezado de la página (visor y modelador)
+        const lugar = document.getElementById('issys-encabezado') || document.querySelector('header') || document.body;
+        encabezado = ISSyS.ponerEncabezado(lugar, usuario, { sistema: 'procesos', items, alSalir: salir });
         marcarEstado(estadoActual);
-    }
-
-    function alternarMenu() {
-        const abierto = document.getElementById('nube-menu');
-        if (abierto) return abierto.remove();
-        const menu = document.createElement('div');
-        menu.id = 'nube-menu';
-        menu.innerHTML = `
-            <div class="cab"><b>${esc(usuario.nombre || usuario.email)}</b><span>${esc(usuario.email)}${usuario.admin ? ' · administrador' : ''}</span>
-                <div id="nube-estado" class="estado"></div></div>
-            <a class="item" href="/">▦ Sistemas ISSyS</a>
-            ${usuario.admin ? '<a class="item" href="/#usuarios">👥 Usuarios y permisos</a>' : ''}
-            <button class="item" data-a="descargar">⬇ Descargar respaldo</button>
-            ${usuario.admin ? '<button class="item" data-a="importar">⬆ Importar respaldo…</button>' : ''}
-            <button class="item rojo" data-a="salir">Cerrar sesión</button>`;
-        document.getElementById('nube-chip').appendChild(menu);
-        marcarEstado(estadoActual);
-        menu.onclick = (e) => {
-            const a = e.target.closest('[data-a]');
-            if (!a) return;
-            menu.remove();
-            ({ descargar: descargarRespaldo, importar: importarRespaldo, salir })[a.dataset.a]();
-        };
     }
 
     function importarRespaldo() {
@@ -321,7 +270,7 @@
         escucharCambios();
         alCargarDom(() => {
             s.mostrar();
-            ponerChip();
+            ponerEncabezado();
             listo();
         });
     });

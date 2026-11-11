@@ -95,7 +95,7 @@
             <a href="index.html" class="flex-shrink-0" title="Ir al listado de procesos">
                 <img src="/shared/marca/issys-logo-recorte.png" alt="ISSyS" class="issys-logo">
             </a>
-            <div class="min-w-0 border-l border-slate-300 pl-4">
+            <div class="hidden sm:block min-w-0 border-l border-slate-300 pl-4">
                 <div class="font-extrabold text-lg leading-tight">Modelador BPMN</div>
                 <p id="hdr-process" class="text-[13px] font-light text-slate-500 leading-tight truncate">Proceso</p>
             </div>
@@ -113,10 +113,13 @@
             </button>
         </div>
 
-        <a id="link-viewer" href="index.html" class="flex items-center gap-1.5 text-xs font-semibold text-issys-blue hover:text-issys-blue-dark hover:underline">
-            <i data-lucide="eye" class="w-4 h-4"></i>
-            <span class="hidden sm:inline">Volver al visor</span>
-        </a>
+        <div class="flex items-center gap-4">
+            <a id="link-viewer" href="index.html" class="flex items-center gap-1.5 text-xs font-semibold text-issys-blue hover:text-issys-blue-dark hover:underline">
+                <i data-lucide="eye" class="w-4 h-4"></i>
+                <span class="hidden sm:inline">Volver al visor</span>
+            </a>
+            <div id="issys-encabezado"></div><!-- encabezado común: lanzador de sistemas + foto (shared/auth.js) -->
+        </div>
     </header>
 
     <!-- Toolbar -->

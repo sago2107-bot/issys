@@ -313,8 +313,27 @@ Para el ícono de app usar la versión **botón/ícono** del manual: isologo cen
 
 ---
 
-## 8. Checklist antes de publicar
+## 8. Encabezado de los Sistemas ISSyS [Regla interna]
 
+Todas las web apps del Instituto comparten el mismo encabezado, con la misma lógica que las apps de Google:
+
+- **Barra blanca** con borde inferior verde (`--issys-green`, 4 px) y sombra suave. Nunca encabezados azules u oscuros.
+- **Izquierda:** logo a color + línea vertical gris + nombre del sistema (Black 900) y bajada (Light 300).
+- **Derecha, siempre en este orden:** herramientas propias del sistema → **lanzador de sistemas** (botón de 9 puntos que abre
+  el panel con los sistemas habilitados) → **foto de perfil** (la de Google; abre el menú de cuenta).
+- Panel del lanzador: fondo `--issys-surface`, bloque blanco con los sistemas activos, íconos en cuadrados redondeados
+  azul (`--issys-blue`, ícono blanco) o verde (`--issys-green`, ícono en `--issys-ink`); los "próximamente" en gris.
+- Menú de cuenta: correo, foto con anillo verde, "¡Hola, Nombre!", etiquetas de rol, acciones y "Cerrar sesión" en `--issys-danger`.
+- Estado de guardado: punto sobre la foto (verde guardado, amarillo guardando, rojo error).
+
+Implementación única: `ISSyS.ponerEncabezado()` en `public/shared/auth.js` + estilos en `public/shared/issys.css`.
+Detalle de uso en el README del repositorio ("Encabezado común").
+
+---
+
+## 9. Checklist antes de publicar
+
+- [ ] El encabezado sigue la sección 8 (lanzador ⋮⋮⋮ y foto de perfil arriba a la derecha, con `ISSyS.ponerEncabezado`).
 - [ ] Se usa `Encode Sans Condensed` en toda la interfaz.
 - [ ] Solo colores de la paleta (o derivados de este documento).
 - [ ] Ningún texto en verde `#59B57E` ni amarillo sobre blanco.

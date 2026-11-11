@@ -25,7 +25,7 @@ a{color:var(--issys-blue)}
 /* ---------- Barra superior ---------- */
 .top{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:14px;padding:10px 24px;background:#fff;border-bottom:4px solid var(--issys-green)}
 .top .sep{width:1px;height:28px;background:var(--issys-gray-light)}
-.top .nombre{font-size:20px;font-weight:600;letter-spacing:.01em}
+.top .nombre{font-size:20px;font-weight:900}
 .top .esp{flex:1}
 
 /* ---------- Contenido ---------- */
@@ -70,6 +70,8 @@ a.sis:hover .pie .flecha{transform:translateX(4px)}
 .ch input{accent-color:var(--issys-blue);margin:0}
 .ch:has(input:checked){border-color:var(--issys-blue);background:var(--issys-blue-tint);color:var(--issys-blue-dark)}
 .ch.adm:has(input:checked){border-color:var(--issys-green-dark);background:var(--issys-green-tint);color:var(--issys-green-dark)}
+.ch select{font:13px var(--issys-font);border:0;border-left:1px solid var(--issys-gray-light);background:transparent;color:inherit;padding:0 0 0 6px;margin-left:2px;cursor:pointer}
+.ch:not(:has(input:checked)) select{display:none}
 .lista{list-style:none;margin:20px 0 0;padding:0}
 .lista li{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:14px 4px;border-top:1px solid var(--issys-line)}
 .lista li .mail{flex:1 1 240px;min-width:0;font-size:17px;word-break:break-all}
@@ -131,14 +133,7 @@ footer{border-top:1px solid var(--issys-line);padding:18px 24px;font-size:13px;c
   const { esc, avisar, config: CFG } = ISSyS;
   const $ = id => document.getElementById(id);
 
-  const ICONOS = {
-    procesos: '<rect x="3" y="3" width="8" height="8" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect x="13" y="13" width="8" height="8" rx="2"/>',
-    presentaciones: '<path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-5 5 5"/>',
-    estatuto: '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
-    delegaciones: '<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
-    consultorios: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>'
-  };
-  const icono = id => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONOS[id] || ICONOS.procesos}</svg>`;
+  const icono = ISSyS.icono;   // íconos comunes (shared/auth.js), los mismos del lanzador
 
   ISSyS.iniciar({
     sistema: null,
@@ -149,7 +144,7 @@ footer{border-top:1px solid var(--issys-line);padding:18px 24px;font-size:13px;c
     const u = ses.usuario;
     const nombre = (u.nombre || '').split(' ')[0];
     if (nombre) $('saludo').innerHTML = `Hola, ${esc(nombre)}<span class="punto">.</span>`;
-    ISSyS.ponerUsuario($('usuario'), u, { portal: false, usuarios: false });
+    ISSyS.ponerEncabezado($('usuario'), u, { sistema: null });   // encabezado común: lanzador + foto
     pintarSistemas(u);
     if (u.admin) iniciarAdmin(ses);
     ses.mostrar();
@@ -184,7 +179,14 @@ footer{border-top:1px solid var(--issys-line);padding:18px 24px;font-size:13px;c
     const col = db.collection('usuarios');
     const ahora = () => firebase.firestore.FieldValue.serverTimestamp();
     const nombreDe = id => (CFG.sistemas.find(s => s.id === id) || { nombre: id }).nombre;
-    const chk = (id, marcado, attrs = '') => `<label class="ch"><input type="checkbox" value="${esc(id)}" ${marcado ? 'checked' : ''} ${attrs}>${esc(nombreDe(id))}</label>`;
+    // Tilde por sistema; los que tienen roles propios (Estatuto) suman un selector de rol
+    const chk = (id, marcado, attrs = '', rol = null) => {
+      const def = CFG.sistemas.find(s => s.id === id) || {};
+      const sel = def.roles ? `<select data-rol="${esc(id)}" aria-label="Rol en ${esc(def.nombre)}">${def.roles.map(r =>
+        `<option value="${esc(r.id)}" ${r.id === (rol || def.roles[def.roles.length - 1].id) ? 'selected' : ''}>${esc(r.nombre)}</option>`).join('')}</select>` : '';
+      return `<label class="ch"><input type="checkbox" value="${esc(id)}" ${marcado ? 'checked' : ''} ${attrs}>${esc(nombreDe(id))}${sel}</label>`;
+    };
+    const rolesDe = cont => Object.fromEntries([...cont.querySelectorAll('select[data-rol]')].map(x => [x.dataset.rol, x.value]));
 
     $('usuarios').hidden = false;
     $('alta-checks').innerHTML = CFG.sistemas.map(s => chk(s.id, false)).join('')
@@ -199,7 +201,7 @@ footer{border-top:1px solid var(--issys-line);padding:18px 24px;font-size:13px;c
       const sistemas = [...f.querySelectorAll('#alta-checks input[value]:checked')].map(i => i.value);
       try {
         await col.doc(email).set({
-          sistemas, admin: f.querySelector('[data-admin]').checked, activo: true,
+          sistemas, roles: rolesDe(f), admin: f.querySelector('[data-admin]').checked, activo: true,
           actualizadoPor: usuario.email, actualizado: ahora()
         }, { merge: true });
         f.reset();
@@ -214,7 +216,7 @@ footer{border-top:1px solid var(--issys-line);padding:18px 24px;font-size:13px;c
         const activo = x.activo !== false;
         filas.push(`<li data-mail="${esc(d.id)}" class="${activo ? '' : 'inactivo'}">
           <span class="mail">${esc(d.id)}${x.admin ? '<small>Administrador: ve todos los sistemas</small>' : ''}</span>
-          <span class="checks">${CFG.sistemas.map(s => chk(s.id, sis.includes(s.id), 'data-sis')).join('')}
+          <span class="checks">${CFG.sistemas.map(s => chk(s.id, sis.includes(s.id), 'data-sis', (x.roles || {})[s.id])).join('')}
             <label class="ch adm"><input type="checkbox" data-admin ${x.admin ? 'checked' : ''}>Administrador</label></span>
           <span class="acc">
             <button class="issys-btn chico" type="button" data-activo>${activo ? 'Suspender' : 'Reactivar'}</button>
@@ -231,8 +233,9 @@ footer{border-top:1px solid var(--issys-line);padding:18px 24px;font-size:13px;c
       try {
         if (e.target.matches('[data-sis]')) {
           const sistemas = [...li.querySelectorAll('[data-sis]:checked')].map(i => i.value);
-          await ref.update({ sistemas, actualizadoPor: usuario.email, actualizado: ahora() });
+          await ref.update({ sistemas, roles: rolesDe(li), actualizadoPor: usuario.email, actualizado: ahora() });
         }
+        if (e.target.matches('[data-rol]')) await ref.update({ roles: rolesDe(li), actualizadoPor: usuario.email, actualizado: ahora() });
         if (e.target.matches('[data-admin]')) await ref.update({ admin: e.target.checked, actualizadoPor: usuario.email, actualizado: ahora() });
       } catch (err) { console.error(err); avisar('No se pudo modificar el usuario.'); }
     };

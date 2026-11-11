@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Migrar Estatuto — Sistemas ISSyS</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="/shared/marca/issys-isologo.png">
+<link href="https://fonts.googleapis.com/css2?family=Encode+Sans+Condensed:wght@300;400;600;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/shared/issys.css" data-issys-css>
+<script src="/shared/firebase-config.js"></script>
+<script src="/shared/auth.js"></script>
+<!--
+  Migración única de Estatuto: proyecto issys-eer → issys-procesos (Sistemas ISSyS).
+  Copia eerEditor/* y eerGraph/* tal cual, y pasa los usuarios activos de users/{uid}
+  a usuarios/{email} con Estatuto habilitado y su rol. No borra nada en issys-eer.
+  Sólo para administradores. Se puede usar más de una vez (vuelve a copiar lo último).
+-->
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:var(--issys-surface);font-family:var(--issys-font);color:var(--issys-ink)}
+.top{display:flex;align-items:center;gap:14px;padding:10px 24px;background:#fff;border-bottom:4px solid var(--issys-green)}
+.top .esp{flex:1}
+.top .sep{width:1px;height:28px;background:var(--issys-gray-light)}
+.top .nombre{font-size:18px;font-weight:900}
+main{max-width:860px;margin:0 auto;padding:36px 20px 64px}
+h1{font-size:40px;font-weight:900;margin:0;line-height:1}
+.bajada{font-size:18px;font-weight:300;margin:10px 0 28px}
+.paso{background:#fff;border:1px solid var(--issys-gray-light);border-radius:var(--issys-radius);padding:22px;margin-bottom:16px}
+.paso h2{font-size:22px;font-weight:900;margin:0 0 6px;display:flex;gap:10px;align-items:center}
+.paso h2 .n{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--issys-blue);color:#fff;font-size:16px}
+.paso.hecho h2 .n{background:var(--issys-green-dark)}
+.paso p{margin:4px 0 12px;color:var(--issys-muted);font-size:16px;line-height:1.45}
+.paso[aria-disabled=true]{opacity:.5;pointer-events:none}
+.fila{display:flex;gap:10px;flex-wrap:wrap}
+.fila input{flex:1 1 220px;min-width:0;border:1px solid var(--issys-gray-light);border-radius:10px;padding:10px 12px;font:16px var(--issys-font)}
+table{width:100%;border-collapse:collapse;font-size:15px;margin-top:8px}
+th,td{text-align:left;padding:7px 6px;border-top:1px solid var(--issys-line);vertical-align:top}
+th{font-weight:600;color:var(--issys-muted);font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+.res{font-size:15px;margin-top:10px;white-space:pre-wrap}
+.err{color:var(--issys-danger)}
+.ok{color:var(--issys-green-dark)}
+</style>
+</head>
+<body>
+<header class="top">
+  <img class="issys-logo" src="/shared/marca/issys-logo-recorte.png" alt="ISSyS">
+  <span class="sep" aria-hidden="true"></span>
+  <span class="nombre">Migrar Estatuto</span>
+  <span class="esp"></span>
+  <div id="usuario"></div>
+</header>
+<main>
+  <h1>Migrar Estatuto<span style="color:var(--issys-green)">.</span></h1>
+  <p class="bajada">Copia los datos del proyecto anterior (issys-eer) a Sistemas ISSyS. En issys-eer no se borra ni se cambia nada.</p>
+
+  <section class="paso" id="p1">
+    <h2><span class="n">1</span>Ingresar al Estatuto anterior</h2>
+    <p>Con el usuario y la contraseña que usabas en issys-eer (tiene que ser un usuario Administrador para poder leer la lista de usuarios).</p>
+    <form class="fila" id="f-origen">
+      <input type="email" id="o-mail" required placeholder="usuario@ejemplo.com" autocomplete="username">
+      <input type="password" id="o-pass" required placeholder="Contraseña" autocomplete="current-password">
+      <button class="issys-btn prim" type="submit">Ingresar y leer</button>
+    </form>
+    <div class="res" id="r1"></div>
+  </section>
+
+  <section class="paso" id="p2" aria-disabled="true">
+    <h2><span class="n">2</span>Revisar y respaldar</h2>
+    <p>Esto es lo que se va a copiar. Descargá el respaldo antes de seguir.</p>
+    <div id="resumen"></div>
+    <div class="fila" style="margin-top:14px"><button class="issys-btn" type="button" id="b-respaldo">⬇ Descargar respaldo (JSON)</button></div>
+  </section>
+
+  <section class="paso" id="p3" aria-disabled="true">
+    <h2><span class="n">3</span>Copiar a Sistemas ISSyS</h2>
+    <p>Reemplaza el contenido de Estatuto en Sistemas ISSyS por el de issys-eer y agrega los permisos de los usuarios (sin quitarles los que ya tengan en otros sistemas).</p>
+    <button class="issys-btn prim" type="button" id="b-copiar">Copiar ahora</button>
+    <div class="res" id="r3"></div>
+  </section>
+</main>
+
+<script>
+(function () {
+  const { esc, avisar, config: CFG } = ISSyS;
+  const $ = id => document.getElementById(id);
+
+  const ORIGEN = {
+    apiKey: 'AIzaSyCEYxLYrmWLFqapZ2_XEIkat3XpqmH5ZHY',
+    authDomain: 'issys-eer.firebaseapp.com',
+    projectId: 'issys-eer',
+    storageBucket: 'issys-eer.firebasestorage.app',
+    messagingSenderId: '300033149212',
+    appId: '1:300033149212:web:93d951869e8a02c01d12d9'
+  };
+  const COLECCIONES = ['eerEditor', 'eerGraph'];
+  const ROLES = (CFG.sistemas.find(s => s.id === 'estatuto').roles || []).map(r => r.id);
+
+  let datos = null;   // { eerEditor: {id: data}, eerGraph: {...}, users: {...} }
+
+  ISSyS.iniciar({ sistema: null, titulo: 'Migrar Estatuto', subtitulo: 'Herramienta de administración' }).then(ses => {
+    if (!ses.usuario.admin) {
+      ses.mostrar();
+      document.querySelector('main').innerHTML = '<h1>Sin permiso.</h1><p class="bajada">Esta herramienta es sólo para administradores.</p>';
+      return;
+    }
+    ISSyS.ponerEncabezado($('usuario'), ses.usuario, { sistema: null });
+    ses.mostrar();
+    iniciar(ses);
+  });
+
+  function iniciar(ses) {
+    const destino = ses.db;
+    const origenApp = firebase.apps.find(a => a.name === 'eer') || firebase.initializeApp(ORIGEN, 'eer');
+    const origenAuth = origenApp.auth();
+    const origenDb = origenApp.firestore();
+    origenAuth.setPersistence(firebase.auth.Auth.Persistence.NONE).catch(() => {});
+
+    $('f-origen').onsubmit = async (e) => {
+      e.preventDefault();
+      $('r1').className = 'res'; $('r1').textContent = 'Ingresando…';
+      try {
+        await origenAuth.signInWithEmailAndPassword($('o-mail').value.trim(), $('o-pass').value);
+      } catch (err) {
+        $('r1').className = 'res err';
+        $('r1').textContent = 'No se pudo ingresar a issys-eer: ' + (err.code || err.message);
+        return;
+      }
+      $('r1').textContent = 'Leyendo datos…';
+      try {
+        datos = {};
+        for (const c of [...COLECCIONES, 'users']) {
+          const snap = await origenDb.collection(c).get();
+          datos[c] = {};
+          snap.forEach(d => { datos[c][d.id] = d.data(); });
+        }
+      } catch (err) {
+        $('r1').className = 'res err';
+        $('r1').textContent = 'No se pudieron leer los datos: ' + (err.code || err.message);
+        return;
+      }
+      $('r1').className = 'res ok';
+      $('r1').textContent = '✓ Datos leídos de issys-eer.';
+      $('p1').classList.add('hecho');
+      mostrarResumen();
+      $('p2').removeAttribute('aria-disabled');
+      $('p3').removeAttribute('aria-disabled');
+    };
+
+    $('b-respaldo').onclick = () => {
+      const blob = new Blob([JSON.stringify({ origen: 'issys-eer', fecha: new Date().toISOString(), datos }, null, 1)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `issys-eer-respaldo-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      $('p2').classList.add('hecho');
+    };
+
+    $('b-copiar').onclick = async () => {
+      const usuarios = usuariosAMigrar();
+      if (!confirm(`Se van a copiar ${Object.keys(datos.eerEditor).length + Object.keys(datos.eerGraph).length} documentos de Estatuto (reemplazando los que haya en Sistemas ISSyS) y habilitar Estatuto a ${usuarios.length} usuario(s). ¿Continuar?`)) return;
+      const r = $('r3');
+      r.className = 'res'; r.textContent = 'Copiando…';
+      try {
+        // Un documento por escritura: eerEditor/state puede acercarse al límite de un lote
+        for (const c of COLECCIONES) {
+          for (const [id, d] of Object.entries(datos[c])) await destino.collection(c).doc(id).set(d);
+        }
+        const lote = destino.batch();
+        const FV = firebase.firestore.FieldValue;
+        usuarios.forEach(u => lote.set(destino.collection('usuarios').doc(u.email), {
+          sistemas: FV.arrayUnion('estatuto'), roles: { estatuto: u.rol }, activo: true,
+          migradoDe: 'issys-eer', actualizadoPor: ses.usuario.email, actualizado: FV.serverTimestamp()
+        }, { merge: true }));
+        await lote.commit();
+        r.className = 'res ok';
+        r.textContent = `✓ Listo. Estatuto ya está en Sistemas ISSyS con ${usuarios.length} usuario(s).\n` +
+          'Revisá los permisos en el portal (Usuarios y permisos) y abrí Estatuto para verificar.';
+        $('p3').classList.add('hecho');
+      } catch (err) {
+        console.error(err);
+        r.className = 'res err';
+        r.textContent = 'Falló la copia: ' + (err.code || err.message) + '\nSe puede volver a intentar: repite la copia completa.';
+      }
+    };
+  }
+
+  // users/{uid} → usuarios/{email}. Quedan afuera los desactivados, los sin email y el administrador fijo.
+  function usuariosAMigrar() {
+    return Object.values(datos.users || {})
+      .filter(u => u && u.email && u.active !== false && u.email.toLowerCase() !== CFG.dueno)
+      .map(u => ({ email: u.email.toLowerCase(), nombre: u.name || '', rol: ROLES.includes(u.role) ? u.role : 'lector' }));
+  }
+
+  function mostrarResumen() {
+    const filasDocs = [...COLECCIONES].flatMap(c => Object.entries(datos[c]).map(([id, d]) =>
+      `<tr><td>${esc(c)}/${esc(id)}</td><td>${(JSON.stringify(d).length / 1024).toFixed(0)} KB</td><td>${esc(d._savedAt || (d._ts ? new Date(d._ts).toLocaleString('es-AR') : ''))}</td></tr>`));
+    const migran = usuariosAMigrar();
+    const todos = Object.values(datos.users || {});
+    const quedan = todos.filter(u => !migran.find(m => m.email === (u.email || '').toLowerCase()));
+    $('resumen').innerHTML = `
+      <table><thead><tr><th>Documento</th><th>Tamaño</th><th>Última edición</th></tr></thead><tbody>${filasDocs.join('') || '<tr><td colspan="3">Sin documentos</td></tr>'}</tbody></table>
+      <table style="margin-top:18px"><thead><tr><th>Usuario</th><th>Rol en Estatuto</th></tr></thead><tbody>
+        ${migran.map(u => `<tr><td>${esc(u.email)}${u.nombre && u.nombre !== u.email ? `<br><small>${esc(u.nombre)}</small>` : ''}</td><td>${esc(u.rol)}</td></tr>`).join('') || '<tr><td colspan="2">Ninguno</td></tr>'}
+      </tbody></table>
+      ${quedan.length ? `<p style="margin-top:10px">No se migran (desactivados, sin email o administrador fijo): ${quedan.map(u => esc(u.email || '(sin email)')).join(', ')}</p>` : ''}
+      <p style="margin-top:10px">Cada persona va a entrar con <b>Google</b> usando ese mismo correo. Si su correo no es de Gmail, tiene que crear una cuenta de Google con ese correo (accounts.google.com → Crear cuenta → Usar mi dirección de correo actual).</p>`;
+  }
+})();
+</script>
+</body>
+</html>

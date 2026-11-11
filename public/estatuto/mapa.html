@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mapa de Conceptos — Sistemas ISSyS</title>
+<meta name="theme-color" content="#4657A0">
+<link rel="icon" type="image/png" href="/shared/marca/issys-isologo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Encode+Sans+Condensed:wght@300;400;600;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* Paleta ISSyS BrandBook 2023 */
+  --issys-verde:#59B57E;--issys-azul:#4657A0;
+  --navy:#4657A0;--navy2:#3a4a88;
+  --accent:#59B57E;--accent2:#7dcf9a;
+  --bg:#F4F4F4;--white:#fff;
+  --border:#C6C6C6;--text:#1A1A1A;--muted:#878787;
+  --green:#59B57E;--green-bg:#edf8f2;--green-bd:#9dd8b6;
+  --red:#D32F2F;--red-bg:#fdf0ee;--red-bd:#e8a8a0;
+  --blue-bg:#ebedf8;--blue:#4657A0;--blue-bd:#a0aacc;
+  --warn:#b88a00;--warn-bg:#fdf8ed;--warn-bd:#e8d080;
+  --purple:#6a309a;--purple-bg:#f5eeff;--purple-bd:#c8a8e8;
+  --font-sans:'Encode Sans Condensed',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+  --shadow-sm:0 1px 3px rgba(70,87,160,.07);
+  --shadow-md:0 4px 16px rgba(70,87,160,.11);
+  --shadow-lg:0 8px 32px rgba(70,87,160,.18);
+}
+body{font-family:var(--font-sans);font-weight:300;background:var(--bg);color:var(--text);min-height:100vh;overflow:hidden}
+
+/* HEADER */
+.hdr{background:var(--navy);color:#fff;padding:0 24px;height:66px;display:flex;align-items:center;gap:18px;box-shadow:0 2px 20px rgba(70,87,160,.45);flex-shrink:0;position:sticky;top:0;z-index:100;border-bottom:1.5px solid rgba(89,181,126,.2);user-select:none}
+.hdr input,.hdr-search-input{user-select:text}
+.hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent 0%,rgba(89,181,126,.6) 30%,rgba(89,181,126,.6) 70%,transparent 100%);pointer-events:none}
+.hdr-logo{width:44px;height:44px;object-fit:contain;flex-shrink:0}
+.hdr-info{flex:1}
+.hdr-title{font-family:var(--font-sans);font-size:15px;font-weight:900;letter-spacing:.4px;color:#fff;line-height:1.2}
+.hdr-sub{font-size:11px;opacity:.55;margin-top:3px;font-weight:400;letter-spacing:.1px}
+.hdr-btns{display:flex;align-items:center;gap:6px;margin-left:auto}
+.hdr-btn{position:relative;width:40px;height:40px;padding:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:rgba(255,255,255,.8);cursor:pointer;transition:all .18s;flex-shrink:0}
+.hdr-btn:hover{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.22);color:#fff;transform:translateY(-1px)}
+.hdr-btn.accent{background:rgba(89,181,126,.18);border-color:rgba(89,181,126,.35);color:var(--accent2)}
+.hdr-btn.accent:hover{background:rgba(89,181,126,.28);color:#fff}
+.hdr-btn::after{content:attr(data-tooltip);position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);background:var(--navy);border:1px solid rgba(255,255,255,.1);color:#fff;padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .18s;z-index:1000}
+.hdr-btn:hover::after{opacity:1}
+.hdr-sep{width:1px;height:28px;background:rgba(255,255,255,.12);margin:0 2px}
+
+/* SEARCH */
+.hdr-search{position:relative;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:8px;padding:8px 14px;width:280px;flex-shrink:0;transition:all .2s}
+.hdr-search:focus-within{background:rgba(255,255,255,.12);border-color:rgba(89,181,126,.45);box-shadow:0 0 0 3px rgba(89,181,126,.1)}
+.hdr-search-ico{color:rgba(255,255,255,.4);flex-shrink:0}
+.hdr-search-input{border:none;outline:none;background:transparent;color:#fff;font-size:13px;flex:1;min-width:0;font-family:var(--font-sans)}
+.hdr-search-input::placeholder{color:rgba(255,255,255,.32)}
+.hdr-search-clear{color:rgba(255,255,255,.38);cursor:pointer;font-size:12px;line-height:1;flex-shrink:0;display:none}
+.hdr-search-clear:hover{color:#fff}
+.hdr-search-clear.visible{display:block}
+.hdr-search-results{position:absolute;top:calc(100% + 8px);left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(70,87,160,.25);z-index:2100;max-height:240px;overflow-y:auto;display:none}
+.hdr-search-results.open{display:block}
+.hdr-search-item{display:flex;align-items:center;gap:8px;padding:8px 12px;font-size:13px;color:var(--text);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-search-item:hover{background:var(--blue-bg);color:var(--navy)}
+.hdr-search-empty{padding:8px 12px;font-size:12.5px;color:var(--muted)}
+
+/* DROPDOWN */
+.hdr-dropdown{position:relative}
+.hdr-dropdown-menu{position:absolute;top:calc(100% + 8px);right:0;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 32px rgba(70,87,160,.2);z-index:500;min-width:200px;overflow:hidden;display:none}
+.hdr-dropdown-item{display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:13px;font-weight:500;color:var(--text);cursor:pointer;background:none;border:none;width:100%;text-align:left;white-space:nowrap;transition:background .12s;font-family:var(--font-sans)}
+.hdr-dropdown-item svg{flex-shrink:0;opacity:.6}
+.hdr-dropdown-item:hover{background:var(--blue-bg);color:var(--navy)}
+.hdr-dropdown-item:hover svg{opacity:1}
+.hdr-dropdown-sep{height:1px;background:var(--border);margin:3px 0}
+
+/* LAYOUT */
+.canvas-wrap{position:relative;width:100%;height:calc(100vh - 66px);overflow:hidden;background:var(--bg)}
+#graphSvg{width:100%;height:100%;display:block}
+.empty-state{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:12px;padding:28px 36px;box-shadow:var(--shadow-md);text-align:center;max-width:340px}
+.empty-ico{font-size:36px;margin-bottom:8px}
+.empty-title{font-size:14px;font-weight:900;color:var(--navy);margin-bottom:5px}
+.empty-desc{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* NAVEGACIÓN / ZOOM */
+.graph-controls{position:absolute;right:18px;bottom:18px;display:flex;flex-direction:column;align-items:center;gap:10px;z-index:40}
+.gc-zoom{display:flex;flex-direction:column;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow-md);overflow:hidden}
+.gc-pad{display:grid;grid-template-columns:repeat(3,36px);grid-template-rows:repeat(3,36px);background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow-md);overflow:hidden}
+.gc-btn{position:relative;width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:#fff;border:none;color:var(--navy2);cursor:pointer;transition:background .15s}
+.gc-btn:hover{background:var(--blue-bg)}
+.gc-zoom .gc-btn:first-child{border-bottom:1px solid var(--border)}
+.gc-pad-up{grid-area:1/2}
+.gc-pad-left{grid-area:2/1}
+.gc-pad-center{grid-area:2/2;color:var(--navy)}
+.gc-pad-right{grid-area:2/3}
+.gc-pad-down{grid-area:3/2}
+.gc-btn::after{content:attr(data-tooltip);position:absolute;right:calc(100% + 8px);top:50%;transform:translateY(-50%);background:var(--navy);color:#fff;padding:4px 9px;border-radius:6px;font-size:11px;font-weight:600;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s}
+.gc-btn:hover::after{opacity:1}
+
+.node{transition:opacity .2s}
+.node circle{cursor:pointer;stroke:#fff;stroke-width:2px}
+.node text{pointer-events:none;user-select:none;font-size:10.5px;font-weight:600;fill:var(--text)}
+.node.selected circle{stroke:var(--navy);stroke-width:3px}
+.node.related circle{stroke:#E8821E;stroke-width:2.5px;stroke-opacity:.85}
+.node.linking circle{stroke:var(--accent);stroke-width:3px;stroke-dasharray:3 2}
+.node.dim{opacity:.15}
+
+.edge{transition:opacity .2s}
+.edge.dim{opacity:.08}
+.edge-line{stroke:var(--navy);stroke-opacity:.45;stroke-width:1.8px;cursor:pointer}
+.edge-line:hover{stroke:#D32F2F;stroke-opacity:.9}
+.edge-label{font-size:10.5px;font-weight:600;fill:#555;paint-order:stroke;stroke:#F4F4F4;stroke-width:4px;stroke-linejoin:round;pointer-events:none;user-select:none}
+
+/* RELATIONS LIST */
+.rel-sec-title{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin:14px 0 7px;padding-bottom:4px;border-bottom:1px solid #eee}
+.rel-item{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:6px;background:#f8f9fc;margin-bottom:5px;font-size:14px}
+.rel-item-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rel-item-edit,.rel-item-del{flex-shrink:0;width:18px;height:18px;display:flex;align-items:center;justify-content:center;border-radius:4px;cursor:pointer;color:var(--muted);font-size:13px;background:none;border:none}
+.rel-item-edit:hover{background:var(--blue-bg);color:var(--navy)}
+.rel-item-del:hover{background:#fdf0ee;color:#D32F2F}
+.rel-empty{font-size:13.5px;color:var(--muted);margin-bottom:8px}
+
+/* CATEGORÍAS */
+.cat-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:#f8f9fc;margin-bottom:5px;font-size:13px}
+.cat-swatch{width:16px;height:16px;border-radius:4px;flex-shrink:0;border:1px solid rgba(0,0,0,.12)}
+.cat-item-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.detail-btn-blue{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:7px 14px;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;background:#ebedf8;color:var(--navy2);border:1px solid #a0aacc;margin-top:4px}
+.detail-btn-blue:hover{background:#dde2f5}
+
+/* DETAIL PANEL */
+.detail-pnl{position:absolute;right:0;top:0;bottom:0;width:300px;background:#fff;border-left:1px solid var(--border);box-shadow:-4px 0 20px rgba(70,87,160,.1);transform:translateX(100%);transition:transform .2s ease;display:flex;flex-direction:column;z-index:50}
+.detail-pnl.open{transform:translateX(0)}
+.detail-pnl-header{padding:16px 18px 12px;border-bottom:1px solid var(--border);position:relative}
+.detail-close{position:absolute;top:12px;right:12px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;background:#eef0fa;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:12px}
+.detail-cat-badge{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;padding:2px 8px;border-radius:10px;display:inline-block;color:#fff}
+.detail-title{font-size:16px;font-weight:900;color:var(--navy);padding-right:20px;margin-bottom:6px}
+.detail-body{flex:1;overflow-y:auto;padding:14px 18px;font-size:15px;line-height:1.6;color:var(--text)}
+.detail-actions{padding:12px 18px;border-top:1px solid var(--border)}
+.detail-btn-red{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:8px 14px;border-radius:6px;font-size:14.5px;font-weight:600;cursor:pointer;background:#fdf0ee;color:#D32F2F;border:1px solid #e8a8a0}
+.detail-btn-red:hover{background:#fae0dd}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(70,87,160,.45);z-index:2000;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{background:#fff;border-radius:14px;padding:26px 30px;width:420px;max-width:95vw;box-shadow:0 16px 48px rgba(70,87,160,.25)}
+.modal-title{font-size:16px;font-weight:900;color:var(--navy);margin-bottom:18px}
+.modal-field{margin-bottom:14px}
+.modal-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:5px;display:block}
+.modal-input,.modal-select,.modal-textarea{width:100%;font-family:var(--font-sans);font-size:13px;padding:9px 12px;border:1px solid var(--border);border-radius:7px;outline:none;color:var(--text)}
+.modal-input:focus,.modal-select:focus,.modal-textarea:focus{border-color:var(--navy2);box-shadow:0 0 0 3px rgba(70,87,160,.08)}
+.modal-textarea{font-family:var(--font-mono);font-size:12.5px;line-height:1.6;min-height:180px;resize:vertical}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+.modal-btn-cancel{padding:8px 18px;border-radius:6px;border:1px solid var(--border);background:#fff;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer}
+.modal-btn-cancel:hover{background:#f5f5f5}
+.modal-btn-confirm{padding:8px 18px;border-radius:6px;border:none;background:var(--navy);color:#fff;font-size:13px;font-weight:600;cursor:pointer}
+.modal-btn-confirm:hover{background:var(--navy2)}
+
+/* AUTOCOMPLETE (combo input + filtered list) */
+.ac-wrap{position:relative}
+.ac-list{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(70,87,160,.18);z-index:2100;max-height:200px;overflow-y:auto;display:none}
+.ac-list.open{display:block}
+.ac-item{padding:8px 12px;font-size:13px;color:var(--text);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ac-item:hover,.ac-item.active{background:var(--blue-bg);color:var(--navy)}
+.ac-item-new{font-weight:700;color:var(--navy2)}
+.ac-empty{padding:8px 12px;font-size:12.5px;color:var(--muted)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;transition:all .3s;z-index:9000;pointer-events:none;max-width:360px;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+
+/* AUTH OVERLAY */
+.auth-overlay{position:fixed;inset:0;background:linear-gradient(145deg,var(--navy) 0%,#3a4a88 50%,#2d3a70 100%);z-index:9999;display:flex;align-items:center;justify-content:center}
+.boot-loader{position:fixed;inset:0;background:linear-gradient(145deg,var(--navy) 0%,#3a4a88 50%,#2d3a70 100%);z-index:9998;display:flex;align-items:center;justify-content:center}
+.boot-spinner{width:38px;height:38px;border:4px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:boot-spin .8s linear infinite}
+@keyframes boot-spin{to{transform:rotate(360deg)}}
+.auth-box{background:#fff;border-radius:16px;width:380px;max-width:95vw;box-shadow:0 20px 60px rgba(70,87,160,.5);overflow:hidden}
+.auth-header{background:var(--navy);padding:32px 40px 24px;text-align:center;border-bottom:2px solid rgba(89,181,126,.25)}
+.auth-header img{width:54px}
+.auth-title{font-size:16px;font-weight:900;color:#fff;margin-top:12px;line-height:1.25}
+.auth-sub{font-size:11px;color:rgba(255,255,255,.5);margin-top:5px}
+.auth-body{padding:28px 40px 36px;background:#fff}
+.auth-field{margin-bottom:16px}
+.auth-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:6px;display:block}
+.auth-input{width:100%;font-family:var(--font-sans);font-size:14px;padding:11px 14px;border:1px solid var(--border);border-radius:8px;outline:none;color:var(--text);background:#fff;transition:all .15s}
+.auth-input:focus{border-color:var(--navy2);box-shadow:0 0 0 3px rgba(70,87,160,.1)}
+.auth-btn{width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:7px;font-family:var(--font-sans);font-size:14px;font-weight:600;cursor:pointer;transition:background .15s;margin-top:4px}
+.auth-btn:hover{background:#4a9a6a}
+.auth-btn:disabled{opacity:.45;cursor:not-allowed}
+.auth-error{background:#fdf0ee;color:#D32F2F;border:1px solid #e8a8a0;border-radius:8px;padding:9px 14px;font-size:12px;font-weight:600;margin-bottom:14px;display:none}
+.auth-error.visible{display:block}
+
+/* LECTOR/REVISOR: ocultar controles de edición */
+body[data-role="lector"] .role-edit-only,
+body[data-role="revisor"] .role-edit-only{display:none!important}
+</style>
+<!-- Login único de los Sistemas ISSyS (Google) + capa de nube de Estatuto -->
+<link rel="stylesheet" href="/shared/issys.css" data-issys-css>
+<script src="/shared/firebase-config.js"></script>
+<script src="/shared/auth.js"></script>
+<script src="nube.js" data-pagina="mapa"></script>
+<!-- Identidad común de los Sistemas ISSyS (va después de los estilos propios) -->
+<link rel="stylesheet" href="estatuto-marca.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <img src="/shared/marca/issys-logo-recorte.png" alt="ISSyS" class="issys-logo">
+  <div class="hdr-info">
+    <div class="hdr-title">Mapa de Conceptos EER</div>
+    <div class="hdr-sub">Instituto de Seguridad Social y Seguros &nbsp;·&nbsp; Versión 2.010</div>
+  </div>
+  <div class="hdr-search">
+    <svg class="hdr-search-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input class="hdr-search-input" id="nodeSearchInput" type="text" placeholder="Buscar nodo…" autocomplete="off"
+      oninput="onNodeSearch(this.value)">
+    <span class="hdr-search-clear" id="nodeSearchClear" onclick="clearNodeSearch()">✕</span>
+    <div class="hdr-search-results" id="nodeSearchResults"></div>
+  </div>
+  <div class="hdr-btns">
+    <button class="hdr-btn" data-tooltip="Volver al Estatuto" onclick="window.location.href='index.html'"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></button>
+    <div class="hdr-sep"></div>
+    <div class="hdr-dropdown role-edit-only" id="addDropdown">
+      <button class="hdr-btn accent" id="addConceptBtn" data-tooltip="Agregar" onclick="toggleAddDropdown(event)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+      <div class="hdr-dropdown-menu" id="addDropdownMenu">
+        <button class="hdr-dropdown-item" onclick="closeAllDropdowns();openAddConceptModal()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><line x1="12" y1="9" x2="12" y2="15"/><line x1="9" y1="12" x2="15" y2="12"/></svg> Agregar nodo</button>
+        <button class="hdr-dropdown-item" onclick="closeAllDropdowns();openAddRelationModal()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><line x1="8.5" y1="8.5" x2="15.5" y2="15.5"/></svg> Agregar relación</button>
+        <div class="hdr-dropdown-sep"></div>
+        <button class="hdr-dropdown-item" onclick="closeAllDropdowns();openCategoryModal()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg> Gestionar categorías</button>
+      </div>
+    </div>
+    <button class="hdr-btn role-edit-only" id="importMdBtn" data-tooltip="Importar Markdown" onclick="openImportMdModal()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg></button>
+    <div class="hdr-sep"></div>
+    <div id="issys-encabezado"></div><!-- encabezado común: lanzador de sistemas + foto (shared/auth.js, lo pone nube.js) -->
+  </div>
+</header>
+
+<!-- CANVAS -->
+<div class="canvas-wrap" id="canvasWrap">
+  <svg id="graphSvg">
+    <defs>
+      <!-- Los degradés grad-cat-* se generan dinámicamente en JS (ensureCategoryGradients), uno por categoría -->
+      <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--navy)" fill-opacity=".7"/>
+      </marker>
+    </defs>
+    <g id="graphRoot">
+      <g id="edgeLayer"></g>
+      <g id="nodeLayer"></g>
+    </g>
+  </svg>
+
+  <!-- NAVEGACIÓN / ZOOM -->
+  <div class="graph-controls">
+    <div class="gc-zoom">
+      <button class="gc-btn" data-tooltip="Acercar" onclick="zoomBy(1.3)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
+      <button class="gc-btn" data-tooltip="Alejar" onclick="zoomBy(1/1.3)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
+    </div>
+    <div class="gc-pad">
+      <button class="gc-btn gc-pad-up" data-tooltip="Subir" onclick="panBy(0,-1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button>
+      <button class="gc-btn gc-pad-left" data-tooltip="Ir a la izquierda" onclick="panBy(-1,0)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></button>
+      <button class="gc-btn gc-pad-center" data-tooltip="Centrar y reiniciar zoom" onclick="centerGraph()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg></button>
+      <button class="gc-btn gc-pad-right" data-tooltip="Ir a la derecha" onclick="panBy(1,0)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+      <button class="gc-btn gc-pad-down" data-tooltip="Bajar" onclick="panBy(0,1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="5 12 12 19 19 12"/></svg></button>
+    </div>
+  </div>
+
+  <div class="empty-state" id="emptyState">
+    <div class="empty-ico">🧩</div>
+    <div class="empty-title">Grafo vacío</div>
+    <div class="empty-desc">Usá "Agregar concepto" para empezar a probar el mapa de conceptos.</div>
+  </div>
+
+  <!-- DETAIL PANEL -->
+  <aside class="detail-pnl" id="detailPnl">
+    <div class="detail-pnl-header">
+      <button class="detail-close" onclick="closeDetail()">✕</button>
+      <div class="detail-title" id="detailTitle">—</div>
+      <div class="detail-cat-badge" id="detailCatBadge">—</div>
+    </div>
+    <div class="detail-body" id="detailBody">
+      <div id="detailDesc"></div>
+      <div id="detailArticleLinks"></div>
+      <div class="rel-sec-title">Relaciones</div>
+      <div id="relList"></div>
+      <button class="detail-btn-blue role-edit-only" onclick="openLinkModal()">+ Relacionar con otro nodo</button>
+    </div>
+    <div class="detail-actions role-edit-only" style="display:flex;gap:8px">
+      <button class="detail-btn-blue" style="margin-top:0;width:auto;flex:1" onclick="openEditConceptModal(selectedId)">✎ Editar</button>
+      <button class="detail-btn-red" style="width:auto;flex:1" onclick="deleteSelectedConcept()">Eliminar</button>
+    </div>
+  </aside>
+</div>
+
+<!-- MODAL: Agregar/Editar concepto -->
+<div class="modal-overlay" id="conceptModal">
+  <div class="modal-box">
+    <div class="modal-title" id="conceptModalTitle">Agregar concepto</div>
+    <div class="modal-field">
+      <label class="modal-label">Label *</label>
+      <input class="modal-input" id="conceptLabel" placeholder="Ej: Ley 3339" maxlength="60">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Descripción</label>
+      <input class="modal-input" id="conceptDesc" placeholder="Descripción breve…" maxlength="120">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Categoría</label>
+      <select class="modal-select" id="conceptCat"></select>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn-cancel" onclick="closeConceptModal()">Cancelar</button>
+      <button class="modal-btn-confirm" id="conceptModalConfirmBtn" onclick="saveConceptModal()">Agregar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Vincular / editar relación -->
+<div class="modal-overlay" id="linkModal">
+  <div class="modal-box">
+    <div class="modal-title" id="linkModalTitle">Vincular conceptos</div>
+    <div class="modal-field ac-wrap" id="linkTargetField">
+      <label class="modal-label">Concepto destino *</label>
+      <input class="modal-input" id="linkTarget" placeholder="Buscar concepto…" autocomplete="off"
+        oninput="renderLinkTargetList(); toggleLinkNewConceptFields()"
+        onfocus="renderLinkTargetList(true); this.select()"
+        onclick="renderLinkTargetList(true); this.select()"
+        onkeydown="onLinkTargetKeydown(event)">
+      <div class="ac-list" id="linkTargetList"></div>
+    </div>
+    <div id="linkNewConceptFields" style="display:none">
+      <div class="modal-field">
+        <label class="modal-label">Nombre del nuevo concepto *</label>
+        <input class="modal-input" id="linkNewLabel" placeholder="Ej: Junta de Disciplina" maxlength="60">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Descripción</label>
+        <input class="modal-input" id="linkNewDesc" placeholder="Descripción breve…" maxlength="120">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Categoría</label>
+        <select class="modal-select" id="linkNewCat"></select>
+      </div>
+    </div>
+    <div class="modal-field" id="linkTargetReadonly" style="display:none">
+      <label class="modal-label">Concepto vinculado</label>
+      <div class="modal-input" style="background:#f8f9fc;color:var(--muted)" id="linkTargetReadonlyText"></div>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Etiqueta de la relación</label>
+      <input class="modal-input" id="linkLabel" placeholder="Ej: regula, complementa, deriva de…" maxlength="60">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Artículo asociado (opcional)</label>
+      <input class="modal-input" id="linkArticle" list="linkArticleDatalist" placeholder="Buscar artículo del Estatuto…" autocomplete="off">
+      <datalist id="linkArticleDatalist"></datalist>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn-cancel" onclick="closeLinkModal()">Cancelar</button>
+      <button class="modal-btn-confirm" id="linkModalConfirmBtn" onclick="saveLinkModal()">Vincular</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Agregar relación entre dos nodos cualesquiera -->
+<div class="modal-overlay" id="addRelationModal">
+  <div class="modal-box">
+    <div class="modal-title">Agregar relación</div>
+    <div class="modal-field ac-wrap" id="relOriginField">
+      <label class="modal-label">Nodo origen *</label>
+      <input class="modal-input" id="relOrigin" placeholder="Buscar nodo…" autocomplete="off"
+        oninput="renderRelCombo('relOrigin')"
+        onfocus="renderRelCombo('relOrigin', true); this.select()"
+        onclick="renderRelCombo('relOrigin', true); this.select()"
+        onkeydown="onRelComboKeydown('relOrigin', event)">
+      <div class="ac-list" id="relOriginList"></div>
+    </div>
+    <div class="modal-field ac-wrap" id="relTargetField">
+      <label class="modal-label">Nodo destino *</label>
+      <input class="modal-input" id="relTarget" placeholder="Buscar nodo…" autocomplete="off"
+        oninput="renderRelCombo('relTarget')"
+        onfocus="renderRelCombo('relTarget', true); this.select()"
+        onclick="renderRelCombo('relTarget', true); this.select()"
+        onkeydown="onRelComboKeydown('relTarget', event)">
+      <div class="ac-list" id="relTargetList"></div>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Etiqueta de la relación</label>
+      <input class="modal-input" id="relLabel" placeholder="Ej: regula, complementa, deriva de…" maxlength="60">
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn-cancel" onclick="closeAddRelationModal()">Cancelar</button>
+      <button class="modal-btn-confirm" onclick="saveAddRelationModal()">Agregar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Gestionar categorías (agregar / editar / eliminar, incluyendo color) -->
+<div class="modal-overlay" id="categoryModal">
+  <div class="modal-box">
+    <div class="modal-title">Gestionar categorías</div>
+    <div id="categoryList" style="margin-bottom:14px"></div>
+    <div id="categoryFormFields" style="display:none">
+      <div class="modal-field">
+        <label class="modal-label">Nombre *</label>
+        <input class="modal-input" id="categoryLabelInput" placeholder="Ej: Procedimiento" maxlength="40">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Color</label>
+        <input type="color" id="categoryColorInput" value="#4657A0" style="width:60px;height:36px;border:1px solid var(--border);border-radius:7px;padding:2px;cursor:pointer">
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn-cancel" onclick="cancelCategoryForm()">Cancelar</button>
+        <button class="modal-btn-confirm" id="categoryFormConfirmBtn" onclick="saveCategoryForm()">Agregar</button>
+      </div>
+    </div>
+    <div class="modal-footer" id="categoryModalMainFooter">
+      <button class="modal-btn-cancel" onclick="closeCategoryModal()">Cerrar</button>
+      <button class="modal-btn-confirm" onclick="showAddCategoryForm()">+ Agregar categoría</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Importar Markdown -->
+<div class="modal-overlay" id="importMdModal">
+  <div class="modal-box" style="width:560px">
+    <div class="modal-title">Importar desde Markdown</div>
+    <div class="modal-field">
+      <label class="modal-label"># Encabezado = concepto principal · [[Texto]] = concepto vinculado a él · ## Subtítulo = etiqueta de esas relaciones</label>
+      <textarea class="modal-textarea" id="importMdText" placeholder="# Planta Temporaria&#10;&#10;Comprende al personal sujeto a un [[Acto Administrativo de Contratación]].&#10;&#10;## Exclusiones del Sistema:&#10;* El acceso a la [[Carrera Administrativa]].&#10;* Los procesos de [[Promoción Salarial]]."></textarea>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Categoría para los conceptos nuevos</label>
+      <select class="modal-select" id="importMdCat"></select>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn-cancel" onclick="closeImportMdModal()">Cancelar</button>
+      <button class="modal-btn-confirm" onclick="importMarkdownToGraph()">Importar</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOOT LOADER — visible mientras Firebase verifica si ya hay sesión activa, evita el parpadeo del formulario de login al navegar entre páginas -->
+<div id="authBootLoader" class="boot-loader"><div class="boot-spinner"></div></div>
+
+<!-- AUTH OVERLAY — bloquea la app hasta que el usuario inicie sesión -->
+<div id="authOverlay" class="auth-overlay" style="display:none">
+  <div class="auth-box">
+    <div class="auth-header">
+      <img src="logo128x128_blanco.png" alt="ISSyS">
+      <div class="auth-title">Mapa de Conceptos EER</div>
+      <div class="auth-sub">Iniciá sesión para continuar</div>
+    </div>
+    <div class="auth-body">
+      <div class="auth-error" id="authError"></div>
+      <div class="auth-field">
+        <div class="auth-label">Email</div>
+        <input id="authEmail" class="auth-input" type="email" placeholder="usuario@ejemplo.com" autocomplete="username">
+      </div>
+      <div class="auth-field">
+        <div class="auth-label">Contraseña</div>
+        <input id="authPassword" class="auth-input" type="password" placeholder="••••••••" autocomplete="current-password"
+          onkeydown="if(event.key==='Enter') doSignIn()">
+      </div>
+      <button class="auth-btn" id="authBtn" onclick="doSignIn()">Iniciar sesión</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- (Firebase: lo carga el <head> con el login único) -->
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script>
+// ─── ESTADO (localStorage como caché + Firestore como fuente compartida) ──
+const STORAGE_KEY = 'eerGraphTestConcepts';
+const LINKS_KEY   = 'eerGraphTestLinks';
+const POSITIONS_KEY = 'eerGraphPositions';
+const CATEGORIES_KEY = 'eerGraphCategories';
+// Categorías editables por el usuario (id estable + label + color sólido). El
+// nodo en el grafo se pinta con un degradé derivado de ese color; la pastilla
+// del panel de detalle usa el color sólido tal cual.
+const DEFAULT_CATEGORIES = [
+  { id: 'normativa', label: 'Normativa', color: '#4657A0' },
+  { id: 'organismo', label: 'Organismo', color: '#6a309a' },
+  { id: 'concepto', label: 'Concepto', color: '#59B57E' },
+  { id: 'persona', label: 'Persona', color: '#b88a00' },
+  { id: 'instrumento', label: 'Instrumento', color: '#2d8f8f' },
+  { id: 'entidad_colectiva', label: 'Entidad Colectiva', color: '#c2410c' },
+  { id: 'otro', label: 'Otro', color: '#878787' }
+];
+function getCategory(id) {
+  return categories.find(c => c.id === id) || categories.find(c => c.id === 'otro') || categories[0];
+}
+// Mezcla un color hex con blanco (pct 0..1) para generar el tono claro del degradé del nodo
+function lightenColor(hex, pct) {
+  const h = hex.replace('#', '');
+  const full = h.length === 3 ? h.split('').map(x => x + x).join('') : h;
+  const num = parseInt(full, 16) || 0;
+  const r = Math.round(((num >> 16) & 255) + (255 - ((num >> 16) & 255)) * pct);
+  const g = Math.round(((num >> 8) & 255) + (255 - ((num >> 8) & 255)) * pct);
+  const b = Math.round((num & 255) + (255 - (num & 255)) * pct);
+  return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+}
+// (Re)crea en <defs> el degradé radial de cada categoría — necesario porque las
+// categorías son dinámicas (el usuario puede agregar/editar color en cualquier momento)
+function ensureCategoryGradients() {
+  const defs = d3.select('#graphSvg defs');
+  categories.forEach(cat => {
+    const gradId = 'grad-cat-' + cat.id;
+    let grad = defs.select('#' + gradId);
+    if (grad.empty()) {
+      grad = defs.append('radialGradient').attr('id', gradId).attr('cx', '35%').attr('cy', '32%').attr('r', '68%');
+    }
+    grad.selectAll('stop').remove();
+    grad.append('stop').attr('offset', '0%').attr('stop-color', lightenColor(cat.color, 0.82));
+    grad.append('stop').attr('offset', '100%').attr('stop-color', cat.color);
+  });
+}
+function populateCategorySelect(selectId, selectedCatId) {
+  const sel = document.getElementById(selectId);
+  sel.innerHTML = categories.map(c => `<option value="${c.id}">${escapeHtml(c.label)}</option>`).join('');
+  sel.value = selectedCatId || categories[0].id;
+}
+
+const SEED_CONCEPTS = [
+  { label: 'Ley 3339', description: 'Ley Orgánica del ISSyS', category: 'normativa' },
+  { label: 'Ley 24.241', description: 'Sistema Integrado de Jubilaciones y Pensiones', category: 'normativa' },
+  { label: 'LCT', description: 'Ley de Contrato de Trabajo N° 20.744', category: 'normativa' },
+  { label: 'ANSES', description: 'Administración Nacional de la Seguridad Social', category: 'organismo' },
+  { label: 'Directorio ISSyS', description: 'Órgano de conducción superior del Instituto', category: 'organismo' },
+  { label: 'Gerencia General', description: 'Máxima autoridad ejecutiva del ISSyS', category: 'organismo' },
+  { label: 'Afiliado activo', description: 'Agente en actividad que aporta al sistema', category: 'concepto' },
+  { label: 'Afiliado pasivo', description: 'Beneficiario jubilado o pensionado', category: 'concepto' },
+  { label: 'BCRA', description: 'Banco Central de la República Argentina', category: 'organismo' },
+  { label: 'Convenio Colectivo', description: 'Acuerdo paritario aplicable al personal', category: 'normativa' },
+  { label: 'Escalafón', description: 'Sistema de clasificación y categorización del personal', category: 'concepto' },
+  { label: 'Carrera administrativa', description: 'Progresión del agente en el sistema escalafonario', category: 'concepto' }
+];
+
+let concepts = loadConcepts();
+let links = loadLinks();
+let categories = loadCategories();
+let articleLinksByConcept = {}; // conceptId -> [{ artId, label }] — vínculos creados desde el editor
+let articleCatalog = []; // [{ id, label }] — catálogo completo de artículos, publicado por el editor
+let selectedId = null;
+let svg, g, sim, zoomBehavior;
+let currentUser = null;
+let currentUserProfile = null;
+let _editingConceptId = null;
+let _editingLinkId = null;
+let _editingCategoryId = null;
+const NEW_CONCEPT_LABEL = '+ Crear nuevo concepto…';
+let _nodePos = loadPositions(); // id -> {x, y, fixed} — preserva el layout entre renders y entre sesiones
+
+function loadConcepts() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch(e) { return []; }
+}
+function persistConcepts() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(concepts));
+  pushConceptsToFirebase();
+}
+function loadLinks() {
+  try { return JSON.parse(localStorage.getItem(LINKS_KEY)) || []; }
+  catch(e) { return []; }
+}
+function persistLinks() {
+  localStorage.setItem(LINKS_KEY, JSON.stringify(links));
+  pushLinksToFirebase();
+}
+function loadCategories() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(CATEGORIES_KEY));
+    return Array.isArray(saved) && saved.length ? saved : DEFAULT_CATEGORIES.slice();
+  } catch(e) { return DEFAULT_CATEGORIES.slice(); }
+}
+function persistCategories() {
+  localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
+  pushCategoriesToFirebase();
+}
+function loadPositions() {
+  try { return JSON.parse(localStorage.getItem(POSITIONS_KEY)) || {}; }
+  catch(e) { return {}; }
+}
+// Persiste el layout (posiciones de los nodos) para que el grafo no vuelva a
+// "desordenarse" cada vez que se reingresa — sin esto, cada carga de página
+// recalculaba la disposición desde cero y el resultado variaba visualmente.
+function persistPositions() {
+  localStorage.setItem(POSITIONS_KEY, JSON.stringify(_nodePos));
+  pushPositionsToFirebase();
+}
+
+// ─── FIREBASE — sync de conceptos y relaciones (colección eerGraph) ──────
+async function pushConceptsToFirebase() {
+  if (!window._fbDb) return;
+  try {
+    await window._fbSetDoc(window._fbDoc(window._fbDb, 'eerGraph', 'concepts'), { items: concepts, _ts: Date.now() });
+  } catch(e) { console.warn('Firebase: no se pudieron guardar los conceptos:', e.message); }
+}
+async function pushLinksToFirebase() {
+  if (!window._fbDb) return;
+  try {
+    await window._fbSetDoc(window._fbDoc(window._fbDb, 'eerGraph', 'links'), { items: links, _ts: Date.now() });
+  } catch(e) { console.warn('Firebase: no se pudieron guardar las relaciones:', e.message); }
+}
+async function pushPositionsToFirebase() {
+  if (!window._fbDb || !canEdit()) return;
+  try {
+    await window._fbSetDoc(window._fbDoc(window._fbDb, 'eerGraph', 'positions'), { items: _nodePos, _ts: Date.now() });
+  } catch(e) { console.warn('Firebase: no se pudieron guardar las posiciones:', e.message); }
+}
+async function pushCategoriesToFirebase() {
+  if (!window._fbDb) return;
+  try {
+    await window._fbSetDoc(window._fbDoc(window._fbDb, 'eerGraph', 'categories'), { items: categories, _ts: Date.now() });
+  } catch(e) { console.warn('Firebase: no se pudieron guardar las categorías:', e.message); }
+}
+async function loadGraphFromFirebase() {
+  if (!window._fbDb) return;
+  try {
+    const [conceptsSnap, linksSnap, positionsSnap, categoriesSnap] = await Promise.all([
+      window._fbGetDoc(window._fbDoc(window._fbDb, 'eerGraph', 'concepts')),
+      window._fbGetDoc(window._fbDoc(window._fbDb, 'eerGraph', 'links')),
+      window._fbGetDoc(window._fbDoc(window._fbDb, 'eerGraph', 'positions')),
+      window._fbGetDoc(window._fbDoc(window._fbDb, 'eerGraph', 'categories'))
+    ]);
+    if (conceptsSnap.exists() && Array.isArray(conceptsSnap.data().items)) {
+      concepts = conceptsSnap.data().items;
+    } else if (canEdit() && !concepts.length) {
+      concepts = SEED_CONCEPTS.map(c => ({ id: crypto.randomUUID(), ...c }));
+      await pushConceptsToFirebase();
+    }
+    if (linksSnap.exists() && Array.isArray(linksSnap.data().items)) {
+      links = linksSnap.data().items;
+    }
+    if (positionsSnap.exists() && positionsSnap.data().items) {
+      _nodePos = { ..._nodePos, ...positionsSnap.data().items };
+    }
+    if (categoriesSnap.exists() && Array.isArray(categoriesSnap.data().items) && categoriesSnap.data().items.length) {
+      categories = categoriesSnap.data().items;
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(concepts));
+    localStorage.setItem(LINKS_KEY, JSON.stringify(links));
+    localStorage.setItem(POSITIONS_KEY, JSON.stringify(_nodePos));
+    localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
+    await loadArticleLinksFromEditor();
+    renderGraph();
+    showToast('☁️ Datos cargados desde Firebase');
+    const qpNode = new URLSearchParams(location.search).get('node');
+    if (qpNode) {
+      const c = concepts.find(c => c.id === qpNode);
+      if (c) setTimeout(() => openDetail(c), 300);
+    }
+  } catch(e) {
+    console.warn('Firebase: no se pudo cargar el grafo, usando datos locales:', e.message);
+    showToast('⚠️ No se pudo conectar a Firebase — usando datos locales');
+  }
+}
+
+// ─── VÍNCULOS CON ARTÍCULOS DEL ESTATUTO (editor) ──────────────────────────
+// El editor (index.html) guarda en `eerEditor/state.graphLinks` el
+// vínculo artículo → nodos del grafo, y publica en `eerEditor/state.articleCatalog`
+// un catálogo liviano { id, label } de todos los artículos — lo leemos en modo
+// solo-lectura para mostrar qué artículo referencia a cada nodo y para poder
+// elegir un artículo cualquiera al asociarlo a una relación.
+async function loadArticleLinksFromEditor() {
+  articleLinksByConcept = {};
+  articleCatalog = [];
+  if (!window._fbDb) return;
+  try {
+    const snap = await window._fbGetDoc(window._fbDoc(window._fbDb, 'eerEditor', 'state'));
+    if (snap.exists()) {
+      const data = snap.data();
+      const graphLinks = data.graphLinks || {};
+      Object.entries(graphLinks).forEach(([artId, info]) => {
+        (info.conceptIds || []).forEach(cid => {
+          if (!articleLinksByConcept[cid]) articleLinksByConcept[cid] = [];
+          articleLinksByConcept[cid].push({ artId, label: info.label || artId });
+        });
+      });
+      if (Array.isArray(data.articleCatalog)) articleCatalog = data.articleCatalog;
+    }
+  } catch(e) {
+    console.warn('No se pudieron cargar los vínculos de artículos del editor:', e.message);
+  }
+}
+function populateLinkArticleDatalist() {
+  document.getElementById('linkArticleDatalist').innerHTML =
+    articleCatalog.map(a => `<option value="${escapeHtml(a.label)}">`).join('');
+}
+function renderArticleLinks(conceptId) {
+  const box = document.getElementById('detailArticleLinks');
+  const arts = articleLinksByConcept[conceptId] || [];
+  if (!arts.length) { box.innerHTML = ''; return; }
+  box.innerHTML = `<div class="rel-sec-title">Artículo vinculado</div>` + arts.map(a =>
+    `<div class="rel-item"><span class="rel-item-label">📄 ${escapeHtml(a.label)}</span>
+      <button class="rel-item-edit" title="Abrir en el editor" onclick="window.open('index.html?art=${a.artId}','_blank')">↗</button>
+    </div>`).join('');
+}
+
+// ─── MODAL: AGREGAR / EDITAR CONCEPTO ───────────────────────────────────────
+function openAddConceptModal() {
+  if (!canEdit()) { showToast('No tenés permiso para editar el grafo'); return; }
+  _editingConceptId = null;
+  document.getElementById('conceptModalTitle').textContent = 'Agregar concepto';
+  document.getElementById('conceptModalConfirmBtn').textContent = 'Agregar';
+  document.getElementById('conceptLabel').value = '';
+  document.getElementById('conceptDesc').value = '';
+  populateCategorySelect('conceptCat', categories[0].id);
+  document.getElementById('conceptModal').classList.add('open');
+  setTimeout(() => document.getElementById('conceptLabel').focus(), 50);
+}
+function openEditConceptModal(id) {
+  if (!canEdit()) { showToast('No tenés permiso para editar el grafo'); return; }
+  const c = concepts.find(c => c.id === id);
+  if (!c) return;
+  _editingConceptId = id;
+  document.getElementById('conceptModalTitle').textContent = 'Editar concepto';
+  document.getElementById('conceptModalConfirmBtn').textContent = 'Guardar';
+  document.getElementById('conceptLabel').value = c.label;
+  document.getElementById('conceptDesc').value = c.description || '';
+  populateCategorySelect('conceptCat', c.category);
+  document.getElementById('conceptModal').classList.add('open');
+  setTimeout(() => document.getElementById('conceptLabel').focus(), 50);
+}
+function closeConceptModal() { document.getElementById('conceptModal').classList.remove('open'); _editingConceptId = null; }
+function saveConceptModal() {
+  if (!canEdit()) { showToast('No tenés permiso para editar el grafo'); return; }
+  const label = document.getElementById('conceptLabel').value.trim();
+  if (!label) { showToast('El label es obligatorio'); return; }
+  const description = document.getElementById('conceptDesc').value.trim();
+  const category = document.getElementById('conceptCat').value;
+  if (_editingConceptId) {
+    const c = concepts.find(c => c.id === _editingConceptId);
+    if (!c) { closeConceptModal(); return; }
+    Object.assign(c, { label, description, category });
+  } else {
+    concepts.push({ id: crypto.randomUUID(), label, description, category });
+  }
+  const wasEditing = !!_editingConceptId;
+  const editedId = _editingConceptId;
+  persistConcepts();
+  closeConceptModal();
+  renderGraph();
+  if (wasEditing && selectedId === editedId) openDetail(concepts.find(c => c.id === editedId));
+  if (wasEditing) { showToast('✓ Concepto actualizado'); return; }
+  showToast('✓ Concepto agregado');
+}
+
+// ─── DETALLE / ELIMINAR ────────────────────────────────────────────────────
+function blurActive() {
+  if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur();
+}
+function openDetail(c) {
+  blurActive();
+  selectedId = c.id;
+  const cat = getCategory(c.category);
+  document.getElementById('detailCatBadge').textContent = cat.label;
+  document.getElementById('detailCatBadge').style.background = cat.color;
+  document.getElementById('detailTitle').textContent = c.label;
+  document.getElementById('detailDesc').textContent = c.description || '(sin descripción)';
+  document.getElementById('detailPnl').classList.add('open');
+  renderArticleLinks(c.id);
+  renderRelList();
+  updateSelectionHighlight();
+}
+function closeDetail() {
+  blurActive();
+  selectedId = null;
+  document.getElementById('detailPnl').classList.remove('open');
+  updateSelectionHighlight();
+}
+function deleteSelectedConcept() {
+  if (!selectedId || !canEdit()) return;
+  const id = selectedId;
+  concepts = concepts.filter(c => c.id !== id);
+  links = links.filter(l => l.source !== id && l.target !== id);
+  persistConcepts();
+  persistLinks();
+  closeDetail();
+  renderGraph();
+  showToast('✓ Concepto eliminado');
+}
+
+// ─── RELACIONES ─────────────────────────────────────────────────────────
+function renderRelList() {
+  const list = document.getElementById('relList');
+  const rel = links.filter(l => l.source === selectedId || l.target === selectedId);
+  if (!rel.length) { list.innerHTML = '<div class="rel-empty">Sin relaciones todavía.</div>'; return; }
+  list.innerHTML = rel.map(l => {
+    const isSource = l.source === selectedId;
+    const otherId = isSource ? l.target : l.source;
+    const other = concepts.find(c => c.id === otherId);
+    const arrow = isSource ? '→' : '←';
+    const lbl = arrow + ' ' + (other?.label || '?') + (l.label ? ` (${l.label})` : '');
+    const artChip = l.articleId
+      ? `<button class="rel-item-edit" title="Abrir ${escapeHtml(l.articleLabel||'')} en el editor" onclick="window.open('index.html?art=${l.articleId}','_blank')">📄</button>`
+      : '';
+    const actions = canEdit()
+      ? `<button class="rel-item-edit" onclick="openEditLinkModal('${l.id}')" title="Editar etiqueta">✎</button><button class="rel-item-del" onclick="deleteLink('${l.id}')" title="Eliminar">✕</button>`
+      : '';
+    return `<div class="rel-item"><span class="rel-item-label">${escapeHtml(lbl)}</span>${artChip}${actions}</div>`;
+  }).join('');
+}
+function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+let _linkTargetOptions = []; // labels de conceptos vinculables, ordenados alfabéticamente
+function openLinkModal() {
+  if (!selectedId || !canEdit()) return;
+  const input = document.getElementById('linkTarget');
+  const existing = concepts.filter(c => c.id !== selectedId)
+    .slice().sort((a, b) => a.label.localeCompare(b.label, 'es'));
+  _linkTargetOptions = existing.map(c => c.label);
+  input.value = '';
+  document.getElementById('linkTargetList').classList.remove('open');
+  _editingLinkId = null;
+  document.getElementById('linkModalTitle').textContent = 'Vincular conceptos';
+  document.getElementById('linkModalConfirmBtn').textContent = 'Vincular';
+  document.getElementById('linkTargetField').style.display = '';
+  document.getElementById('linkTargetReadonly').style.display = 'none';
+  document.getElementById('linkLabel').value = '';
+  document.getElementById('linkArticle').value = '';
+  document.getElementById('linkNewLabel').value = '';
+  document.getElementById('linkNewDesc').value = '';
+  populateCategorySelect('linkNewCat', getCategory('concepto').id);
+  populateLinkArticleDatalist();
+  toggleLinkNewConceptFields();
+  document.getElementById('linkModal').classList.add('open');
+}
+function toggleLinkNewConceptFields() {
+  const isNew = document.getElementById('linkTarget').value === NEW_CONCEPT_LABEL;
+  document.getElementById('linkNewConceptFields').style.display = isNew ? '' : 'none';
+  if (isNew) setTimeout(() => document.getElementById('linkNewLabel')?.focus(), 50);
+}
+function renderLinkTargetList(showAll) {
+  const list = document.getElementById('linkTargetList');
+  const query = showAll ? '' : document.getElementById('linkTarget').value.trim().toLowerCase();
+  const matches = query
+    ? _linkTargetOptions.filter(label => label.toLowerCase().includes(query))
+    : _linkTargetOptions;
+  const itemsHtml = matches.length
+    ? matches.map(label => `<div class="ac-item" onmousedown="selectLinkTarget('${escapeHtml(label).replace(/'/g, "\\'")}')">${escapeHtml(label)}</div>`).join('')
+    : `<div class="ac-empty">Sin coincidencias</div>`;
+  const newHtml = `<div class="ac-item ac-item-new" onmousedown="selectLinkTarget('${NEW_CONCEPT_LABEL.replace(/'/g, "\\'")}')">${escapeHtml(NEW_CONCEPT_LABEL)}</div>`;
+  list.innerHTML = itemsHtml + newHtml;
+  list.classList.add('open');
+}
+function selectLinkTarget(label) {
+  document.getElementById('linkTarget').value = label;
+  document.getElementById('linkTargetList').classList.remove('open');
+  toggleLinkNewConceptFields();
+}
+function onLinkTargetKeydown(event) {
+  const list = document.getElementById('linkTargetList');
+  if (event.key === 'Escape') { list.classList.remove('open'); return; }
+  if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp' && event.key !== 'Enter') return;
+  const items = Array.from(list.querySelectorAll('.ac-item'));
+  if (!items.length) return;
+  let idx = items.findIndex(it => it.classList.contains('active'));
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    (items[idx] || items[0]).dispatchEvent(new Event('mousedown'));
+    return;
+  }
+  event.preventDefault();
+  if (idx >= 0) items[idx].classList.remove('active');
+  idx = event.key === 'ArrowDown' ? (idx + 1) % items.length : (idx - 1 + items.length) % items.length;
+  items[idx].classList.add('active');
+  items[idx].scrollIntoView({ block: 'nearest' });
+}
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#linkTargetField')) document.getElementById('linkTargetList')?.classList.remove('open');
+});
+function openEditLinkModal(linkId) {
+  if (!canEdit()) { showToast('No tenés permiso para editar el grafo'); return; }
+  const l = links.find(l => l.id === linkId);
+  if (!l) return;
+  const otherId = l.source === selectedId ? l.target : l.source;
+  const other = concepts.find(c => c.id === otherId);
+  _editingLinkId = linkId;
+  document.getElementById('linkModalTitle').textContent = 'Editar relación';
+  document.getElementById('linkModalConfirmBtn').textContent = 'Guardar';
+  document.getElementById('linkTargetField').style.display = 'none';
+  document.getElementById('linkNewConceptFields').style.display = 'none';
+  document.getElementById('linkTargetReadonly').style.display = '';
+  const isSource = l.source === selectedId;
+  document.getElementById('linkTargetReadonlyText').textContent = (isSource ? '→ ' : '← ') + (other?.label || '?');
+  document.getElementById('linkLabel').value = l.label || '';
+  document.getElementById('linkArticle').value = l.articleLabel || '';
+  populateLinkArticleDatalist();
+  document.getElementById('linkModal').classList.add('open');
+  setTimeout(() => document.getElementById('linkLabel').focus(), 50);
+}
+function closeLinkModal() {
+  document.getElementById('linkModal').classList.remove('open');
+  document.getElementById('linkTargetList').classList.remove('open');
+  _editingLinkId = null;
+}
+// Resuelve el texto tipeado/elegido en el campo "Artículo asociado" contra el
+// catálogo cargado desde el editor. Devuelve null si el campo está vacío, o
+// false si el texto no coincide con ningún artículo del catálogo.
+function _resolveLinkArticle() {
+  const input = document.getElementById('linkArticle').value.trim();
+  if (!input) return null;
+  const match = articleCatalog.find(a => a.label === input);
+  return match || false;
+}
+function saveLinkModal() {
+  if (!canEdit()) { showToast('No tenés permiso para editar el grafo'); return; }
+  const label = document.getElementById('linkLabel').value.trim();
+  const articleMatch = _resolveLinkArticle();
+  if (articleMatch === false) { showToast('⚠️ Seleccioná un artículo de la lista (o dejá el campo vacío)'); return; }
+  if (_editingLinkId) {
+    const l = links.find(l => l.id === _editingLinkId);
+    if (!l) { closeLinkModal(); return; }
+    l.label = label;
+    l.articleId = articleMatch ? articleMatch.id : null;
+    l.articleLabel = articleMatch ? articleMatch.label : '';
+    persistLinks();
+    closeLinkModal();
+    renderRelList();
+    renderGraph();
+    showToast('✓ Relación actualizada');
+    return;
+  }
+  const targetInput = document.getElementById('linkTarget').value.trim();
+  if (!targetInput) { showToast('⚠️ Seleccioná un concepto destino'); return; }
+  let target;
+  let createdNew = false;
+  if (targetInput === NEW_CONCEPT_LABEL) {
+    const newLabel = document.getElementById('linkNewLabel').value.trim();
+    if (!newLabel) { showToast('⚠️ Ingresá un nombre para el nuevo concepto'); return; }
+    const newConcept = {
+      id: crypto.randomUUID(),
+      label: newLabel,
+      description: document.getElementById('linkNewDesc').value.trim(),
+      category: document.getElementById('linkNewCat').value
+    };
+    concepts.push(newConcept);
+    persistConcepts();
+    target = newConcept.id;
+    createdNew = true;
+  } else {
+    const match = concepts.find(c => c.id !== selectedId && c.label === targetInput);
+    if (!match) { showToast('⚠️ Seleccioná un concepto de la lista'); return; }
+    target = match.id;
+  }
+  // Las relaciones son direccionales (source → target): se permite que también
+  // exista la inversa (target → source) como una relación distinta, solo se
+  // bloquea crear dos veces la misma dirección exacta.
+  const exists = !createdNew && links.some(l => l.source === selectedId && l.target === target);
+  if (exists) { showToast('Ya existe esa relación en esta dirección'); return; }
+  links.push({
+    id: crypto.randomUUID(), source: selectedId, target, label,
+    articleId: articleMatch ? articleMatch.id : null,
+    articleLabel: articleMatch ? articleMatch.label : ''
+  });
+  persistLinks();
+  closeLinkModal();
+  renderRelList();
+  renderGraph();
+  showToast(createdNew ? '✓ Concepto y relación creados' : '✓ Relación creada');
+}
+function deleteLink(linkId) {
+  if (!canEdit()) return;
+  links = links.filter(l => l.id !== linkId);
+  persistLinks();
+  renderRelList();
+  renderGraph();
+  showToast('✓ Relación eliminada');
+}
+
+// ─── MODAL: AGREGAR RELACIÓN (entre dos nodos cualesquiera, desde el encabezado) ──
+let _relComboOptions = []; // labels de nodos, ordenados alfabéticamente, compartido por ambos combos
+function openAddRelationModal() {
+  if (!canEdit()) { showToast('No tenés permiso para editar el grafo'); return; }
+  _relComboOptions = concepts.slice().sort((a, b) => a.label.localeCompare(b.label, 'es')).map(c => c.label);
+  document.getElementById('relOrigin').value = '';
+  document.getElementById('relTarget').value = '';
+  document.getElementById('relLabel').value = '';
+  document.getElementById('relOriginList').classList.remove('open');
+  document.getElementById('relTargetList').classList.remove('open');
+  document.getElementById('addRelationModal').classList.add('open');
+}
+function closeAddRelationModal() {
+  document.getElementById('addRelationModal').classList.remove('open');
+  document.getElementById('relOriginList').classList.remove('open');
+  document.getElementById('relTargetList').classList.remove('open');
+}
+function renderRelCombo(prefix, showAll) {
+  const list = document.getElementById(prefix + 'List');
+  const input = document.getElementById(prefix);
+  const query = showAll ? '' : input.value.trim().toLowerCase();
+  const matches = query ? _relComboOptions.filter(l => l.toLowerCase().includes(query)) : _relComboOptions;
+  list.innerHTML = matches.length
+    ? matches.map(label => `<div class="ac-item" onmousedown="selectRelCombo('${prefix}','${label.replace(/'/g, "\\'")}')">${escapeHtml(label)}</div>`).join('')
+    : `<div class="ac-empty">Sin coincidencias</div>`;
+  list.classList.add('open');
+}
+function selectRelCombo(prefix, label) {
+  document.getElementById(prefix).value = label;
+  document.getElementById(prefix + 'List').classList.remove('open');
+}
+function onRelComboKeydown(prefix, event) {
+  const list = document.getElementById(prefix + 'List');
+  if (event.key === 'Escape') { list.classList.remove('open'); return; }
+  if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp' && event.key !== 'Enter') return;
+  const items = Array.from(list.querySelectorAll('.ac-item'));
+  if (!items.length) return;
+  let idx = items.findIndex(it => it.classList.contains('active'));
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    (items[idx] || items[0]).dispatchEvent(new Event('mousedown'));
+    return;
+  }
+  event.preventDefault();
+  if (idx >= 0) items[idx].classList.remove('active');
+  idx = event.key === 'ArrowDown' ? (idx + 1) % items.length : (idx - 1 + items.length) % items.length;
+  items[idx].classList.add('active');
+  items[idx].scrollIntoView({ block: 'nearest' });
+}
+function saveAddRelationModal() {
+  if (!canEdit()) { showToast('No tenés permiso para editar el grafo'); return; }
+  const originLabel = document.getElementById('relOrigin').value.trim();
+  const targetLabel = document.getElementById('relTarget').value.trim();
+  if (!originLabel || !targetLabel) { showToast('⚠️ Seleccioná ambos nodos'); return; }
+  const origin = concepts.find(c => c.label === originLabel);
+  const target = concepts.find(c => c.label === targetLabel);
+  if (!origin || !target) { showToast('⚠️ Seleccioná nodos válidos de la lista'); return; }
+  if (origin.id === target.id) { showToast('⚠️ El nodo origen y destino no pueden ser el mismo'); return; }
+  const exists = links.some(l => l.source === origin.id && l.target === target.id);
+  if (exists) { showToast('Ya existe esa relación en esta dirección'); return; }
+  const label = document.getElementById('relLabel').value.trim();
+  links.push({ id: crypto.randomUUID(), source: origin.id, target: target.id, label, articleId: null, articleLabel: '' });
+  persistLinks();
+  closeAddRelationModal();
+  renderGraph();
+  if (selectedId === origin.id || selectedId === target.id) renderRelList();
+  showToast('✓ Relación agregada');
+}
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#relOriginField')) document.getElementById('relOriginList')?.classList.remove('open');
+  if (!e.target.closest('#relTargetField')) document.getElementById('relTargetList')?.classList.remove('open');
+});
+
+// ─── IMPORTAR MARKDOWN ──────────────────────────────────────────────────────
+// El encabezado H1 (#) ancla el concepto principal de la sección. Cada
+// referencia [[Texto]] en párrafos o viñetas se vincula a ese concepto.
+// Un encabezado H2-H6 (##) no crea nodo: su texto se usa como etiqueta de
+// las relaciones creadas hasta el próximo encabezado.
+function openImportMdModal() {
+  if (!canEdit()) { showToast('No tenés permiso para editar el grafo'); return; }
+  document.getElementById('importMdText').value = '';
+  populateCategorySelect('importMdCat', getCategory('concepto').id);
+  document.getElementById('importMdModal').classList.add('open');
+  setTimeout(() => document.getElementById('importMdText').focus(), 50);
+}
+function closeImportMdModal() { document.getElementById('importMdModal').classList.remove('open'); }
+
+// ─── MODAL: GESTIONAR CATEGORÍAS (agregar / editar / eliminar, incluyendo color) ──
+function openCategoryModal() {
+  if (!canEdit()) { showToast('No tenés permiso para editar el grafo'); return; }
+  renderCategoryList();
+  cancelCategoryForm();
+  document.getElementById('categoryModal').classList.add('open');
+}
+function closeCategoryModal() {
+  document.getElementById('categoryModal').classList.remove('open');
+  cancelCategoryForm();
+}
+function renderCategoryList() {
+  const box = document.getElementById('categoryList');
+  box.innerHTML = categories.map(c => `
+    <div class="cat-item">
+      <span class="cat-swatch" style="background:${c.color}"></span>
+      <span class="cat-item-label">${escapeHtml(c.label)}</span>
+      <button class="rel-item-edit" title="Editar" onclick="showEditCategoryForm('${c.id}')">✎</button>
+      <button class="rel-item-del" title="Eliminar" onclick="deleteCategory('${c.id}')">✕</button>
+    </div>`).join('');
+}
+function showAddCategoryForm() {
+  _editingCategoryId = null;
+  document.getElementById('categoryLabelInput').value = '';
+  document.getElementById('categoryColorInput').value = '#4657A0';
+  document.getElementById('categoryFormConfirmBtn').textContent = 'Agregar';
+  document.getElementById('categoryFormFields').style.display = '';
+  document.getElementById('categoryModalMainFooter').style.display = 'none';
+  setTimeout(() => document.getElementById('categoryLabelInput')?.focus(), 50);
+}
+function showEditCategoryForm(id) {
+  const c = categories.find(c => c.id === id);
+  if (!c) return;
+  _editingCategoryId = id;
+  document.getElementById('categoryLabelInput').value = c.label;
+  document.getElementById('categoryColorInput').value = c.color;
+  document.getElementById('categoryFormConfirmBtn').textContent = 'Guardar';
+  document.getElementById('categoryFormFields').style.display = '';
+  document.getElementById('categoryModalMainFooter').style.display = 'none';
+  setTimeout(() => document.getElementById('categoryLabelInput')?.focus(), 50);
+}
+function cancelCategoryForm() {
+  _editingCategoryId = null;
+  document.getElementById('categoryFormFields').style.display = 'none';
+  document.getElementById('categoryModalMainFooter').style.display = 'flex';
+}
+function saveCategoryForm() {
+  if (!canEdit()) { showToast('No tenés permiso para editar el grafo'); return; }
+  const label = document.getElementById('categoryLabelInput').value.trim();
+  const color = document.getElementById('categoryColorInput').value;
+  if (!label) { showToast('⚠️ Ingresá un nombre para la categoría'); return; }
+  if (_editingCategoryId) {
+    const c = categories.find(c => c.id === _editingCategoryId);
+    if (!c) { cancelCategoryForm(); return; }
+    c.label = label;
+    c.color = color;
+  } else {
+    const dup = categories.some(c => c.label.toLowerCase() === label.toLowerCase());
+    if (dup) { showToast('⚠️ Ya existe una categoría con ese nombre'); return; }
+    categories.push({ id: crypto.randomUUID(), label, color });
+  }
+  persistCategories();
+  renderCategoryList();
+  cancelCategoryForm();
+  renderGraph();
+  if (selectedId) {
+    const c = concepts.find(c => c.id === selectedId);
+    if (c) openDetail(c);
+  }
+  showToast('✓ Categoría guardada');
+}
+function deleteCategory(id) {
+  if (!canEdit()) { showToast('No tenés permiso para editar el grafo'); return; }
+  if (categories.length <= 1) { showToast('⚠️ Debe quedar al menos una categoría'); return; }
+  const inUse = concepts.some(c => c.category === id);
+  if (inUse) { showToast('⚠️ No se puede eliminar: hay nodos usando esta categoría'); return; }
+  if (!confirm('¿Eliminar esta categoría?')) return;
+  categories = categories.filter(c => c.id !== id);
+  persistCategories();
+  renderCategoryList();
+  showToast('✓ Categoría eliminada');
+}
+
+function mdCleanLabel(s) { return s.replace(/^[*_`~]+|[*_`~]+$/g, '').trim(); }
+function mdFindOrCreateConcept(label, category) {
+  const norm = label.toLowerCase();
+  const existing = concepts.find(c => c.label.trim().toLowerCase() === norm);
+  if (existing) return { concept: existing, created: false };
+  const concept = { id: crypto.randomUUID(), label, description: '', category };
+  concepts.push(concept);
+  return { concept, created: true };
+}
+function mdLinkExists(aId, bId) {
+  return links.some(l => (l.source === aId && l.target === bId) || (l.source === bId && l.target === aId));
+}
+
+function importMarkdownToGraph() {
+  if (!canEdit()) { showToast('No tenés permiso para editar el grafo'); return; }
+  const raw = document.getElementById('importMdText').value;
+  const category = document.getElementById('importMdCat').value;
+  if (!raw.trim()) { showToast('Pegá texto en formato Markdown para importar'); return; }
+
+  let mainConcept = null, relLabel = '';
+  let newConcepts = 0, newLinks = 0, refsFound = 0;
+
+  for (const rawLine of raw.split('\n')) {
+    const line = rawLine.replace(/\r$/, '');
+    if (!line.trim()) continue;
+
+    const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
+    if (headingMatch) {
+      const level = headingMatch[1].length;
+      const text = mdCleanLabel(headingMatch[2].replace(/:\s*$/, ''));
+      if (level === 1) {
+        const { concept, created } = mdFindOrCreateConcept(text, category);
+        if (created) newConcepts++;
+        mainConcept = concept;
+        relLabel = '';
+      } else {
+        relLabel = text;
+      }
+      continue;
+    }
+
+    for (const m of line.matchAll(/\[\[([^\]]+)\]\]/g)) {
+      const label = mdCleanLabel(m[1]);
+      if (!label) continue;
+      refsFound++;
+      const { concept: node, created } = mdFindOrCreateConcept(label, category);
+      if (created) newConcepts++;
+      if (mainConcept && mainConcept.id !== node.id && !mdLinkExists(mainConcept.id, node.id)) {
+        links.push({ id: crypto.randomUUID(), source: mainConcept.id, target: node.id, label: relLabel });
+        newLinks++;
+      }
+    }
+  }
+
+  if (!mainConcept && !refsFound) { showToast('No se encontró ningún encabezado # ni referencia [[...]] en el texto'); return; }
+  if (mainConcept && !refsFound) { showToast('Se creó el concepto principal pero no se encontraron referencias [[...]] para vincular'); }
+
+  persistConcepts();
+  persistLinks();
+  closeImportMdModal();
+  renderGraph();
+  showToast(`✓ Importado: ${newConcepts} concepto(s) nuevo(s), ${newLinks} relación(es) nueva(s)`);
+}
+
+// ─── TEXTO ADAPTADO AL NODO ─────────────────────────────────────────────
+function nodeRadius(label) {
+  const len = (label || '').length;
+  if (len <= 10) return 34;
+  if (len <= 18) return 40;
+  if (len <= 28) return 46;
+  return 52;
+}
+function wrapLabel(label, maxChars) {
+  const words = label.split(/\s+/);
+  const lines = [];
+  let cur = '';
+  for (const w of words) {
+    const test = cur ? cur + ' ' + w : w;
+    if (test.length > maxChars && cur) { lines.push(cur); cur = w; }
+    else cur = test;
+  }
+  if (cur) lines.push(cur);
+  return lines;
+}
+function wrapNodeLabel(label, r) {
+  const maxChars = Math.max(7, Math.round(r * 0.3));
+  const maxLines = 3;
+  let lines = wrapLabel(label, maxChars);
+  if (lines.length > maxLines) {
+    lines = lines.slice(0, maxLines);
+    const last = lines[maxLines - 1];
+    lines[maxLines - 1] = last.length > 2 ? last.slice(0, last.length - 1) + '…' : last + '…';
+  }
+  return lines;
+}
+
+// ─── GRAFO (d3 force, solo nodos de concepto) ──────────────────────────────
+function renderGraph() {
+  document.getElementById('emptyState').style.display = concepts.length ? 'none' : 'block';
+
+  const svgEl = document.getElementById('graphSvg');
+  const wrap  = document.getElementById('canvasWrap');
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+
+  svg = d3.select(svgEl);
+  g   = d3.select('#graphRoot');
+  const nodeLayer = d3.select('#nodeLayer');
+  const edgeLayer = d3.select('#edgeLayer');
+  ensureCategoryGradients();
+
+  if (!zoomBehavior) {
+    zoomBehavior = d3.zoom()
+      .scaleExtent([0.25, 3])
+      .filter(ev => !ev.target.closest('.node'))
+      .on('zoom', ev => g.attr('transform', ev.transform));
+    svg.call(zoomBehavior);
+  }
+  // Click en un área vacía del canvas (no sobre un nodo) deselecciona el nodo actual
+  // Cualquier interacción con el lienzo (click en nodo, en vacío, o inicio de
+  // arrastre) debe quitarle el foco al buscador del encabezado si lo tenía,
+  // así no queda el cursor de texto titilando ahí mientras se usa el grafo.
+  svg.on('mousedown', blurActive);
+  svg.on('click', ev => { if (ev.target === svgEl) closeDetail(); });
+
+  const nodes = concepts.map(c => {
+    const n = { ...c, r: nodeRadius(c.label) };
+    const pos = _nodePos[c.id];
+    if (pos) {
+      n.x = pos.x; n.y = pos.y;
+      if (pos.fixed) { n.fx = pos.x; n.fy = pos.y; }
+    }
+    return n;
+  });
+  const edges = links
+    .filter(l => nodes.some(n => n.id === l.source) && nodes.some(n => n.id === l.target))
+    .map(l => ({ ...l }));
+
+  if (sim) sim.stop();
+  sim = d3.forceSimulation(nodes)
+    .force('charge', d3.forceManyBody().strength(-420))
+    .force('center', d3.forceCenter(W / 2, H / 2))
+    .force('x', d3.forceX(W / 2).strength(0.04))
+    .force('y', d3.forceY(H / 2).strength(0.04))
+    .force('collide', d3.forceCollide(d => d.r + 30))
+    .force('link', d3.forceLink(edges).id(d => d.id).distance(190).strength(0.5))
+    .alphaDecay(0.018)
+    .on('tick', ticked)
+    .on('end', () => persistPositions());
+
+  const edgeSel = edgeLayer.selectAll('g.edge').data(edges, d => d.id);
+  edgeSel.exit().remove();
+  const edgeEnter = edgeSel.enter().append('g').attr('class', 'edge');
+  edgeEnter.append('line').attr('class', 'edge-line').attr('marker-end', 'url(#arrow)');
+  edgeEnter.append('text').attr('class', 'edge-label').attr('text-anchor', 'middle');
+
+  const allEdgeSel = edgeLayer.selectAll('g.edge');
+  allEdgeSel.select('text').text(d => (d.label || '') + (d.articleId ? ' 📄' : ''));
+  allEdgeSel.select('line').on('click', (ev, d) => {
+    if (canEdit() && confirm('¿Eliminar esta relación?')) deleteLink(d.id);
+  });
+
+  const nodeSel = nodeLayer.selectAll('g.node').data(nodes, d => d.id);
+  nodeSel.exit().remove();
+  const nodeEnter = nodeSel.enter().append('g').attr('class', 'node');
+  nodeEnter.append('circle').attr('r', 34);
+  nodeEnter.append('text').attr('text-anchor', 'middle');
+
+  const allNodeSel = nodeLayer.selectAll('g.node');
+  allNodeSel.select('circle').attr('r', d => d.r).attr('fill', d => `url(#grad-cat-${getCategory(d.category).id})`);
+  allNodeSel.select('text').attr('fill', '#fff').each(function(d) {
+    const lines = wrapNodeLabel(d.label, d.r);
+    const lineHeight = 11;
+    const startDy = -((lines.length - 1) / 2) * lineHeight + 4;
+    const sel = d3.select(this);
+    sel.selectAll('tspan').remove();
+    lines.forEach((line, i) => {
+      sel.append('tspan').attr('x', 0).attr('dy', i === 0 ? startDy : lineHeight).text(line);
+    });
+  });
+  allNodeSel.on('click', (ev, d) => {
+    ev.stopPropagation();
+    if (d.id === selectedId) closeDetail(); else openDetail(d);
+  });
+  allNodeSel.call(d3.drag()
+    .on('start', (ev, d) => { d.fx = d.x; d.fy = d.y; })
+    .on('drag', (ev, d) => { d.fx = ev.x; d.fy = ev.y; sim.alpha(0.3).restart(); })
+    .on('end', (ev, d) => { _nodePos[d.id] = { x: d.fx, y: d.fy, fixed: true }; persistPositions(); }));
+
+  function ticked() {
+    nodes.forEach(d => { _nodePos[d.id] = { x: d.x, y: d.y, fixed: d.fx != null }; });
+    nodeLayer.selectAll('g.node').attr('transform', d => `translate(${d.x},${d.y})`);
+    edgeLayer.selectAll('g.edge').select('line')
+      .attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+      .attr('x2', d => {
+        const dx = d.target.x - d.source.x, dy = d.target.y - d.source.y;
+        const len = Math.hypot(dx, dy) || 1;
+        return d.target.x - (dx / len) * (d.target.r + 4);
+      })
+      .attr('y2', d => {
+        const dx = d.target.x - d.source.x, dy = d.target.y - d.source.y;
+        const len = Math.hypot(dx, dy) || 1;
+        return d.target.y - (dy / len) * (d.target.r + 4);
+      });
+    edgeLayer.selectAll('g.edge').select('text')
+      .attr('x', d => (d.source.x + d.target.x) / 2)
+      .attr('y', d => (d.source.y + d.target.y) / 2 - 4);
+  }
+
+  updateSelectionHighlight();
+}
+
+// Resalta el nodo seleccionado y sus relacionados sin recalcular el layout
+function updateSelectionHighlight() {
+  const relatedIds = new Set();
+  if (selectedId) {
+    links.forEach(l => {
+      if (l.source === selectedId) relatedIds.add(l.target);
+      if (l.target === selectedId) relatedIds.add(l.source);
+    });
+  }
+  d3.select('#nodeLayer').selectAll('g.node')
+    .classed('selected', d => d.id === selectedId)
+    .classed('related', d => relatedIds.has(d.id))
+    .classed('dim', d => !!selectedId && d.id !== selectedId && !relatedIds.has(d.id));
+  d3.select('#edgeLayer').selectAll('g.edge')
+    .classed('dim', d => !!selectedId && d.source.id !== selectedId && d.target.id !== selectedId);
+}
+
+function centerGraph() {
+  if (sim) sim.alpha(1).restart();
+  if (svg && zoomBehavior) svg.transition().duration(400).call(zoomBehavior.transform, d3.zoomIdentity);
+}
+
+function zoomBy(factor) {
+  if (svg && zoomBehavior) svg.transition().duration(200).call(zoomBehavior.scaleBy, factor);
+}
+
+function panBy(dx, dy) {
+  if (svg && zoomBehavior) svg.transition().duration(200).call(zoomBehavior.translateBy, dx * 120, dy * 120);
+}
+
+function panToNode(id) {
+  const pos = _nodePos[id];
+  if (!pos || !svg || !zoomBehavior) return;
+  const wrap = document.getElementById('canvasWrap');
+  const k = 1;
+  const transform = d3.zoomIdentity
+    .translate(wrap.clientWidth / 2, wrap.clientHeight / 2)
+    .scale(k)
+    .translate(-pos.x, -pos.y);
+  svg.transition().duration(400).call(zoomBehavior.transform, transform);
+}
+
+// ─── BÚSQUEDA DE NODOS (encabezado) ────────────────────────────────────────
+function onNodeSearch(q) {
+  document.getElementById('nodeSearchClear').classList.toggle('visible', q.length > 0);
+  const box = document.getElementById('nodeSearchResults');
+  const query = q.trim().toLowerCase();
+  if (!query) { box.classList.remove('open'); return; }
+  const matches = concepts.filter(c => c.label.toLowerCase().includes(query));
+  box.innerHTML = matches.length
+    ? matches.map(c => `<div class="hdr-search-item" onclick="selectSearchResult('${c.id}')">${escapeHtml(c.label)}</div>`).join('')
+    : `<div class="hdr-search-empty">Sin coincidencias</div>`;
+  box.classList.add('open');
+}
+function selectSearchResult(id) {
+  const c = concepts.find(c => c.id === id);
+  if (!c) return;
+  clearNodeSearch();
+  openDetail(c);
+  panToNode(id);
+}
+function clearNodeSearch() {
+  document.getElementById('nodeSearchInput').value = '';
+  document.getElementById('nodeSearchClear').classList.remove('visible');
+  document.getElementById('nodeSearchResults').classList.remove('open');
+}
+// Cualquier interacción fuera del buscador del encabezado le quita el foco —
+// así el cursor de texto solo aparece ahí cuando se hace click directamente
+// para buscar, y no queda titilando mientras se usa el resto de la página.
+// Se escucha en fase de "captura" (3er argumento true) para que se ejecute
+// ANTES que cualquier otro handler (zoom/drag del grafo, etc.) pueda detener
+// la propagación del evento e impedir que el blur ocurra.
+document.addEventListener('mousedown', (e) => {
+  if (!e.target.closest('.hdr-search')) {
+    document.getElementById('nodeSearchResults')?.classList.remove('open');
+    const inp = document.getElementById('nodeSearchInput');
+    if (inp && document.activeElement === inp) inp.blur();
+  }
+}, true);
+
+window.addEventListener('resize', () => renderGraph());
+
+// ─── TOAST ──────────────────────────────────────────────────────────────
+let toastTimer = null;
+function showToast(msg, dur = 2200) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), dur);
+}
+
+// ─── AUTH ───────────────────────────────────────────────────────────────
+function canEdit() { return currentUserProfile && ['admin','editor'].includes(currentUserProfile.role); }
+
+function initAuth() {
+  window._fbOnAuthChanged(async user => {
+    const bootLoader = document.getElementById('authBootLoader');
+    if (bootLoader) bootLoader.style.display = 'none';
+    if (user) {
+      currentUser = user;
+      // Rol de usuarios/{email}.roles.estatuto (login único ISSyS, ver nube.js)
+      currentUserProfile = window._issysEstatuto.perfil;
+      if (currentUserProfile.active === false) {
+        showToast('❌ Tu cuenta está desactivada');
+        await doSignOut();
+        return;
+      }
+      document.getElementById('authOverlay').style.display = 'none';
+      document.body.setAttribute('data-role', currentUserProfile.role || 'lector');
+      updateUserBadge();
+      await loadGraphFromFirebase();
+    } else {
+      currentUser = null;
+      currentUserProfile = null;
+      (document.getElementById('userDropdownMenu') || { style: {} }).style.display = 'none';
+      document.getElementById('authOverlay').style.display = 'flex';
+    }
+  });
+}
+
+async function doSignIn() {
+  const email = document.getElementById('authEmail').value.trim();
+  const pass  = document.getElementById('authPassword').value;
+  const btn   = document.getElementById('authBtn');
+  const err   = document.getElementById('authError');
+  if (!email || !pass) { showAuthError('Completá email y contraseña'); return; }
+  btn.disabled = true; btn.textContent = 'Iniciando…';
+  err.classList.remove('visible');
+  try {
+    await window._fbSignIn(email, pass);
+  } catch(e) {
+    const msgs = {
+      'auth/user-not-found': 'Usuario no encontrado',
+      'auth/wrong-password': 'Contraseña incorrecta',
+      'auth/invalid-email': 'Email inválido',
+      'auth/too-many-requests': 'Demasiados intentos. Esperá unos minutos.',
+      'auth/invalid-credential': 'Email o contraseña incorrectos'
+    };
+    showAuthError(msgs[e.code] || e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Iniciar sesión';
+  }
+}
+function showAuthError(msg) {
+  const e = document.getElementById('authError');
+  e.textContent = msg; e.classList.add('visible');
+}
+async function doSignOut() {
+  try { await window._fbSignOut(); closeAllDropdowns(); }
+  catch(e) { showToast('❌ Error al cerrar sesión'); }
+}
+function updateUserBadge(){ /* el usuario va en el encabezado común: ISSyS.ponerEncabezado (nube.js) */ }
+
+function toggleUserDropdown(e) {
+  e.stopPropagation();
+  const m = document.getElementById('userDropdownMenu');
+  const isOpen = m.style.display === 'block';
+  closeAllDropdowns();
+  if (!isOpen) m.style.display = 'block';
+}
+function toggleAddDropdown(e) {
+  e.stopPropagation();
+  const m = document.getElementById('addDropdownMenu');
+  const isOpen = m.style.display === 'block';
+  closeAllDropdowns();
+  if (!isOpen) m.style.display = 'block';
+}
+function closeAllDropdowns() {
+  (document.getElementById('userDropdownMenu') || { style: {} }).style.display = 'none';
+  document.getElementById('addDropdownMenu').style.display = 'none';
+}
+document.addEventListener('click', () => closeAllDropdowns());
+
+// ─── BOOT ───────────────────────────────────────────────────────────────
+renderGraph();
+</script>
+</body>
+</html>

@@ -5,10 +5,12 @@
  * (issys-sistemas.web.app), así que la sesión de Google es una sola: quien ingresó en el portal
  * entra directo a cada sistema habilitado, y "Cerrar sesión" cierra todo.
  *
- * Permisos: usuarios/{email} = { admin: bool, activo: bool, sistemas: ['procesos', ...] }
+ * Permisos: usuarios/{email} = { admin: bool, activo: bool, sistemas: ['procesos', ...], roles: { estatuto: 'editor', ... } }
  *   - Se indexa por email (y no por uid) para poder dar de alta a alguien antes de su primer ingreso.
  *   - El administrador fijo (config.dueno) entra siempre a todo.
  *   - admin: true habilita todos los sistemas y la gestión de usuarios en el portal.
+ *   - roles: rol dentro de un sistema que los tiene (hoy sólo Estatuto: admin, editor, revisor, lector).
+ *     Lo interpreta cada sistema; ver ISSyS.rolEn(usuario, sistema).
  *
  * Uso en un sistema:
  *   const ses = await ISSyS.iniciar({ sistema: 'procesos', titulo: 'Procesos BPMN', subtitulo: 'Modelado y optimización' });
@@ -127,12 +129,16 @@
     // Permisos
     // ------------------------------------------------------------
     async function perfilDe(db, email) {
-        if (email === DUENO) return { admin: true, activo: true, sistemas: IDS.slice(), dueno: true };
+        if (email === DUENO) return { admin: true, activo: true, sistemas: IDS.slice(), roles: {}, dueno: true };
         const doc = await db.collection('usuarios').doc(email).get();
         if (!doc.exists) return null;
         const d = doc.data();
         if (d.activo === false) return null;
-        return { admin: d.admin === true, activo: true, sistemas: Array.isArray(d.sistemas) ? d.sistemas : [], dueno: false };
+        return {
+            admin: d.admin === true, activo: true, dueno: false,
+            sistemas: Array.isArray(d.sistemas) ? d.sistemas : [],
+            roles: d.roles && typeof d.roles === 'object' ? d.roles : {}
+        };
     }
 
     function habilitado(perfil, sistema) {
@@ -262,7 +268,7 @@
 
                     sesion = {
                         firebase, auth, db,
-                        usuario: { email, nombre: user.displayName, foto: user.photoURL, admin: perfil.admin, dueno: perfil.dueno, sistemas: perfil.admin ? IDS.slice() : perfil.sistemas },
+                        usuario: { email, nombre: user.displayName, foto: user.photoURL, admin: perfil.admin, dueno: perfil.dueno, sistemas: perfil.admin ? IDS.slice() : perfil.sistemas, roles: perfil.roles },
                         mensaje: t => gate.cargando(t),
                         error: t => gate.error(t),
                         mostrar: () => gate.quitar(),
@@ -278,44 +284,232 @@
     }
 
     // ------------------------------------------------------------
-    // Avatar con menú (portal y sistemas que lo quieran usar)
-    //   items: [{ texto, href } | { texto, accion, rojo }] — se agregan antes de "Cerrar sesión"
+    // Íconos de los sistemas (portal y lanzador). Trazos de 24×24; la clave es config.sistemas[].icono
     // ------------------------------------------------------------
-    function ponerUsuario(contenedor, usuario, opciones = {}) {
-        const items = [];
-        if (opciones.portal !== false) items.push({ texto: '▦ Sistemas ISSyS', href: '/' });
-        if (usuario.admin && opciones.usuarios !== false) items.push({ texto: '👥 Usuarios y permisos', href: '/#usuarios' });
-        (opciones.items || []).forEach(i => items.push(i));
-        items.push({ texto: 'Cerrar sesión', rojo: true, accion: opciones.alSalir || salir });
+    const ICONOS = {
+        portal: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+        procesos: '<rect x="3" y="3" width="8" height="8" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect x="13" y="13" width="8" height="8" rx="2"/>',
+        presentaciones: '<path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-5 5 5"/>',
+        estatuto: '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+        delegaciones: '<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+        consultorios: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+        usuarios: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+        salir: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/>',
+        descargar: '<path d="M12 4v12M7 11l5 5 5-5M4 20h16"/>',
+        subir: '<path d="M12 20V8M7 13l5-5 5 5M4 4h16"/>',
+        mapa: '<circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><path d="M8.5 7.5 11 15.5M15.5 7.5 13 15.5M9 6h6"/>',
+        editor: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/>'
+    };
+    const icono = (id, extra = '') => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"${extra}>${ICONOS[id] || ICONOS.portal}</svg>`;
+    // Botón del lanzador: 9 puntos, como el de Google
+    const NUEVE_PUNTOS = '<svg viewBox="0 0 24 24" aria-hidden="true">' + [5, 12, 19].map(y => [5, 12, 19].map(x => `<circle cx="${x}" cy="${y}" r="2.1"/>`).join('')).join('') + '</svg>';
 
-        const chip = document.createElement('div');
-        chip.className = 'issys-usuario';
-        const inicial = esc((usuario.nombre || usuario.email).charAt(0).toUpperCase());
-        chip.innerHTML = `<button class="avatar" type="button" title="${esc(usuario.email)}" aria-label="Cuenta de ${esc(usuario.email)}" aria-haspopup="menu">${usuario.foto ? `<img src="${esc(usuario.foto)}" alt="" referrerpolicy="no-referrer">` : inicial}</button>`;
-        contenedor.appendChild(chip);
+    // ------------------------------------------------------------
+    // ENCABEZADO COMÚN (regla general de los Sistemas ISSyS; ver README → "Encabezado común")
+    //
+    // Agrega al final del contenedor (el extremo derecho del encabezado):
+    //   [lanzador de sistemas ⋮⋮⋮]  [foto de perfil]
+    // · Lanzador: panel con los sistemas que la persona tiene habilitados (sale de config.sistemas),
+    //   el sistema actual marcado y acceso al portal. Reemplaza al viejo botón "Sistemas ISSyS".
+    // · Foto de perfil (la de Google; si no hay, la inicial): menú de cuenta con nombre, correo,
+    //   rol en el sistema, estado de guardado (opcional), acciones propias y "Cerrar sesión".
+    //
+    //   const enc = ISSyS.ponerEncabezado(contenedor, ses.usuario, {
+    //       sistema: 'procesos',                              // id del sistema actual (null en el portal)
+    //       rol: 'Editor',                                    // opcional: se muestra en la tarjeta de cuenta
+    //       items: [{ texto, accion | href, icono? }],        // opcional: acciones propias del sistema
+    //       alSalir: fn                                       // opcional: en vez de ISSyS.salir
+    //   });
+    //   enc.estado('guardando' | 'ok' | 'error');            // opcional: punto de estado sobre la foto
+    // ------------------------------------------------------------
+    let abierto = null;   // { boton, panel } del panel abierto (uno a la vez en toda la página)
 
-        const cerrar = () => { const m = chip.querySelector('.issys-menu'); if (m) m.remove(); };
-        chip.querySelector('.avatar').onclick = (e) => {
-            e.stopPropagation();
-            if (chip.querySelector('.issys-menu')) return cerrar();
-            const menu = document.createElement('div');
-            menu.className = 'issys-menu';
-            menu.setAttribute('role', 'menu');
-            menu.innerHTML = `<div class="cab"><b>${esc(usuario.nombre || usuario.email)}</b><span>${esc(usuario.email)}${usuario.admin ? ' · administrador' : ''}</span></div>`
-                + items.map((it, i) => it.href
-                    ? `<a class="item" role="menuitem" href="${esc(it.href)}">${esc(it.texto)}</a>`
-                    : `<button class="item${it.rojo ? ' rojo' : ''}" role="menuitem" type="button" data-i="${i}">${esc(it.texto)}</button>`).join('');
-            menu.onclick = (ev) => {
-                const b = ev.target.closest('[data-i]');
-                if (!b) return;
-                cerrar();
-                items[+b.dataset.i].accion();
-            };
-            chip.appendChild(menu);
-        };
-        document.addEventListener('click', (e) => { if (!chip.contains(e.target)) cerrar(); });
-        return chip;
+    function cerrarPanel(volverFoco) {
+        if (!abierto) return;
+        const { boton, panel } = abierto;
+        abierto = null;
+        panel.remove();
+        boton.setAttribute('aria-expanded', 'false');
+        if (volverFoco) boton.focus();
+    }
+    document.addEventListener('click', e => { if (abierto && !abierto.panel.contains(e.target) && !abierto.boton.contains(e.target)) cerrarPanel(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && abierto) cerrarPanel(true); });
+    // Debajo del botón, alineado a su borde derecho; se reubica si cambia el tamaño de la ventana
+    function ubicarPanel() {
+        if (!abierto) return;
+        const r = abierto.boton.getBoundingClientRect();
+        const ancho = document.documentElement.clientWidth;
+        // Nunca fuera de pantalla: ni pasado el borde derecho ni el izquierdo
+        const derecha = Math.min(Math.max(12, Math.round(ancho - r.right)), Math.max(12, ancho - abierto.panel.offsetWidth - 12));
+        abierto.panel.style.top = `${Math.round(r.bottom + 8)}px`;
+        abierto.panel.style.right = `${derecha}px`;
+    }
+    window.addEventListener('resize', ubicarPanel);
+
+    function alternarPanel(boton, armar, teclado) {
+        const eraEste = abierto && abierto.boton === boton;
+        cerrarPanel();
+        if (eraEste) return;
+        // El panel cuelga del body (posición fija): así no lo recortan ni lo pisan los estilos del encabezado de cada sistema
+        const panel = armar();
+        document.body.appendChild(panel);
+        boton.setAttribute('aria-expanded', 'true');
+        abierto = { boton, panel };
+        ubicarPanel();
+        // Con teclado (Enter/Espacio) el foco entra al panel; con el mouse no, para no mostrar el contorno de foco
+        const primero = teclado && panel.querySelector('a,button');
+        if (primero) primero.focus({ preventScroll: true });
     }
 
-    window.ISSyS = { config: CFG, iniciar, salir, ponerUsuario, avisar, esc, cargarScript, alCargarDom };
+    const ESTADOS = {
+        ok: '✓ Cambios guardados en la nube',
+        guardando: 'Guardando en la nube…',
+        error: '⚠ No se pudieron guardar los cambios'
+    };
+
+    function ponerEncabezado(contenedor, usuario, opciones = {}) {
+        const actual = opciones.sistema || null;
+        const nombre = usuario.nombre || usuario.email;
+        const inicial = esc(nombre.charAt(0).toUpperCase());
+        let estado = null;
+
+        const caja = document.createElement('div');
+        caja.className = 'issys-encabezado';
+        caja.innerHTML = `
+            <div class="issys-ancla">
+                <button class="issys-lanzador" type="button" title="Sistemas ISSyS" aria-label="Sistemas ISSyS" aria-haspopup="true" aria-expanded="false">${NUEVE_PUNTOS}</button>
+            </div>
+            <div class="issys-ancla">
+                <button class="issys-avatar" type="button" title="Cuenta de ISSyS&#10;${esc(nombre)}&#10;${esc(usuario.email)}" aria-label="Cuenta de ${esc(usuario.email)}" aria-haspopup="true" aria-expanded="false">
+                    <span class="foto">${inicial}</span><span class="punto" hidden></span>
+                </button>
+            </div>`;
+        contenedor.appendChild(caja);
+
+        // Foto de Google con respaldo a la inicial si no carga
+        const foto = caja.querySelector('.issys-avatar .foto');
+        if (usuario.foto) {
+            const img = new Image();
+            img.alt = '';
+            img.referrerPolicy = 'no-referrer';
+            img.onload = () => { foto.textContent = ''; foto.appendChild(img); };
+            img.src = usuario.foto;
+        }
+
+        // ---- Lanzador de sistemas ----
+        const lanzador = caja.querySelector('.issys-lanzador');
+        lanzador.onclick = e => {
+            e.stopPropagation();
+            alternarPanel(lanzador, () => {
+                const visibles = CFG.sistemas.filter(s => s.estado === 'activo' ? usuario.sistemas.includes(s.id) : usuario.admin);
+                const p = document.createElement('div');
+                p.className = 'issys-panel issys-apps';
+                p.setAttribute('role', 'dialog');
+                p.setAttribute('aria-label', 'Sistemas ISSyS');
+                const mosaico = (s) => {
+                    const es = s.id === actual;
+                    const color = s.color === 'green' ? 'verde' : 'azul';
+                    if (s.estado !== 'activo') {
+                        return `<div class="app prox" aria-disabled="true" title="${esc(s.descripcion || '')}"><span class="ico ${color}">${icono(s.icono)}</span><span class="nom">${esc(s.nombre)}</span><span class="sub">Próximamente</span></div>`;
+                    }
+                    return `<a class="app${es ? ' actual' : ''}" href="${esc(s.url)}" title="${esc(s.descripcion || s.nombre)}"${es ? ' aria-current="page"' : ''}><span class="ico ${color}">${icono(s.icono)}</span><span class="nom">${esc(s.nombre)}</span>${es ? '<span class="sub">Estás acá</span>' : ''}</a>`;
+                };
+                p.innerHTML = `
+                    <div class="cab"><b>Sistemas ISSyS</b><span>Tu sesión sirve para todos</span></div>
+                    <div class="favoritos">
+                        <div class="grilla">
+                            <a class="app${actual === null ? ' actual' : ''}" href="/"><span class="ico gris">${icono('portal')}</span><span class="nom">Inicio</span>${actual === null ? '<span class="sub">Estás acá</span>' : ''}</a>
+                            ${visibles.filter(s => s.estado === 'activo').map(mosaico).join('')}
+                        </div>
+                    </div>
+                    ${visibles.some(s => s.estado !== 'activo') ? `<div class="grilla resto">${visibles.filter(s => s.estado !== 'activo').map(mosaico).join('')}</div>` : ''}
+                    ${usuario.admin ? `<a class="pie" href="/#usuarios">${icono('usuarios')}Usuarios y permisos</a>` : ''}`;
+                return p;
+            }, e.detail === 0);
+        };
+
+        // ---- Menú de cuenta ----
+        const items = (opciones.items || []).slice();
+        const avatar = caja.querySelector('.issys-avatar');
+        avatar.onclick = e => {
+            e.stopPropagation();
+            alternarPanel(avatar, () => {
+                const p = document.createElement('div');
+                p.className = 'issys-panel issys-cuenta';
+                p.setAttribute('role', 'dialog');
+                p.setAttribute('aria-label', 'Cuenta');
+                const etiquetas = [];
+                if (usuario.admin) etiquetas.push('<span class="issys-tag">Administrador ISSyS</span>');
+                if (opciones.rol) etiquetas.push(`<span class="issys-tag verde">${esc(opciones.rol)}</span>`);
+                p.innerHTML = `
+                    <div class="correo">${esc(usuario.email)}</div>
+                    <div class="foto-grande">${foto.innerHTML}</div>
+                    <div class="hola">¡Hola, ${esc((usuario.nombre || '').split(' ')[0] || usuario.email)}!</div>
+                    ${etiquetas.length ? `<div class="etiquetas">${etiquetas.join('')}</div>` : ''}
+                    <div class="estado" ${estado ? '' : 'hidden'}></div>
+                    <div class="acciones">
+                        ${items.map((it, i) => it.href
+                            ? `<a class="item" href="${esc(it.href)}">${it.icono ? icono(it.icono) : ''}<span>${esc(it.texto)}</span></a>`
+                            : `<button class="item" type="button" data-i="${i}">${it.icono ? icono(it.icono) : ''}<span>${esc(it.texto)}</span></button>`).join('')}
+                        <button class="item salir" type="button" data-salir>${icono('salir')}<span>Cerrar sesión</span></button>
+                    </div>
+                    <div class="pie">Instituto de Seguridad Social y Seguros del Chubut</div>`;
+                pintarEstado(p);
+                p.onclick = ev => {
+                    const b = ev.target.closest('[data-i],[data-salir]');
+                    if (!b) return;
+                    cerrarPanel();
+                    if (b.hasAttribute('data-salir')) (opciones.alSalir || salir)();
+                    else items[+b.dataset.i].accion();
+                };
+                return p;
+            }, e.detail === 0);
+        };
+
+        function pintarEstado(p) {
+            const el = p && p.querySelector('.estado');
+            if (!el || !estado) return;
+            el.hidden = false;
+            el.className = `estado ${estado}`;
+            el.textContent = ESTADOS[estado] || '';
+        }
+
+        return {
+            elemento: caja,
+            estado(e) {
+                estado = e;
+                const punto = avatar.querySelector('.punto');
+                punto.hidden = false;
+                punto.className = `punto ${e}`;
+                if (abierto && abierto.boton === avatar) pintarEstado(abierto.panel);
+            }
+        };
+    }
+
+    // Compatibilidad con la versión anterior (sólo avatar). Ahora pone el encabezado completo.
+    function ponerUsuario(contenedor, usuario, opciones = {}) {
+        return ponerEncabezado(contenedor, usuario, opciones).elemento;
+    }
+
+    // Rol de la persona en un sistema con roles (config.sistemas[].roles). El dueño es siempre el primer rol (admin);
+    // sin rol asignado: un administrador global toma el primero y el resto el último (el de menos permisos).
+    function rolEn(usuario, sistema) {
+        const def = CFG.sistemas.find(s => s.id === sistema);
+        const roles = (def && def.roles) ? def.roles.map(r => r.id) : [];
+        if (!roles.length) return null;
+        if (usuario.dueno) return roles[0];
+        const r = usuario.roles && usuario.roles[sistema];
+        if (roles.includes(r)) return r;
+        return usuario.admin ? roles[0] : roles[roles.length - 1];
+    }
+
+    // Nombre visible del rol de la persona en un sistema (ej. 'Editor'), o null si el sistema no tiene roles
+    function nombreRol(usuario, sistema) {
+        const id = rolEn(usuario, sistema);
+        const def = CFG.sistemas.find(s => s.id === sistema);
+        const r = id && def && def.roles.find(x => x.id === id);
+        return r ? r.nombre : null;
+    }
+
+    window.ISSyS = { config: CFG, iniciar, salir, ponerEncabezado, ponerUsuario, icono, avisar, esc, cargarScript, alCargarDom, rolEn, nombreRol };
 })();

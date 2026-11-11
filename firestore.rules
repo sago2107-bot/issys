@@ -4,12 +4,13 @@ rules_version = '2';
 // Estas reglas se publican SÓLO desde D:\issys (firebase deploy --only firestore:rules).
 // No volver a publicarlas desde D:\issys-procesos: pisaría la colección usuarios.
 //
-// usuarios/{email}: { admin: bool, activo: bool, sistemas: ['procesos', 'presentaciones', ...] }
+// usuarios/{email}: { admin: bool, activo: bool, sistemas: ['procesos', ...], roles: { estatuto: 'editor' } }
 //   Permisos del login único. Lo gestiona el portal (sólo administradores).
 //
 // Colecciones de cada sistema:
 //   Procesos        → datos/{clave}
 //   Presentaciones  → presentaciones/{id}, presentacionesImagenes/{hash}
+//   Estatuto        → eerEditor/state (texto, comentarios, marcas), eerGraph/{concepts|links|positions|categories}
 //
 // TRANSICIÓN: acceso/{email} y presentacionesAcceso/{email} son las listas anteriores de cada sistema.
 // Se mantienen para que los sitios viejos (issys-procesos.web.app / issys-presentaciones.web.app)
@@ -47,6 +48,7 @@ service cloud.firestore {
       allow create, update: if adminGlobal()
         && mail == mail.lower()
         && request.resource.data.sistemas is list
+        && request.resource.data.get('roles', {}) is map
         && request.resource.data.get('admin', false) is bool
         && request.resource.data.get('activo', true) is bool;
       allow delete: if adminGlobal();
@@ -99,6 +101,27 @@ service cloud.firestore {
       allow create, update: if puedePresentaciones()
         && hash.matches('^[0-9a-f]{64}$')
         && request.resource.data.data is string;
+    }
+
+    // ---------- Estatuto ----------
+    // Roles (usuarios/{email}.roles.estatuto): admin, editor, revisor, lector.
+    // Sin rol asignado: un administrador global es admin; el resto, lector (igual que ISSyS.rolEn en auth.js).
+    function rolEstatutoAsignado() {
+      return get(rutaPerfil()).data.get('roles', {}).get('estatuto', '');
+    }
+    function editaEstatuto() {
+      return dueno() || (habilitado('estatuto') && (
+        rolEstatutoAsignado() in ['admin', 'editor'] ||
+        (rolEstatutoAsignado() == '' && get(rutaPerfil()).data.get('admin', false) == true)
+      ));
+    }
+    // Comentarios y marcas de revisores y lectores viven en el mismo documento: escribe todo el que tiene el sistema
+    match /eerEditor/{documento=**} {
+      allow read, write: if habilitado('estatuto');
+    }
+    match /eerGraph/{documento=**} {
+      allow read: if habilitado('estatuto');
+      allow write: if editaEstatuto();
     }
   }
 }

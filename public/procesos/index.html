@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Encode+Sans+Condensed:wght@300;400;600;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <!-- Lucide Icons CDN -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
     <!-- Identidad ISSyS: paleta y tipografía del manual de marca -->
     <script src="/shared/issys-tailwind.js"></script>
     <link rel="stylesheet" href="/shared/issys.css" data-issys-css>
@@ -85,14 +85,17 @@
     <header class="bg-white text-issys-ink h-16 border-b-4 border-issys-green flex items-center justify-between gap-4 px-4 z-30 shadow-sm flex-shrink-0">
         <a href="#/" class="flex items-center gap-4 min-w-0" title="Ir al listado de procesos">
             <img src="/shared/marca/issys-logo-recorte.png" alt="ISSyS" class="issys-logo">
-            <div class="min-w-0 border-l border-slate-300 pl-4">
+            <div class="hidden sm:block min-w-0 border-l border-slate-300 pl-4">
                 <div class="font-extrabold text-lg leading-tight">Procesos BPMN</div>
                 <p class="text-[13px] font-light text-slate-500 leading-tight truncate">Sección Enlace Delegaciones · Modelado y optimización de procesos</p>
             </div>
         </a>
 
         <!-- Breadcrumb (se completa según la pantalla activa) -->
-        <nav id="breadcrumb" class="hidden md:flex items-center gap-1.5 text-xs text-slate-500 min-w-0"></nav>
+        <div class="flex items-center gap-4 min-w-0">
+            <nav id="breadcrumb" class="hidden md:flex items-center gap-1.5 text-xs text-slate-500 min-w-0"></nav>
+            <div id="issys-encabezado"></div><!-- encabezado común: lanzador de sistemas + foto (shared/auth.js) -->
+        </div>
     </header>
 
     <!-- ============================================================ -->
